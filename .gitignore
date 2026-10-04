@@ -11,4 +11,4 @@ TestResults/
 .idea/
 
 # Ядра, скачанные tools/cores (в репозиторий не попадают)
-cores/
+/cores/

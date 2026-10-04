@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "cores": [
+    {
+      "name": "xray",
+      "version": "26.9.9",
+      "license": "MPL-2.0",
+      "source": "https://github.com/XTLS/Xray-core/tree/v26.9.9",
+      "assets": [
+        {
+          "platform": "win-x64",
+          "url": "https://github.com/XTLS/Xray-core/releases/download/v26.9.9/Xray-windows-64.zip",
+          "sha256": "244deaba2098c2964e49bba90df3707777e5f5f428a82d2f29604015f24beec2",
+          "files": [
+            { "entry": "xray.exe", "path": "xray.exe", "sha256": "0d0fc0ea2b05641acb78c01fc36ad694e7b029861b2d5eb93da0e3e9fda9a98f" },
+            { "entry": "LICENSE", "path": "LICENSE", "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5" }
+          ]
+        },
+        {
+          "platform": "linux-x64",
+          "url": "https://github.com/XTLS/Xray-core/releases/download/v26.9.9/Xray-linux-64.zip",
+          "sha256": "1eb9175d0f0a8f8149c9230a7fc5ae66ce332ed20a53155ce61fe62e3f58b7df",
+          "files": [
+            { "entry": "xray", "path": "xray", "sha256": "c4ae6798c38e0e5343b192406746333cd0ba7ff3eb984f8c4b9939dcb68c3f8a", "executable": true },
+            { "entry": "LICENSE", "path": "LICENSE", "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sing-box",
+      "version": "1.14.2",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/SagerNet/sing-box/tree/v1.14.2",
+      "assets": [
+        {
+          "platform": "win-x64",
+          "url": "https://github.com/SagerNet/sing-box/releases/download/v1.14.2/sing-box-1.14.2-windows-amd64.zip",
+          "sha256": "c2d8bfff918755808781dfdeeb8581b6c91eb3a243d9a7b55483cfc0c0684d32",
+          "files": [
+            { "entry": "sing-box-1.14.2-windows-amd64/sing-box.exe", "path": "sing-box.exe", "sha256": "7bbef1dea9189ee12799ae834ea4b4658355da25c47a21ad8804904c0ccd9410" },
+            { "entry": "sing-box-1.14.2-windows-amd64/LICENSE", "path": "LICENSE", "sha256": "bb3805862b583aee73ad6f7805ec634747a37257a637a3069857843f05ea589c" }
+          ]
+        },
+        {
+          "platform": "linux-x64",
+          "url": "https://github.com/SagerNet/sing-box/releases/download/v1.14.2/sing-box-1.14.2-linux-amd64.tar.gz",
+          "sha256": "a684484d7477d1437282ee411f4d131d0340aaad60a7868841ebd5d87dd8a0c6",
+          "files": [
+            { "entry": "sing-box-1.14.2-linux-amd64/sing-box", "path": "sing-box", "sha256": "fc9c6e6ab345f045b16a0ed10d1ff28d68e8e56e7749fca30738d1406e98d7b8", "executable": true },
+            { "entry": "sing-box-1.14.2-linux-amd64/LICENSE", "path": "LICENSE", "sha256": "650d5e3b99a446fb38e820fa87a49562e0c79eab868fff58618ac487a58e554c" }
+          ]
+        }
+      ]
+    }
+  ]
+}
