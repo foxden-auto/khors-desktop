@@ -47,3 +47,8 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --configuration Release
+
+      - name: Fetch and verify cores
+        run: |
+          dotnet run tools/cores/fetch-cores.cs -- --platform all
+          dotnet run tools/cores/fetch-cores.cs -- --platform all --verify

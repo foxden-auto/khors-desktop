@@ -38,6 +38,7 @@ tools/cores/                 cores.lock.json и скрипты загрузки 
 dotnet build
 dotnet test
 dotnet run --project src/Khors.App
+dotnet run tools/cores/fetch-cores.cs            # ядра в cores/<платформа>/ по tools/cores/cores.lock.json
 ```
 
 Работай в нативной Windows-среде (не WSL): TUN, WFP, системный прокси и служба Windows в WSL не проверить. Команды, требующие прав администратора, не запускай сам — опиши, что нужно выполнить, и попроси пользователя.

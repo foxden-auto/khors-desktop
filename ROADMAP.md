@@ -10,8 +10,12 @@
 - [x] 0.2 Solution и проекты по структуре из `CLAUDE.md`, общие настройки (`Directory.Build.props`: .NET 10, Nullable, анализаторы)
   - Сделано: `Khors.slnx`, все проекты `net10.0`; `global.json` (SDK 10.0.400, тесты на Microsoft.Testing.Platform), `Directory.Build.props` (Nullable, анализаторы `latest-recommended`, CA1416 и nullable — ошибки, в Core все предупреждения — ошибки), `Directory.Packages.props` (центральные версии), `.editorconfig`. Avalonia 12.1.3 + CommunityToolkit.Mvvm 8.4.2, ресурсы строк en/ru, манифест `asInvoker`. `Khors.Platform.Windows` помечен `SupportedOSPlatform("windows")`. Заготовки интерфейсов платформы и `IIpcTransport`. `Khors.App` и `Khors.Service` выбирают платформу только в `PlatformComposition.cs`. `tests/Khors.Architecture.Tests` проверяет изоляцию платформы (проверено внесением нарушений). `NOTICE` дополнен NuGet-зависимостями. Телеметрия сборки Avalonia отключена в `Directory.Build.targets`.
   - Отложено: `Khors.Core.Tests` — в 0.5 вместе с первыми тестами, `Khors.Engines.Tests` — в 1.4; брендовая тема — после получения палитры KHORS Android.
-- [ ] 0.3 CI на GitHub Actions: сборка + `dotnet test` на windows-latest
-- [ ] 0.4 `tools/cores/cores.lock.json` и скрипт загрузки ядер с проверкой SHA-256
+- [x] 0.3 CI на GitHub Actions: сборка + `dotnet test` на windows-latest
+  - Сделано: `.github/workflows/ci.yml` — restore, сборка Release, `dotnet test` на windows-latest для push в main, PR и вручную; кэш NuGet, действия закреплены по SHA, права `contents: read`. `nuget.config` с единственным источником nuget.org. Первый прогон зелёный.
+- [x] 0.4 `tools/cores/cores.lock.json` и скрипт загрузки ядер с проверкой SHA-256
+  - Сделано: lock-файл (schemaVersion 1) с Xray-core 26.9.9 и sing-box 1.14.2 для win-x64 и linux-x64: URL, SHA-256 архива (сверен с дайджестом GitHub и `.dgst` Xray), список извлекаемых файлов с их SHA-256, лицензия, ссылка на исходники. `tools/cores/fetch-cores.cs` (`dotnet run`): проверка архива до распаковки и каждого файла после, атомарная замена установленной версии, `--verify`, `--platform`, `--out`. Проверено на подмене файлов и хэшей. Шаг в CI.
+  - Решено: из архивов берём только исполняемый файл ядра и LICENSE. `libcronet` из sing-box не ставим (нужен только для naive, не входит в ТЗ; sing-box без него запускается), geo-файлы и wintun.dll из архива Xray — нет (гео-базы — 3.6 с записью в NOTICE, wintun — 3.2).
+  - Отложено: копирование ядер в вывод сборки/установщик — 1.4 и 5.1; обновление ядер из приложения — 5.2.
 - [ ] 0.5 Общий маскировщик секретов для логов + тесты
 
 **Готово, когда:** чистый клон собирается одной командой, CI зелёный.
