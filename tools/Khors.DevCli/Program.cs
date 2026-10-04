@@ -6,6 +6,7 @@ using Khors.Core.Diagnostics;
 using Khors.Core.Import;
 using Khors.Core.Profiles;
 using Khors.DevCli;
+using Khors.Engines;
 using Khors.Engines.Processes;
 using Khors.Engines.Xray;
 using Khors.Platform;
@@ -17,6 +18,12 @@ using Khors.Platform;
 // Ключи: --loglevel debug|info|warning|error   --socks <порт>   --http <порт>
 //        --system-proxy  включить системный прокси Windows на HTTP-вход Xray (ROADMAP 1.5)
 //        --no-wait       не ждать Enter перед выходом
+
+// Запуск в роли сторожа системного прокси (см. SystemProxyWatchdog) — без окна и без вывода.
+if (await SystemProxyWatchdog.TryRunAsync(args, PlatformComposition.CreateSystemProxy) is { } watchdogExitCode)
+{
+    return watchdogExitCode;
+}
 
 var exitCode = await RunAsync(args);
 
@@ -200,6 +207,8 @@ static async Task<int> RunAsync(string[] args)
 
             if (systemProxy is not null)
             {
+                // Сторож вернёт прокси, если эту утилиту завершат жёстко (TerminateProcess).
+                SystemProxyWatchdog.EnsureStarted();
                 systemProxy.Enable(SystemProxySettings.ForLocalHttp(session.HttpPort));
                 Console.WriteLine($"Системный прокси Windows → 127.0.0.1:{session.HttpPort} (Edge, Chrome и др.).");
             }

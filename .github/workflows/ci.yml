@@ -66,6 +66,11 @@ jobs:
           Copy-Item -Recurse cores/win-x64/xray artifacts/devcli-win-x64/cores/
           Get-Content docs/testing/devcli-1.4.md, docs/testing/devcli-1.5.md -Encoding utf8 | Set-Content artifacts/devcli-win-x64/README.md -Encoding utf8
 
+      # Раннер одноразовый: проверяем сквозной сценарий «KHORS убит → прокси вернулся».
+      - name: Test system proxy watchdog
+        shell: pwsh
+        run: ./tools/ci/test-proxy-watchdog.ps1
+
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: khors-devcli-win-x64
