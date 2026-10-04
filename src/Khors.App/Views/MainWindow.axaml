@@ -1,0 +1,13 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Khors.App.ViewModels"
+        xmlns:res="using:Khors.App.Resources"
+        x:Class="Khors.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{x:Static res:Strings.AppTitle}"
+        Width="420" Height="640"
+        MinWidth="360" MinHeight="480">
+  <TextBlock Text="{Binding Status}"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center" />
+</Window>

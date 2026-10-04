@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Вызов API конкретной ОС без проверки платформы — ошибка (docs/SPEC.md, 3.5). -->
+    <WarningsAsErrors>$(WarningsAsErrors);CA1416;nullable</WarningsAsErrors>
+
+    <Company>KHORS contributors</Company>
+    <Product>KHORS Desktop</Product>
+    <Copyright>Copyright 2026 KHORS contributors</Copyright>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>

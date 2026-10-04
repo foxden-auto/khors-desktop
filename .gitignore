@@ -1,2 +1,14 @@
 # Исходный архив документов (дублирует файлы репозитория)
 khors-desktop.zip
+
+# Сборка
+bin/
+obj/
+artifacts/
+TestResults/
+*.user
+.vs/
+.idea/
+
+# Ядра, скачанные tools/cores (в репозиторий не попадают)
+cores/

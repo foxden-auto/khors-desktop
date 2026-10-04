@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Контракты UI ↔ служба и интерфейс транспорта. Конкретные транспорты — в Khors.Platform.*. -->
+</Project>

@@ -7,7 +7,9 @@
 - [x] 0.1 Решение: Avalonia или WPF (зафиксировать в `docs/SPEC.md`)
   - Сделано: выбрана Avalonia (цель — Windows, затем Linux). В `docs/SPEC.md` (разделы 2, 3.1, 3.2, новый 3.5) и `CLAUDE.md` (правила 10–11, структура) зафиксированы: платформенный код только в `Khors.Platform.*`, интерфейсы в `Khors.Platform.Abstractions`, транспорт IPC абстрагирован.
   - Отложено: конкретная версия Avalonia — при создании решения (0.2).
-- [ ] 0.2 Solution и проекты по структуре из `CLAUDE.md`, общие настройки (`Directory.Build.props`: .NET 10, Nullable, анализаторы)
+- [x] 0.2 Solution и проекты по структуре из `CLAUDE.md`, общие настройки (`Directory.Build.props`: .NET 10, Nullable, анализаторы)
+  - Сделано: `Khors.slnx`, все проекты `net10.0`; `global.json` (SDK 10.0.400, тесты на Microsoft.Testing.Platform), `Directory.Build.props` (Nullable, анализаторы `latest-recommended`, CA1416 и nullable — ошибки, в Core все предупреждения — ошибки), `Directory.Packages.props` (центральные версии), `.editorconfig`. Avalonia 12.1.3 + CommunityToolkit.Mvvm 8.4.2, ресурсы строк en/ru, манифест `asInvoker`. `Khors.Platform.Windows` помечен `SupportedOSPlatform("windows")`. Заготовки интерфейсов платформы и `IIpcTransport`. `Khors.App` и `Khors.Service` выбирают платформу только в `PlatformComposition.cs`. `tests/Khors.Architecture.Tests` проверяет изоляцию платформы (проверено внесением нарушений). `NOTICE` дополнен NuGet-зависимостями. Телеметрия сборки Avalonia отключена в `Directory.Build.targets`.
+  - Отложено: `Khors.Core.Tests` — в 0.5 вместе с первыми тестами, `Khors.Engines.Tests` — в 1.4; брендовая тема — после получения палитры KHORS Android.
 - [ ] 0.3 CI на GitHub Actions: сборка + `dotnet test` на windows-latest
 - [ ] 0.4 `tools/cores/cores.lock.json` и скрипт загрузки ядер с проверкой SHA-256
 - [ ] 0.5 Общий маскировщик секретов для логов + тесты
@@ -77,4 +79,5 @@
 
 ## Известные проблемы
 
-(пока нет)
+- Нет исходников фирменного стиля KHORS Android (палитра светлой/тёмной темы, логотип в SVG). До их получения тема `Khors.App` использует стандартные цвета Fluent; брендовые токены нужно заполнить по Android-приложению (требование — `docs/SPEC.md`, 4.9).
+- Память UI: пустое окно Avalonia (Release) — рабочий набор ~134 МБ, приватная память ~93 МБ при требовании ТЗ ≤ 100 МБ (`docs/SPEC.md`, 5). Нужно уточнить метрику в ТЗ и следить за ней по мере роста UI.

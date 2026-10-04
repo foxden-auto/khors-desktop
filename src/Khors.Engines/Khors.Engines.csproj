@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Процессы ядер, логи, API статистики, классификатор ошибок. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Khors.Core\Khors.Core.csproj" />
+    <ProjectReference Include="..\Khors.Platform.Abstractions\Khors.Platform.Abstractions.csproj" />
+  </ItemGroup>
+</Project>

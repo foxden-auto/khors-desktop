@@ -1,0 +1,9 @@
+<Project>
+  <!--
+    Отключение телеметрии сборки Avalonia (пакет Avalonia.BuildServices).
+    Цель AvaloniaStats из пакета переопределяется пустой: Directory.Build.targets
+    импортируется после целей NuGet-пакетов, поэтому побеждает это определение.
+    Действует для всех, кто собирает проект, независимо от AVALONIA_TELEMETRY_OPTOUT.
+  -->
+  <Target Name="AvaloniaStats" />
+</Project>
