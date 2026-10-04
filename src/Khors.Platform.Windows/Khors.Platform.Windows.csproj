@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Реализация платформенных интерфейсов для Windows. Вся сборка помечена SupportedOSPlatform("windows"). -->
+  <PropertyGroup>
+    <!-- LibraryImport генерирует код маршалинга с unsafe. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Khors.Platform.Abstractions\Khors.Platform.Abstractions.csproj" />
     <ProjectReference Include="..\Khors.Ipc\Khors.Ipc.csproj" />

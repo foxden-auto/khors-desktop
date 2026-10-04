@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Утилита разработчика для живой проверки подключения (ROADMAP 1.4). Пользователям не поставляется. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>khors-devcli</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Khors.Core\Khors.Core.csproj" />
+    <ProjectReference Include="..\..\src\Khors.Engines\Khors.Engines.csproj" />
+    <ProjectReference Include="..\..\src\Khors.Platform.Abstractions\Khors.Platform.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Khors.Platform.Windows\Khors.Platform.Windows.csproj" />
+  </ItemGroup>
+</Project>
