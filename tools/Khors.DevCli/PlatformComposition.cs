@@ -1,5 +1,7 @@
 using Khors.Platform;
+using Khors.Platform.Windows;
 using Khors.Platform.Windows.Processes;
+using Khors.Platform.Windows.Proxy;
 
 namespace Khors.DevCli;
 
@@ -8,4 +10,7 @@ internal static class PlatformComposition
 {
     public static IChildProcessGuard? CreateChildProcessGuard() =>
         OperatingSystem.IsWindows() ? new JobObjectChildProcessGuard() : null;
+
+    public static ISystemProxy? CreateSystemProxy() =>
+        OperatingSystem.IsWindows() ? new WindowsSystemProxy(WindowsPlatform.StateDirectory) : null;
 }
