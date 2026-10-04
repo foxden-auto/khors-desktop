@@ -14,7 +14,8 @@ using Khors.Platform;
 // Живая проверка: ссылка → профиль → Xray → тестовый запрос через прокси. Ссылка и секреты на экран не выводятся.
 //   khors-devcli "<ссылка>"          ссылка аргументом
 //   khors-devcli --file link.txt     ссылка из файла
-//   khors-devcli                     link.txt рядом с программой или ввод с клавиатуры
+//   khors-devcli                     link.txt рядом с программой, затем %APPDATA%\KHORS\devcli\link.txt,
+//                                    иначе ввод с клавиатуры
 // Ключи: --loglevel debug|info|warning|error   --socks <порт>   --http <порт>
 //        --system-proxy  включить системный прокси Windows на HTTP-вход Xray (ROADMAP 1.5)
 //        --no-wait       не ждать Enter перед выходом
@@ -75,11 +76,19 @@ static async Task<int> RunAsync(string[] args)
         }
     }
 
-    var linkFile = Path.Combine(AppContext.BaseDirectory, "link.txt");
-    if (link is null && File.Exists(linkFile))
+    // %APPDATA%\KHORS\devcli\link.txt не затрагивается пересборкой и переносом пакета.
+    string[] linkFiles =
+    [
+        Path.Combine(AppContext.BaseDirectory, "link.txt"),
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "KHORS", "devcli", "link.txt"),
+    ];
+    foreach (var linkFile in linkFiles)
     {
-        Console.WriteLine("Ссылка взята из link.txt рядом с программой.");
-        link = File.ReadAllText(linkFile);
+        if (link is null && File.Exists(linkFile))
+        {
+            Console.WriteLine($"Ссылка взята из {linkFile}.");
+            link = File.ReadAllText(linkFile);
+        }
     }
 
     if (link is null)
