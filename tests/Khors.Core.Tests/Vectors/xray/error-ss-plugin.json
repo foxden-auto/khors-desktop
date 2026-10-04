@@ -1,0 +1,12 @@
+{
+  "description": "SIP003-плагины Xray не поддерживает",
+  "link": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpTc1BhNTV3MHJk@192.0.2.44:8388/?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dobfs.example.com#ss",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "error": {
+    "code": "UnsupportedFeature",
+    "field": "protocol.plugin"
+  }
+}

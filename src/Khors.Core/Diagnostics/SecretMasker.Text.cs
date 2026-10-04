@@ -234,7 +234,7 @@ public sealed partial class SecretMasker
     private static partial Regex LinkPattern();
 
     [GeneratedRegex(
-        @"(?<![\w-])(?<q>[""']?)(?<key>password|passwd|pass|pwd|uuid|pbk|public[_-]?key|private[_-]?key|peer[_-]?public[_-]?key|pre[_-]?shared[_-]?key|psk|sid|short[_-]?id|auth|auth[_-]?str|token|secret|obfs[_-]?password|sni|server[_-]?name|server|address|host|authority)\k<q>\s*[:=]\s*[""']?(?<val>[^\s""'&,;{}\[\]]+)",
+        @"(?<![\w-])(?<q>[""']?)(?<key>password|passwd|pass|pwd|uuid|pbk|public[_-]?key|private[_-]?key|peer[_-]?public[_-]?key|pre[_-]?shared[_-]?key|psk|sid|short[_-]?id|auth|auth[_-]?str|token|secret|obfs[_-]?password|sni|server[_-]?name|server|address|host|authority|vcn|verify[_-]?peer[_-]?cert[_-]?by[_-]?name)\k<q>\s*[:=]\s*[""']?(?<val>[^\s""'&,;{}\[\]]+)",
         RegexOptions.IgnoreCase)]
     private static partial Regex KeyValuePattern();
 

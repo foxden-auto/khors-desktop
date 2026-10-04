@@ -143,6 +143,8 @@ public static partial class ShareLinkParser
                 Alpn = SplitList(query.Take("alpn")),
                 Fingerprint = query.Take("fp"),
                 AllowInsecure = IsTrue(query.TakeFirst("allowInsecure", "insecure")),
+                PinnedPeerCertSha256 = SplitList(query.Take("pcs")),
+                VerifyPeerCertByName = SplitList(query.Take("vcn")),
             },
             "reality" => new RealitySecurity
             {

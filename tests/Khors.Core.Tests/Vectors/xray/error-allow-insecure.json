@@ -1,0 +1,12 @@
+{
+  "description": "allowInsecure без pcs: в Xray 26 удалён",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@cdn.example.net:443?type=ws&path=%2Fws%3Fed%3D2048&host=cdn.example.net&security=tls&sni=cdn.example.net&alpn=h2%2Chttp%2F1.1&fp=firefox&allowInsecure=1#ws",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "error": {
+    "code": "UnsupportedFeature",
+    "field": "security.allowInsecure"
+  }
+}

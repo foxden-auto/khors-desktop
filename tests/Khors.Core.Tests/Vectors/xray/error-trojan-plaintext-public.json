@@ -1,0 +1,12 @@
+{
+  "description": "Trojan без TLS к публичному адресу Xray запрещает",
+  "link": "trojan://Fictional-Pa55@trojan.example.com:443?security=none&peer=trojan.example.com#tr",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "error": {
+    "code": "UnsupportedFeature",
+    "field": "security"
+  }
+}

@@ -53,7 +53,7 @@ public class ShareLinkVectorTests
     {
         var link = Load(name)["link"]!.GetValue<string>();
         var profile = ShareLinkParser.Parse(link).Profile!;
-        var secrets = SecretsOf(profile).Where(s => s.Length >= 6).ToList();
+        var secrets = ProfileSecrets.Of(profile);
 
         var masked = new SecretMasker(Encoding.UTF8.GetBytes("vector-test")).MaskText(link);
 
@@ -91,43 +91,6 @@ public class ShareLinkVectorTests
 
         Assert.All(s_schemes, scheme =>
             Assert.Contains(links, l => l.StartsWith(scheme, StringComparison.Ordinal)));
-    }
-
-    private static IEnumerable<string> SecretsOf(Profile profile)
-    {
-        yield return profile.Server.Host;
-
-        switch (profile.Protocol)
-        {
-            case VlessSettings vless:
-                yield return vless.Id.Value;
-                break;
-            case VmessSettings vmess:
-                yield return vmess.Id.Value;
-                break;
-            case TrojanSettings trojan:
-                yield return trojan.Password.Value;
-                break;
-            case ShadowsocksSettings ss:
-                yield return ss.Password.Value;
-                break;
-        }
-
-        switch (profile.Security)
-        {
-            case TlsSecurity { Sni: { } sni }:
-                yield return sni;
-                break;
-            case RealitySecurity reality:
-                yield return reality.Sni;
-                yield return reality.PublicKey.Value;
-                if (reality.ShortId is { } shortId)
-                {
-                    yield return shortId.Value;
-                }
-
-                break;
-        }
     }
 
     private static IEnumerable<string> VectorNames(Func<JsonObject, bool> filter) =>

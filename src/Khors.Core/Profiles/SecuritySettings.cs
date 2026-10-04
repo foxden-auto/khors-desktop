@@ -19,7 +19,17 @@ public sealed record TlsSecurity : SecuritySettings
     /// <summary>Отпечаток uTLS (chrome, firefox, safari, …); <c>null</c> — по умолчанию ядра.</summary>
     public string? Fingerprint { get; init; }
 
+    /// <summary>
+    /// Не проверять сертификат. Xray-core 26 этот режим удалил — вместо него
+    /// <see cref="PinnedPeerCertSha256"/> и <see cref="VerifyPeerCertByName"/>.
+    /// </summary>
     public bool AllowInsecure { get; init; }
+
+    /// <summary>SHA-256 сертификата сервера в hex (двоеточия допустимы); параметр ссылки <c>pcs</c>.</summary>
+    public EquatableArray<string> PinnedPeerCertSha256 { get; init; }
+
+    /// <summary>Имена, по которым проверять сертификат вместо SNI; параметр ссылки <c>vcn</c>.</summary>
+    public EquatableArray<string> VerifyPeerCertByName { get; init; }
 
     public override string ToString() => $"TlsSecurity {{ Fingerprint = {Fingerprint}, AllowInsecure = {AllowInsecure} }}";
 }
@@ -41,7 +51,7 @@ public sealed record RealitySecurity : SecuritySettings
 
     public string? SpiderX { get; init; }
 
-    /// <summary>Ключ проверки ML-DSA-65 (параметр ссылки <c>pqv</c>, в Xray — <c>mldsa65Verify</c>).</summary>
+    /// <summary>Ключ проверки ML-DSA-65, base64url без паддинга, 1952 байта (параметр ссылки <c>pqv</c>, в Xray — <c>mldsa65Verify</c>).</summary>
     public string? MlDsa65Verify { get; init; }
 
     public override string ToString() => $"RealitySecurity {{ Fingerprint = {Fingerprint} }}";

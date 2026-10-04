@@ -1,0 +1,123 @@
+{
+  "description": "VLESS по gRPC (multi) с TLS и mux",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@grpc.example.net:443?type=grpc&serviceName=tun&mode=multi&authority=grpc.example.net&security=tls&sni=grpc.example.net#grpc",
+  "mux": {
+    "enabled": true,
+    "concurrency": 8
+  },
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "expected": {
+    "log": {
+      "loglevel": "warning"
+    },
+    "inbounds": [
+      {
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "port": 10808,
+        "protocol": "socks",
+        "settings": {
+          "auth": "noauth",
+          "udp": true
+        },
+        "sniffing": {
+          "enabled": true,
+          "destOverride": [
+            "http",
+            "tls",
+            "quic"
+          ],
+          "routeOnly": true
+        }
+      },
+      {
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "port": 10809,
+        "protocol": "http",
+        "sniffing": {
+          "enabled": true,
+          "destOverride": [
+            "http",
+            "tls",
+            "quic"
+          ],
+          "routeOnly": true
+        }
+      }
+    ],
+    "outbounds": [
+      {
+        "tag": "proxy",
+        "protocol": "vless",
+        "settings": {
+          "vnext": [
+            {
+              "address": "grpc.example.net",
+              "port": 443,
+              "users": [
+                {
+                  "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+                  "encryption": "none"
+                }
+              ]
+            }
+          ]
+        },
+        "streamSettings": {
+          "network": "grpc",
+          "grpcSettings": {
+            "serviceName": "tun",
+            "multiMode": true,
+            "authority": "grpc.example.net"
+          },
+          "security": "tls",
+          "tlsSettings": {
+            "serverName": "grpc.example.net"
+          }
+        },
+        "mux": {
+          "enabled": true,
+          "concurrency": 8
+        }
+      },
+      {
+        "tag": "direct",
+        "protocol": "freedom"
+      },
+      {
+        "tag": "block",
+        "protocol": "blackhole"
+      }
+    ],
+    "routing": {
+      "domainStrategy": "AsIs",
+      "rules": [
+        {
+          "type": "field",
+          "ip": [
+            "127.0.0.0/8",
+            "10.0.0.0/8",
+            "172.16.0.0/12",
+            "192.168.0.0/16",
+            "169.254.0.0/16",
+            "::1/128",
+            "fc00::/7",
+            "fe80::/10"
+          ],
+          "outboundTag": "direct"
+        },
+        {
+          "type": "field",
+          "domain": [
+            "full:localhost"
+          ],
+          "outboundTag": "direct"
+        }
+      ]
+    }
+  }
+}

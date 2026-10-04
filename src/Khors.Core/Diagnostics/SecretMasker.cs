@@ -104,6 +104,11 @@ public sealed partial class SecretMasker
             return MaskText(value);
         }
 
+        if (value.Contains(',', StringComparison.Ordinal))
+        {
+            return string.Join(',', value.Split(',').Select(MaskHostValue));
+        }
+
         var hostPort = HostWithPort().Match(value);
         if (hostPort.Success && LooksLikeHost(hostPort.Groups["host"].Value))
         {
@@ -156,7 +161,8 @@ public sealed partial class SecretMasker
             "pbk" or "publickey" or "privatekey" or "peerpublickey" or "presharedkey" or "psk" => SecretKind.Key,
             "sid" or "shortid" or "shortids" => SecretKind.ShortId,
             "token" or "secret" or "accesstoken" => SecretKind.Token,
-            "address" or "server" or "serveraddress" or "servername" or "sni" or "host" or "peer" or "endpoint" or "authority" => SecretKind.Host,
+            "address" or "server" or "serveraddress" or "servername" or "sni" or "host" or "peer" or "endpoint" or "authority"
+                or "vcn" or "verifypeercertbyname" => SecretKind.Host,
             "add" when json => SecretKind.Host, // адрес сервера в vmess:// (формат v2rayN)
             _ => null,
         };

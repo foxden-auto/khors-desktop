@@ -9,6 +9,8 @@ public static class ProfileValidator
     private const int MaxStringIdBytes = 30;
     private const int RealityPublicKeyBytes = 32;
     private const int MaxShortIdLength = 16;
+    private const int MlDsa65PublicKeyBytes = 1952;
+    private const int Sha256Bytes = 32;
 
     private static readonly HashSet<string> s_flows = new(StringComparer.Ordinal)
     {
@@ -177,8 +179,17 @@ public static class ProfileValidator
     {
         switch (profile.Security)
         {
-            case TlsSecurity { AllowInsecure: true }:
-                warning(ProfileIssueCode.InsecureTls, "security.allowInsecure");
+            case TlsSecurity tls:
+                if (tls.AllowInsecure)
+                {
+                    warning(ProfileIssueCode.InsecureTls, "security.allowInsecure");
+                }
+
+                if (tls.PinnedPeerCertSha256.Any(h => !IsSha256Hex(h)))
+                {
+                    error(ProfileIssueCode.TlsPinnedCertInvalid, "security.pinnedPeerCertSha256");
+                }
+
                 break;
 
             case RealitySecurity reality:
@@ -190,6 +201,11 @@ public static class ProfileValidator
                 if (!IsRealityPublicKey(reality.PublicKey.Value))
                 {
                     error(ProfileIssueCode.RealityPublicKeyInvalid, "security.publicKey");
+                }
+
+                if (reality.MlDsa65Verify is { } pqv && DecodedLength(pqv) != MlDsa65PublicKeyBytes)
+                {
+                    error(ProfileIssueCode.RealityMlDsa65VerifyInvalid, "security.mlDsa65Verify");
                 }
 
                 if (reality.ShortId is { } shortId && !IsShortId(shortId.Value))
@@ -207,12 +223,21 @@ public static class ProfileValidator
         }
     }
 
-    private static bool IsRealityPublicKey(string value)
+    private static bool IsRealityPublicKey(string value) => DecodedLength(value) == RealityPublicKeyBytes;
+
+    /// <summary>Длина base64/base64url-значения в байтах; -1, если это не base64.</summary>
+    private static int DecodedLength(string value)
     {
         var base64 = value.Replace('-', '+').Replace('_', '/').TrimEnd('=');
         base64 += new string('=', (4 - (base64.Length % 4)) % 4);
-        Span<byte> buffer = stackalloc byte[48];
-        return Convert.TryFromBase64String(base64, buffer, out var written) && written == RealityPublicKeyBytes;
+        var buffer = new byte[base64.Length];
+        return Convert.TryFromBase64String(base64, buffer, out var written) ? written : -1;
+    }
+
+    private static bool IsSha256Hex(string value)
+    {
+        var hex = value.Replace(":", string.Empty, StringComparison.Ordinal);
+        return hex.Length == Sha256Bytes * 2 && hex.All(char.IsAsciiHexDigit);
     }
 
     private static bool IsShortId(string value) =>

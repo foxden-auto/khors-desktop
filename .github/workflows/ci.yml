@@ -45,10 +45,11 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
-      - name: Test
-        run: dotnet test --no-build --configuration Release
-
+      # Ядра нужны тестам: сгенерированные конфиги проверяются настоящим xray run -test.
       - name: Fetch and verify cores
         run: |
           dotnet run tools/cores/fetch-cores.cs -- --platform all
           dotnet run tools/cores/fetch-cores.cs -- --platform all --verify
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release

@@ -124,7 +124,7 @@ UI → служба → sing-box поднимает TUN (`auto_route`, `strict_r
 
 ### 4.2. Модель профиля (минимум)
 
-Протокол и его параметры; адрес, порт; транспорт (tcp/raw, ws, grpc, httpupgrade, xhttp, quic); безопасность (none, tls, reality) с SNI, ALPN, fingerprint uTLS, REALITY public key, short id, spiderX; flow; мультиплекс; выбор ядра (auto/xray/singbox); имя, группа, источник (ручной/подписка), дата обновления; служебное поле `unknownParams`. `schemaVersion` хранится в корне файла профилей (миграции — на уровне файла).
+Протокол и его параметры; адрес, порт; транспорт (tcp/raw, ws, grpc, httpupgrade, xhttp, quic); безопасность (none, tls, reality) с SNI, ALPN, fingerprint uTLS, закреплённым сертификатом (`pcs`) и проверкой по имени (`vcn`), REALITY public key, short id, spiderX, ключом ML-DSA-65 (`pqv`); flow; мультиплекс; выбор ядра (auto/xray/singbox); имя, группа, источник (ручной/подписка), дата обновления; служебное поле `unknownParams`. `schemaVersion` хранится в корне файла профилей (миграции — на уровне файла).
 
 Fingerprint по умолчанию для REALITY — `chrome`.
 

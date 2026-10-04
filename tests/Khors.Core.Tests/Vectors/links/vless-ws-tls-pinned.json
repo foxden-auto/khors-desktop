@@ -1,0 +1,30 @@
+{
+  "description": "VLESS по WebSocket с TLS: закреплённый сертификат (pcs) и проверка по имени (vcn) вместо allowInsecure",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@cdn.example.net:443?type=ws&path=%2Fws&security=tls&sni=cdn.example.net&pcs=9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08&vcn=origin.example.net%2Ccdn.example.net#pinned",
+  "expected": {
+    "name": "pinned",
+    "server": {
+      "host": "cdn.example.net",
+      "port": 443
+    },
+    "protocol": {
+      "type": "vless",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b"
+    },
+    "transport": {
+      "type": "ws",
+      "path": "/ws"
+    },
+    "security": {
+      "type": "tls",
+      "sni": "cdn.example.net",
+      "pinnedPeerCertSha256": [
+        "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+      ],
+      "verifyPeerCertByName": [
+        "origin.example.net",
+        "cdn.example.net"
+      ]
+    }
+  }
+}

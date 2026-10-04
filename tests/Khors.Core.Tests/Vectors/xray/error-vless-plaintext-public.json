@@ -1,0 +1,12 @@
+{
+  "description": "VLESS без TLS к публичному адресу Xray запрещает",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@vpn.example.com:80?type=raw&headerType=http&host=www.example.org&path=%2Findex.html#raw",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "error": {
+    "code": "UnsupportedFeature",
+    "field": "security"
+  }
+}

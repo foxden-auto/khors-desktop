@@ -35,6 +35,8 @@ public enum ProfileIssueCode
     RealityPublicKeyInvalid,
     RealityShortIdInvalid,
     RealityTransportUnsupported,
+    RealityMlDsa65VerifyInvalid,
+    TlsPinnedCertInvalid,
     InsecureTls,
     UnknownParameters,
 }
