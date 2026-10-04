@@ -1,0 +1,8 @@
+{
+  "description": "Транспорт QUIC в VMess не поддерживается моделью",
+  "link": "vmess://eyJ2IjogIjIiLCAicHMiOiAicSIsICJhZGQiOiAidm0uZXhhbXBsZS5jb20iLCAicG9ydCI6ICI0NDMiLCAiaWQiOiAiM2YxYzJhOWUtN2I0ZC00ZThhLTljMjEtNWQ2ZTdmODA5YTFiIiwgIm5ldCI6ICJxdWljIiwgInRscyI6ICJ0bHMifQ==",
+  "error": {
+    "code": "UnsupportedTransport",
+    "field": "net"
+  }
+}

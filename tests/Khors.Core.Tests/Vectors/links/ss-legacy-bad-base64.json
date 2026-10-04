@@ -1,0 +1,8 @@
+{
+  "description": "Устаревшая форма, но не base64",
+  "link": "ss://###",
+  "error": {
+    "code": "InvalidBase64",
+    "field": "userinfo"
+  }
+}

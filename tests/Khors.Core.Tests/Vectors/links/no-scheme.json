@@ -1,0 +1,8 @@
+{
+  "description": "Не ссылка",
+  "link": "просто текст",
+  "error": {
+    "code": "UnsupportedScheme",
+    "field": "scheme"
+  }
+}

@@ -28,7 +28,9 @@
   - Сделано: `Khors.Core.Profiles` — неизменяемый `Profile` (id, имя, группа, подписка-источник, дата, выбор ядра, сервер, протокол, транспорт, безопасность, mux, `unknownParams`). Протоколы VLESS/VMess/Trojan/Shadowsocks; транспорты tcp, ws, grpc, httpupgrade, xhttp; безопасность none/tls/reality (fingerprint по умолчанию `chrome`, `pqv`). Секреты в `Secret` (ToString — `***`), `ToString()` профиля и частей без адресов. `ProfileValidator` — коды проблем с уровнем Error/Warning. `ProfileJson` — System.Text.Json с генерацией кода, тип в поле `type`. 60 тестов.
   - Решено: `schemaVersion` — в корне файла профилей (1.7), не в профиле.
   - Отложено: Hysteria2, TUIC, WireGuard, QUIC — 2.3; тексты проблем для UI — 1.6.
-- [ ] 1.2 Парсеры `vless://`, `vmess://`, `trojan://`, `ss://` + тестовые векторы
+- [x] 1.2 Парсеры `vless://`, `vmess://`, `trojan://`, `ss://` + тестовые векторы
+  - Сделано: `Khors.Core.Import.ShareLinkParser.Parse` — чистая функция, возвращает профиль или ошибку с кодом (`LinkParseErrorCode`). VLESS/Trojan/VMess по стандарту ссылок Xray (tcp/raw с HTTP-заголовком, ws, httpupgrade, grpc, xhttp/splithttp; tls, reality с `pqv`; у Trojan TLS по умолчанию; синонимы `peer`, `insecure`), VMess в формате v2rayN (base64 JSON, числа и строки), Shadowsocks SIP002 (base64 и открытая форма 2022), legacy, плагины SIP003. Неизвестные параметры — в `unknownParams` по порядку. 33 вектора в `tests/Khors.Core.Tests/Vectors/links/`; для каждого успешного вектора проверяются отсутствие ошибок валидации и то, что `SecretMasker` убирает все секреты (в том числе внутри base64). Найдено и исправлено: маскировщик не скрывал `authority` gRPC.
+  - Отложено: mKCP, QUIC, HTTP/2 (h2) — ошибка `UnsupportedTransport`, пока модель их не поддерживает; разбор нескольких ссылок из буфера — 1.6; Id и дату профиля назначает импорт (1.6/1.7).
 - [ ] 1.3 Генератор конфига Xray (tcp/raw, ws, grpc, xhttp; tls, reality; flow)
 - [ ] 1.4 Управление процессом Xray: запуск, остановка, чтение лога, обнаружение падения
 - [ ] 1.5 Системный прокси Windows: установка, восстановление, очистка после сбоя

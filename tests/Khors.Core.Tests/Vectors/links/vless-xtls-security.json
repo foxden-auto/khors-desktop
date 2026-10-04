@@ -1,0 +1,8 @@
+{
+  "description": "Устаревший security=xtls",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@vpn.example.com:443?security=xtls",
+  "error": {
+    "code": "UnsupportedSecurity",
+    "field": "security"
+  }
+}

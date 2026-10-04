@@ -1,0 +1,25 @@
+{
+  "description": "v2rayN: gRPC — path это serviceName, type это режим, host это authority",
+  "link": "vmess://eyJ2IjogIjIiLCAicHMiOiAiZ3JwYyIsICJhZGQiOiAiZ3JwYy5leGFtcGxlLm5ldCIsICJwb3J0IjogIjQ0MyIsICJpZCI6ICIzZjFjMmE5ZS03YjRkLTRlOGEtOWMyMS01ZDZlN2Y4MDlhMWIiLCAiYWlkIjogIjAiLCAibmV0IjogImdycGMiLCAidHlwZSI6ICJtdWx0aSIsICJob3N0IjogImdycGMuZXhhbXBsZS5uZXQiLCAicGF0aCI6ICJzdmMiLCAidGxzIjogInRscyIsICJzbmkiOiAiZ3JwYy5leGFtcGxlLm5ldCJ9",
+  "expected": {
+    "name": "grpc",
+    "server": {
+      "host": "grpc.example.net",
+      "port": 443
+    },
+    "protocol": {
+      "type": "vmess",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b"
+    },
+    "transport": {
+      "type": "grpc",
+      "serviceName": "svc",
+      "mode": "multi",
+      "authority": "grpc.example.net"
+    },
+    "security": {
+      "type": "tls",
+      "sni": "grpc.example.net"
+    }
+  }
+}

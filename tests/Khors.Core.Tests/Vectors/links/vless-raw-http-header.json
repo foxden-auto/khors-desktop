@@ -1,0 +1,21 @@
+{
+  "description": "RAW (tcp) с маскировкой заголовка под HTTP",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@vpn.example.com:80?type=raw&headerType=http&host=www.example.org&path=%2Findex.html#raw",
+  "expected": {
+    "name": "raw",
+    "server": {
+      "host": "vpn.example.com",
+      "port": 80
+    },
+    "protocol": {
+      "type": "vless",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b"
+    },
+    "transport": {
+      "type": "tcp",
+      "headerType": "http",
+      "host": "www.example.org",
+      "path": "/index.html"
+    }
+  }
+}

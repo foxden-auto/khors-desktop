@@ -1,0 +1,23 @@
+{
+  "description": "v2rayN: порт и aid числами, tcp с HTTP-заголовком, tls пустой, base64 без паддинга (URL-safe)",
+  "link": "vmess://eyJ2IjogMiwgInBzIjogIiIsICJhZGQiOiAiMTk4LjUxLjEwMC43IiwgInBvcnQiOiA4MDgwLCAiaWQiOiAiM2YxYzJhOWUtN2I0ZC00ZThhLTljMjEtNWQ2ZTdmODA5YTFiIiwgImFpZCI6IDAsICJzY3kiOiAiYWVzLTEyOC1nY20iLCAibmV0IjogInRjcCIsICJ0eXBlIjogImh0dHAiLCAiaG9zdCI6ICJ3d3cuZXhhbXBsZS5vcmciLCAicGF0aCI6ICIvIiwgInRscyI6ICIifQ",
+  "expected": {
+    "name": "198.51.100.7:8080",
+    "server": {
+      "host": "198.51.100.7",
+      "port": 8080
+    },
+    "protocol": {
+      "type": "vmess",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+      "alterId": 0,
+      "cipher": "aes-128-gcm"
+    },
+    "transport": {
+      "type": "tcp",
+      "headerType": "http",
+      "host": "www.example.org",
+      "path": "/"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "description": "VLESS по WebSocket с TLS, ALPN, fingerprint и allowInsecure",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@cdn.example.net:443?type=ws&path=%2Fws%3Fed%3D2048&host=cdn.example.net&security=tls&sni=cdn.example.net&alpn=h2%2Chttp%2F1.1&fp=firefox&allowInsecure=1#ws",
+  "expected": {
+    "name": "ws",
+    "server": {
+      "host": "cdn.example.net",
+      "port": 443
+    },
+    "protocol": {
+      "type": "vless",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b"
+    },
+    "transport": {
+      "type": "ws",
+      "path": "/ws?ed=2048",
+      "host": "cdn.example.net"
+    },
+    "security": {
+      "type": "tls",
+      "sni": "cdn.example.net",
+      "alpn": [
+        "h2",
+        "http/1.1"
+      ],
+      "fingerprint": "firefox",
+      "allowInsecure": true
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "description": "SIP002 с открытым userinfo для метода 2022, ключ %-кодирован",
+  "link": "ss://2022-blake3-aes-128-gcm:Aq3%2BZt%2F9Kp1Lm0Xy7Wq2Bw%3D%3D@[2001:db8::20]:8388#2022",
+  "expected": {
+    "name": "2022",
+    "server": {
+      "host": "2001:db8::20",
+      "port": 8388
+    },
+    "protocol": {
+      "type": "shadowsocks",
+      "method": "2022-blake3-aes-128-gcm",
+      "password": "Aq3+Zt/9Kp1Lm0Xy7Wq2Bw=="
+    }
+  }
+}

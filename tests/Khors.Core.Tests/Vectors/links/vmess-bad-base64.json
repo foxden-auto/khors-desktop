@@ -1,0 +1,8 @@
+{
+  "description": "Не base64",
+  "link": "vmess://!!!not-base64!!!",
+  "error": {
+    "code": "InvalidBase64",
+    "field": "payload"
+  }
+}

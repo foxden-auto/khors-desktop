@@ -1,0 +1,8 @@
+{
+  "description": "Нет адреса сервера",
+  "link": "vmess://eyJ2IjogIjIiLCAicG9ydCI6ICI0NDMiLCAiaWQiOiAiM2YxYzJhOWUtN2I0ZC00ZThhLTljMjEtNWQ2ZTdmODA5YTFiIn0=",
+  "error": {
+    "code": "MissingHost",
+    "field": "add"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "description": "VLESS + REALITY по XHTTP с extra и pqv, без sid",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@203.0.113.20:8443?security=reality&sni=www.example.org&fp=firefox&pbk=Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM&pqv=Fict1onalMlDsa65VerifyKey0000000000000000000000&type=xhttp&path=%2Fxh&mode=stream-one&extra=%7B%22xPaddingBytes%22%3A%22100-1000%22%2C%22noGRPCHeader%22%3Afalse%7D#xhttp",
+  "expected": {
+    "name": "xhttp",
+    "server": {
+      "host": "203.0.113.20",
+      "port": 8443
+    },
+    "protocol": {
+      "type": "vless",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b"
+    },
+    "transport": {
+      "type": "xhttp",
+      "path": "/xh",
+      "mode": "stream-one",
+      "extra": "{\"xPaddingBytes\":\"100-1000\",\"noGRPCHeader\":false}"
+    },
+    "security": {
+      "type": "reality",
+      "sni": "www.example.org",
+      "fingerprint": "firefox",
+      "publicKey": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM",
+      "mlDsa65Verify": "Fict1onalMlDsa65VerifyKey0000000000000000000000"
+    }
+  }
+}

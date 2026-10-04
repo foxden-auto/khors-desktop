@@ -1,0 +1,25 @@
+{
+  "description": "VLESS по gRPC (multi) с authority",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@grpc.example.net:443?type=grpc&serviceName=tun&mode=multi&authority=grpc.example.net&security=tls&sni=grpc.example.net#grpc",
+  "expected": {
+    "name": "grpc",
+    "server": {
+      "host": "grpc.example.net",
+      "port": 443
+    },
+    "protocol": {
+      "type": "vless",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b"
+    },
+    "transport": {
+      "type": "grpc",
+      "serviceName": "tun",
+      "mode": "multi",
+      "authority": "grpc.example.net"
+    },
+    "security": {
+      "type": "tls",
+      "sni": "grpc.example.net"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "description": "VMess по стандарту ссылок Xray: uuid@host, encryption — шифр",
+  "link": "vmess://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@vm.example.com:443?encryption=aes-128-gcm&type=ws&path=%2Fvm&security=tls&sni=vm.example.com#std",
+  "expected": {
+    "name": "std",
+    "server": {
+      "host": "vm.example.com",
+      "port": 443
+    },
+    "protocol": {
+      "type": "vmess",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+      "cipher": "aes-128-gcm"
+    },
+    "transport": {
+      "type": "ws",
+      "path": "/vm"
+    },
+    "security": {
+      "type": "tls",
+      "sni": "vm.example.com"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "description": "base64, но не JSON",
+  "link": "vmess://aGVsbG8gd29ybGQ=",
+  "error": {
+    "code": "InvalidJson",
+    "field": "payload"
+  }
+}

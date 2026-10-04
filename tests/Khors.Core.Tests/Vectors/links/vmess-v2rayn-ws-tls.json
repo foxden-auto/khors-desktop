@@ -1,0 +1,37 @@
+{
+  "description": "v2rayN: WebSocket + TLS, порт и aid строками, лишнее поле — в unknownParams",
+  "link": "vmess://eyJ2IjogIjIiLCAicHMiOiAi0J3QuNC00LXRgNC70LDQvdC00YsiLCAiYWRkIjogInZtLmV4YW1wbGUuY29tIiwgInBvcnQiOiAiNDQzIiwgImlkIjogIjNmMWMyYTllLTdiNGQtNGU4YS05YzIxLTVkNmU3ZjgwOWExYiIsICJhaWQiOiAiMCIsICJzY3kiOiAiYXV0byIsICJuZXQiOiAid3MiLCAidHlwZSI6ICJub25lIiwgImhvc3QiOiAiY2RuLmV4YW1wbGUubmV0IiwgInBhdGgiOiAiL3ZtIiwgInRscyI6ICJ0bHMiLCAic25pIjogImNkbi5leGFtcGxlLm5ldCIsICJhbHBuIjogImgyLGh0dHAvMS4xIiwgImZwIjogImNocm9tZSIsICJ0ZXN0IjogIngifQ==",
+  "expected": {
+    "name": "Нидерланды",
+    "server": {
+      "host": "vm.example.com",
+      "port": 443
+    },
+    "protocol": {
+      "type": "vmess",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+      "alterId": 0,
+      "cipher": "auto"
+    },
+    "transport": {
+      "type": "ws",
+      "path": "/vm",
+      "host": "cdn.example.net"
+    },
+    "security": {
+      "type": "tls",
+      "sni": "cdn.example.net",
+      "alpn": [
+        "h2",
+        "http/1.1"
+      ],
+      "fingerprint": "chrome"
+    },
+    "unknownParams": [
+      {
+        "key": "test",
+        "value": "x"
+      }
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "description": "SIP002: userinfo в base64url без паддинга, плагин obfs-local с параметрами, форма /?",
+  "link": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpTc1BhNTV3MHJk@192.0.2.44:8388/?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dobfs.example.com#ss",
+  "expected": {
+    "name": "ss",
+    "server": {
+      "host": "192.0.2.44",
+      "port": 8388
+    },
+    "protocol": {
+      "type": "shadowsocks",
+      "method": "chacha20-ietf-poly1305",
+      "password": "SsPa55w0rd",
+      "plugin": "obfs-local",
+      "pluginOptions": "obfs=http;obfs-host=obfs.example.com"
+    }
+  }
+}

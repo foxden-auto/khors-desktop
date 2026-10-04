@@ -1,0 +1,8 @@
+{
+  "description": "Нет UUID",
+  "link": "vless://vpn.example.com:443?security=none",
+  "error": {
+    "code": "MissingCredentials",
+    "field": "userinfo"
+  }
+}

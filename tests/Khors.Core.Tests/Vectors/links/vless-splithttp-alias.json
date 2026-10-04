@@ -1,0 +1,23 @@
+{
+  "description": "Старое имя транспорта splithttp — это xhttp",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@vpn.example.com:443?type=splithttp&path=%2Fsh&security=tls&sni=vpn.example.com#sh",
+  "expected": {
+    "name": "sh",
+    "server": {
+      "host": "vpn.example.com",
+      "port": 443
+    },
+    "protocol": {
+      "type": "vless",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b"
+    },
+    "transport": {
+      "type": "xhttp",
+      "path": "/sh"
+    },
+    "security": {
+      "type": "tls",
+      "sni": "vpn.example.com"
+    }
+  }
+}

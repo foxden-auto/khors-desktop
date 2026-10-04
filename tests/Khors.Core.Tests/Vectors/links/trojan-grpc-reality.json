@@ -1,0 +1,26 @@
+{
+  "description": "Trojan по gRPC с REALITY",
+  "link": "trojan://Fictional-Pa55@vpn.example.com:443?type=grpc&serviceName=tr&security=reality&sni=www.example.org&pbk=Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM&sid=ab#r",
+  "expected": {
+    "name": "r",
+    "server": {
+      "host": "vpn.example.com",
+      "port": 443
+    },
+    "protocol": {
+      "type": "trojan",
+      "password": "Fictional-Pa55"
+    },
+    "transport": {
+      "type": "grpc",
+      "serviceName": "tr"
+    },
+    "security": {
+      "type": "reality",
+      "sni": "www.example.org",
+      "fingerprint": "chrome",
+      "publicKey": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM",
+      "shortId": "ab"
+    }
+  }
+}

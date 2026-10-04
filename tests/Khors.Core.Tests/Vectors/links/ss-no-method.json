@@ -1,0 +1,8 @@
+{
+  "description": "В userinfo нет «метод:пароль»",
+  "link": "ss://bm9jb2xvbg==@192.0.2.44:8388",
+  "error": {
+    "code": "MissingCredentials",
+    "field": "userinfo"
+  }
+}

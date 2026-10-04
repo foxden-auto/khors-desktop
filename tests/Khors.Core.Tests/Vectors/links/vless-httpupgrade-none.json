@@ -1,0 +1,23 @@
+{
+  "description": "VLESS по HTTPUpgrade без шифрования транспорта",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@198.51.100.7:80?type=httpupgrade&path=%2Fup&host=up.example.net&security=none#up",
+  "expected": {
+    "name": "up",
+    "server": {
+      "host": "198.51.100.7",
+      "port": 80
+    },
+    "protocol": {
+      "type": "vless",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b"
+    },
+    "transport": {
+      "type": "httpupgrade",
+      "path": "/up",
+      "host": "up.example.net"
+    },
+    "security": {
+      "type": "none"
+    }
+  }
+}

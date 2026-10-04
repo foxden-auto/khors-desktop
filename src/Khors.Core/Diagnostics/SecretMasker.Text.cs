@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using Khors.Core.Text;
 
 namespace Khors.Core.Diagnostics;
 
@@ -61,7 +62,7 @@ public sealed partial class SecretMasker
                 return scheme + "://" + MaskVmessPayload(beforeQuery) + maskedQuery + fragment + trailing;
             }
 
-            if (lower == "ss" && TryDecodeBase64(beforeQuery, out var legacy) && legacy.Contains('@', StringComparison.Ordinal))
+            if (lower == "ss" && Base64Text.TryDecodeUtf8(beforeQuery, out var legacy) && legacy.Contains('@', StringComparison.Ordinal))
             {
                 return MaskLink(scheme, legacy + maskedQuery + fragment) + trailing;
             }
@@ -105,7 +106,7 @@ public sealed partial class SecretMasker
 
         var plain = userinfo.Contains(':', StringComparison.Ordinal)
             ? userinfo
-            : TryDecodeBase64(userinfo, out var decoded) && decoded.Contains(':', StringComparison.Ordinal) ? decoded : null;
+            : Base64Text.TryDecodeUtf8(userinfo, out var decoded) && decoded.Contains(':', StringComparison.Ordinal) ? decoded : null;
 
         if (plain is null)
         {
@@ -185,43 +186,13 @@ public sealed partial class SecretMasker
             return payload;
         }
 
-        if (TryDecodeBase64(payload, out var json) && json.TrimStart().StartsWith('{'))
+        if (Base64Text.TryDecodeUtf8(payload, out var json) && json.TrimStart().StartsWith('{'))
         {
             var masked = MaskJson(json, indented: false);
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(masked));
         }
 
         return Mask(SecretKind.Token, payload);
-    }
-
-    private static bool TryDecodeBase64(string value, out string decoded)
-    {
-        decoded = string.Empty;
-        var normalized = Uri.UnescapeDataString(value).Trim().Replace('-', '+').Replace('_', '/');
-        if (normalized.Length == 0)
-        {
-            return false;
-        }
-
-        normalized = normalized.TrimEnd('=');
-        normalized += new string('=', (4 - (normalized.Length % 4)) % 4);
-
-        var buffer = new byte[normalized.Length];
-        if (!Convert.TryFromBase64String(normalized, buffer, out var written))
-        {
-            return false;
-        }
-
-        try
-        {
-            decoded = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true)
-                .GetString(buffer, 0, written);
-            return true;
-        }
-        catch (DecoderFallbackException)
-        {
-            return false;
-        }
     }
 
     private string MaskKeyValue(Match match)
@@ -263,7 +234,7 @@ public sealed partial class SecretMasker
     private static partial Regex LinkPattern();
 
     [GeneratedRegex(
-        @"(?<![\w-])(?<q>[""']?)(?<key>password|passwd|pass|pwd|uuid|pbk|public[_-]?key|private[_-]?key|peer[_-]?public[_-]?key|pre[_-]?shared[_-]?key|psk|sid|short[_-]?id|auth|auth[_-]?str|token|secret|obfs[_-]?password|sni|server[_-]?name|server|address|host)\k<q>\s*[:=]\s*[""']?(?<val>[^\s""'&,;{}\[\]]+)",
+        @"(?<![\w-])(?<q>[""']?)(?<key>password|passwd|pass|pwd|uuid|pbk|public[_-]?key|private[_-]?key|peer[_-]?public[_-]?key|pre[_-]?shared[_-]?key|psk|sid|short[_-]?id|auth|auth[_-]?str|token|secret|obfs[_-]?password|sni|server[_-]?name|server|address|host|authority)\k<q>\s*[:=]\s*[""']?(?<val>[^\s""'&,;{}\[\]]+)",
         RegexOptions.IgnoreCase)]
     private static partial Regex KeyValuePattern();
 

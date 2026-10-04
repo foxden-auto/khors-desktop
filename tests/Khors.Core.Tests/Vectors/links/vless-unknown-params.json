@@ -1,0 +1,40 @@
+{
+  "description": "Неизвестные и повторяющиеся параметры сохраняются в unknownParams по порядку",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@vpn.example.com:443?type=ws&path=%2F&future=1&security=none&ed=2048&future=2&flag#u",
+  "expected": {
+    "name": "u",
+    "server": {
+      "host": "vpn.example.com",
+      "port": 443
+    },
+    "protocol": {
+      "type": "vless",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b"
+    },
+    "transport": {
+      "type": "ws",
+      "path": "/"
+    },
+    "security": {
+      "type": "none"
+    },
+    "unknownParams": [
+      {
+        "key": "future",
+        "value": "1"
+      },
+      {
+        "key": "ed",
+        "value": "2048"
+      },
+      {
+        "key": "future",
+        "value": "2"
+      },
+      {
+        "key": "flag",
+        "value": ""
+      }
+    ]
+  }
+}

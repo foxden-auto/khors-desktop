@@ -1,0 +1,15 @@
+{
+  "description": "IPv6-адрес, без имени и без параметров: имя — адрес, security none, tcp",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@[2001:db8::10]:443",
+  "expected": {
+    "name": "[2001:db8::10]:443",
+    "server": {
+      "host": "2001:db8::10",
+      "port": 443
+    },
+    "protocol": {
+      "type": "vless",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "description": "Trojan без security — TLS; устаревший peer вместо sni",
+  "link": "trojan://Fictional-Pa55@trojan.example.com:443?peer=trojan.example.com#tr",
+  "expected": {
+    "name": "tr",
+    "server": {
+      "host": "trojan.example.com",
+      "port": 443
+    },
+    "protocol": {
+      "type": "trojan",
+      "password": "Fictional-Pa55"
+    },
+    "security": {
+      "type": "tls",
+      "sni": "trojan.example.com"
+    }
+  }
+}
