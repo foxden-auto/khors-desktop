@@ -24,7 +24,10 @@
 
 ## Этап 1. MVP: системный прокси + Xray
 
-- [ ] 1.1 Модель профиля (`schemaVersion`, `unknownParams`)
+- [x] 1.1 Модель профиля (`schemaVersion`, `unknownParams`)
+  - Сделано: `Khors.Core.Profiles` — неизменяемый `Profile` (id, имя, группа, подписка-источник, дата, выбор ядра, сервер, протокол, транспорт, безопасность, mux, `unknownParams`). Протоколы VLESS/VMess/Trojan/Shadowsocks; транспорты tcp, ws, grpc, httpupgrade, xhttp; безопасность none/tls/reality (fingerprint по умолчанию `chrome`, `pqv`). Секреты в `Secret` (ToString — `***`), `ToString()` профиля и частей без адресов. `ProfileValidator` — коды проблем с уровнем Error/Warning. `ProfileJson` — System.Text.Json с генерацией кода, тип в поле `type`. 60 тестов.
+  - Решено: `schemaVersion` — в корне файла профилей (1.7), не в профиле.
+  - Отложено: Hysteria2, TUIC, WireGuard, QUIC — 2.3; тексты проблем для UI — 1.6.
 - [ ] 1.2 Парсеры `vless://`, `vmess://`, `trojan://`, `ss://` + тестовые векторы
 - [ ] 1.3 Генератор конфига Xray (tcp/raw, ws, grpc, xhttp; tls, reality; flow)
 - [ ] 1.4 Управление процессом Xray: запуск, остановка, чтение лога, обнаружение падения
