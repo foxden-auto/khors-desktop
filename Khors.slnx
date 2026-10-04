@@ -10,6 +10,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Khors.Architecture.Tests/Khors.Architecture.Tests.csproj" />
+    <Project Path="tests/Khors.Core.Tests/Khors.Core.Tests.csproj" />
   </Folder>
   <Folder Name="/solution/">
     <File Path="Directory.Build.props" />
