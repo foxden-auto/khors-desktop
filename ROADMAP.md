@@ -63,7 +63,8 @@
 
 - [ ] 2.1 Подписки: base64, список ссылок, Clash/mihomo YAML, sing-box JSON, Xray JSON; `subscription-userinfo`
   - Сделано (2.1а): модель подписки (адрес — секрет), `profiles.json` версии 2 с миграцией 1 → 2; форматы: список ссылок и base64-список; заголовки `subscription-userinfo`, `profile-update-interval`, `profile-title`; загрузка в обход системного прокси (лимит 5 МБ, тайм-аут, перенаправления), при сетевой ошибке и подключённом KHORS — повтор через его прокси; обновление сохраняет Id тех же подключений, пустой ответ не стирает профили. Окно: адрес подписки и base64-содержимое во «Вставить из буфера», секция «Подписки» (трафик, срок, обновление, ошибка, удаление вместе с профилями), имя подписки у её профилей. Импорт сохраняет пробелы в имени ссылки. User-Agent — `KHORS-Desktop/<версия>` (у подписки можно переопределить; согласовать с панелью серверов KHORS). Чек-лист `docs/testing/app-2.1.md`.
-  - Осталось: 2.1б — Clash/mihomo YAML (YamlDotNet, согласовано); 2.1в — sing-box JSON и Xray JSON.
+  - Сделано (2.1б): Clash/mihomo YAML — раздел `proxies` (vless, vmess, trojan, ss; tcp, http-маскировка, ws с early data и `v2ray-http-upgrade`, grpc, xhttp; tls, reality с `support-x25519mlkem768`; плагины ss → SIP003). YAML читается деревом узлов (YamlDotNet 18.1.0, MIT, в NOTICE; разрешён для Core в архитектурном тесте), неизвестные поля — в `unknownParams` с путём через точку. Hysteria2/TUIC/WireGuard — ошибка до 2.3. Вектор `Vectors/subscriptions/clash.yaml` с ожидаемыми профилями.
+  - Осталось: 2.1в — sing-box JSON и Xray JSON.
 - [ ] 2.2 Автообновление подписок
 - [ ] 2.3 Парсеры `hysteria2://`, `tuic://`, `wireguard://`
 - [ ] 2.4 Генератор конфига sing-box, управление процессом sing-box

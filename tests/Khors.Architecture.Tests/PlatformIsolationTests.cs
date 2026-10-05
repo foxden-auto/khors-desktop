@@ -29,15 +29,18 @@ public partial class PlatformIsolationTests
         Assert.DoesNotContain(references, r => RepositoryLayout.IsOsSpecificPlatformProject(r));
     }
 
+    /// <summary>Пакеты, которые Khors.Core может использовать: чистые библиотеки без ОС и UI (каждый — в NOTICE).</summary>
+    private static readonly string[] s_coreAllowedPackages = ["YamlDotNet"];
+
     [Fact]
-    public void CoreDependsOnlyOnBaseLibrary()
+    public void CoreDependsOnlyOnBaseLibraryAndAllowedPackages()
     {
         Assert.Empty(ProjectReferences("Khors.Core"));
-        Assert.Empty(ReferenceItems("Khors.Core", "PackageReference"));
+        Assert.All(ReferenceItems("Khors.Core", "PackageReference"), p => Assert.Contains(p, s_coreAllowedPackages));
 
         var references = Assembly.Load("Khors.Core").GetReferencedAssemblies().Select(a => a.Name!);
         Assert.All(references, r => Assert.True(
-            r.StartsWith("System.", StringComparison.Ordinal) || r is "System" or "netstandard",
+            r.StartsWith("System.", StringComparison.Ordinal) || r is "System" or "netstandard" || s_coreAllowedPackages.Contains(r),
             $"Khors.Core references {r}"));
     }
 

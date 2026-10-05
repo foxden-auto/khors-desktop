@@ -1,0 +1,42 @@
+{
+  "description": "Ожидаемые профили clash.yaml (без id); ошибки — прокси 6 (hysteria2 до ROADMAP 2.3) и 7 (нет порта)",
+  "profiles": [
+    {
+      "name": "Германия REALITY",
+      "server": { "host": "vpn.example.com", "port": 443 },
+      "protocol": { "type": "vless", "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b", "flow": "xtls-rprx-vision" },
+      "security": { "type": "reality", "sni": "www.example.org", "fingerprint": "chrome", "publicKey": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM", "shortId": "6ba85179e30d4fc2" }
+    },
+    {
+      "name": "VMess WS",
+      "server": { "host": "cdn.example.net", "port": 443 },
+      "protocol": { "type": "vmess", "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b", "alterId": 0, "cipher": "auto" },
+      "transport": { "type": "ws", "path": "/vm?ed=2048", "host": "cdn.example.net" },
+      "security": { "type": "tls", "sni": "cdn.example.net" }
+    },
+    {
+      "name": "Trojan gRPC",
+      "server": { "host": "198.51.100.7", "port": 8443 },
+      "protocol": { "type": "trojan", "password": "Fictional-Pa55" },
+      "transport": { "type": "grpc", "serviceName": "tun" },
+      "security": { "type": "tls", "sni": "grpc.example.net", "alpn": ["h2"] }
+    },
+    {
+      "name": "SS obfs",
+      "server": { "host": "192.0.2.44", "port": 8388 },
+      "protocol": { "type": "shadowsocks", "method": "chacha20-ietf-poly1305", "password": "SsPa55w0rd", "plugin": "obfs-local", "pluginOptions": "obfs=http;obfs-host=obfs.example.com" }
+    },
+    {
+      "name": "HTTPUpgrade",
+      "server": { "host": "up.example.net", "port": 443 },
+      "protocol": { "type": "vless", "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b" },
+      "transport": { "type": "httpupgrade", "path": "/up" },
+      "security": { "type": "tls" },
+      "unknownParams": [ { "key": "ip-version", "value": "ipv4" } ]
+    }
+  ],
+  "errors": [
+    { "line": 6, "code": "UnsupportedScheme", "field": "type" },
+    { "line": 7, "code": "InvalidPort", "field": "port" }
+  ]
+}

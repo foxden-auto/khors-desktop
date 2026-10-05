@@ -1,0 +1,85 @@
+# Вымышленная подписка в формате mihomo: адреса из RFC 5737, домены example.*, ключи сгенерированы для тестов.
+mixed-port: 7890
+allow-lan: false
+proxies:
+  - name: "Германия REALITY"
+    type: vless
+    server: vpn.example.com
+    port: 443
+    uuid: 3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b
+    network: tcp
+    tls: true
+    udp: true
+    flow: xtls-rprx-vision
+    servername: www.example.org
+    client-fingerprint: chrome
+    reality-opts:
+      public-key: Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM
+      short-id: 6ba85179e30d4fc2
+  - name: VMess WS
+    type: vmess
+    server: cdn.example.net
+    port: 443
+    uuid: 3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b
+    alterId: 0
+    cipher: auto
+    tls: true
+    servername: cdn.example.net
+    network: ws
+    ws-opts:
+      path: /vm
+      headers:
+        Host: cdn.example.net
+      max-early-data: 2048
+      early-data-header-name: Sec-WebSocket-Protocol
+  - name: Trojan gRPC
+    type: trojan
+    server: 198.51.100.7
+    port: 8443
+    password: Fictional-Pa55
+    sni: grpc.example.net
+    skip-cert-verify: false
+    alpn: [h2]
+    network: grpc
+    grpc-opts:
+      grpc-service-name: tun
+  - name: SS obfs
+    type: ss
+    server: 192.0.2.44
+    port: 8388
+    cipher: chacha20-ietf-poly1305
+    password: SsPa55w0rd
+    plugin: obfs
+    plugin-opts:
+      mode: http
+      host: obfs.example.com
+  - name: HTTPUpgrade
+    type: vless
+    server: up.example.net
+    port: 443
+    uuid: 3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b
+    tls: true
+    ip-version: ipv4
+    network: ws
+    ws-opts:
+      path: /up
+      v2ray-http-upgrade: true
+  - name: Hysteria2
+    type: hysteria2
+    server: hy.example.com
+    port: 443
+    password: Hy2Pa55
+  - name: Без порта
+    type: vless
+    server: noport.example.com
+    uuid: 3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b
+proxy-groups:
+  - name: Proxy
+    type: select
+    proxies: ["Германия REALITY", "VMess WS"]
+rule-providers:
+  ads:
+    type: http
+    url: https://rules.example.com/ads.yaml
+rules:
+  - MATCH,Proxy

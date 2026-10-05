@@ -24,6 +24,36 @@ public class SubscriptionContentTests
         Assert.Equal([new ImportLineError(6, new LinkParseError(LinkParseErrorCode.UnsupportedScheme, "scheme"))], result.Errors);
     }
 
+    [Fact]
+    public void ClashYamlIsParsedIntoProfiles()
+    {
+        var expected = System.Text.Json.Nodes.JsonNode.Parse(Vector("clash.expected.json"))!;
+
+        var result = SubscriptionContent.Parse(Vector("clash.yaml"));
+
+        Assert.Equal(SubscriptionFormat.ClashYaml, result.Format);
+        var expectedProfiles = expected["profiles"]!.AsArray().Select(node =>
+        {
+            node!["id"] = Guid.Empty.ToString();
+            return ProfileJson.Deserialize(node.ToJsonString());
+        }).ToList();
+        Assert.Equal(expectedProfiles.Select(ProfileJson.Serialize), result.Profiles.Select(ProfileJson.Serialize));
+        Assert.Equal(expectedProfiles, result.Profiles);
+        Assert.Equal(
+            expected["errors"]!.AsArray().Select(e => new ImportLineError(
+                e!["line"]!.GetValue<int>(),
+                new LinkParseError(Enum.Parse<LinkParseErrorCode>(e["code"]!.GetValue<string>()), e["field"]?.GetValue<string>()))),
+            result.Errors);
+    }
+
+    [Fact]
+    public void YamlWithoutProxiesIsNotClash() =>
+        Assert.Equal(SubscriptionFormat.Unknown, SubscriptionContent.Parse("proxies-count: 3\nrules: []\n").Format);
+
+    [Fact]
+    public void BrokenYamlIsNotClash() =>
+        Assert.Equal(SubscriptionFormat.Unknown, SubscriptionContent.Parse("proxies: [unclosed").Format);
+
     [Theory]
     [InlineData("html-page.txt")]
     [InlineData("")]

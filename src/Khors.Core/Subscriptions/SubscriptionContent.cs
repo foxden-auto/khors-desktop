@@ -13,6 +13,9 @@ public enum SubscriptionFormat
 
     /// <summary>Тот же список, закодированный в base64 (самый распространённый формат панелей).</summary>
     Base64LinkList,
+
+    /// <summary>YAML Clash / mihomo с разделом <c>proxies</c>.</summary>
+    ClashYaml,
 }
 
 /// <param name="Profiles">Профили подписки без Id (назначаются при слиянии), без повторов.</param>
@@ -24,7 +27,13 @@ public static class SubscriptionContent
     public static SubscriptionContentResult Parse(string body)
     {
         ArgumentNullException.ThrowIfNull(body);
-        var text = body.Trim().TrimStart('﻿');
+        var text = body.Trim().TrimStart('\uFEFF');
+
+        // YAML Clash проверяем первым: в нём бывают «://» (адреса наборов правил), а список ссылок — тоже валидный YAML.
+        if (text.Contains("proxies", StringComparison.Ordinal) && ClashYaml.TryParse(text, out var clashProfiles, out var clashErrors))
+        {
+            return Unique(SubscriptionFormat.ClashYaml, clashProfiles, clashErrors);
+        }
 
         if (LinkText.LooksLikeLinks(text))
         {
@@ -42,6 +51,11 @@ public static class SubscriptionContent
     private static SubscriptionContentResult FromLinks(SubscriptionFormat format, string text)
     {
         var (profiles, errors) = LinkText.Parse(text);
+        return Unique(format, profiles, errors);
+    }
+
+    private static SubscriptionContentResult Unique(SubscriptionFormat format, List<Profile> profiles, List<ImportLineError> errors)
+    {
         var unique = new List<Profile>();
         var seen = new HashSet<Profile>();
         foreach (var profile in profiles)
