@@ -28,6 +28,16 @@ public sealed partial class NamedPipeIpcServer : IIpcServerTransport
     {
     }
 
+    /// <summary>
+    /// Служба работает от SYSTEM — ACL как описано выше. Запуск из консоли под обычной учётной записью (разработка):
+    /// той же учётной записи — полный доступ, иначе она не сможет создавать следующие экземпляры канала.
+    /// </summary>
+    public static NamedPipeIpcServer ForCurrentProcess()
+    {
+        using var identity = WindowsIdentity.GetCurrent();
+        return identity.IsSystem ? new NamedPipeIpcServer() : new NamedPipeIpcServer(ServicePipeName, identity.User);
+    }
+
     /// <param name="ownerFullControl">Дополнительно полный доступ этой учётной записи — для тестов без прав SYSTEM.</param>
     internal NamedPipeIpcServer(string pipeName, SecurityIdentifier? ownerFullControl)
     {

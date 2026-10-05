@@ -64,6 +64,19 @@ public class LocalizationTests
                 keys.Add($"Problem_{problem}");
             }
 
+            foreach (var state in Enum.GetNames<Khors.Platform.ServiceState>())
+            {
+                keys.Add($"ServiceState_{state}");
+            }
+
+            foreach (var action in Enum.GetNames<Khors.Platform.ServiceSetupAction>())
+            {
+                keys.Add($"ServiceSetup_{action}_Succeeded");
+                keys.Add($"ServiceSetup_{action}_Failed");
+            }
+
+            keys.Add("ServiceSetup_Cancelled");
+            keys.Add("ServiceSetup_SetupNotFound");
             keys.Add("Problem_RealityRejected_SingBox");
             keys.Add("ConnectionProblemFormat");
 

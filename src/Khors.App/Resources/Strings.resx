@@ -21,6 +21,7 @@
   <data name="ButtonDelete" xml:space="preserve"><value>Delete</value></data>
   <data name="ButtonDisconnect" xml:space="preserve"><value>Disconnect</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Paste from clipboard</value></data>
+  <data name="ButtonInstallService" xml:space="preserve"><value>Install</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Latency</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Update</value></data>
   <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} GB</value></data>
@@ -130,6 +131,25 @@
   <data name="QrWindowTitle" xml:space="preserve"><value>Profile QR code</value></data>
   <data name="ScreenCaptureFailed" xml:space="preserve"><value>Could not capture the screen.</value></data>
   <data name="ScreenNoQr" xml:space="preserve"><value>No QR code was found on the screen. Open the image with the code on top of other windows and try again.</value></data>
+  <data name="ServiceInstallTooltip" xml:space="preserve"><value>Install the KHORS service (Windows will ask for administrator rights)</value></data>
+  <data name="ServiceLabelFormat" xml:space="preserve"><value>KHORS service (TUN mode): {0}</value></data>
+  <data name="ServiceNotResponding" xml:space="preserve"><value>started but not responding</value></data>
+  <data name="ServiceRemoveTooltip" xml:space="preserve"><value>Remove the KHORS service (Windows will ask for administrator rights)</value></data>
+  <data name="ServiceRunningFormat" xml:space="preserve"><value>running, version {0}</value></data>
+  <data name="ServiceSetup_Cancelled" xml:space="preserve"><value>Cancelled: administrator rights were not granted.</value></data>
+  <data name="ServiceSetup_Install_Failed" xml:space="preserve"><value>Failed to install the service. To see the reason, run “khors-service.exe install” in an administrator command prompt.</value></data>
+  <data name="ServiceSetup_Install_Succeeded" xml:space="preserve"><value>The KHORS service is installed and running.</value></data>
+  <data name="ServiceSetup_SetupNotFound" xml:space="preserve"><value>khors-service.exe is missing next to KHORS — the full KHORS build is required.</value></data>
+  <data name="ServiceSetup_Uninstall_Failed" xml:space="preserve"><value>Failed to remove the service. To see the reason, run “khors-service.exe uninstall” in an administrator command prompt.</value></data>
+  <data name="ServiceSetup_Uninstall_Succeeded" xml:space="preserve"><value>The KHORS service is removed.</value></data>
+  <data name="ServiceState_NotInstalled" xml:space="preserve"><value>not installed</value></data>
+  <data name="ServiceState_Running" xml:space="preserve"><value>running</value></data>
+  <data name="ServiceState_Starting" xml:space="preserve"><value>starting</value></data>
+  <data name="ServiceState_Stopped" xml:space="preserve"><value>stopped</value></data>
+  <data name="ServiceState_Stopping" xml:space="preserve"><value>stopping</value></data>
+  <data name="ServiceState_Unknown" xml:space="preserve"><value>state unknown</value></data>
+  <data name="ServiceUntrusted" xml:space="preserve"><value>the service channel is taken by another process</value></data>
+  <data name="ServiceVersionMismatch" xml:space="preserve"><value>different version — install again</value></data>
   <data name="SessionTimeFormat" xml:space="preserve"><value>Session time: {0}</value></data>
   <data name="SortByLatency" xml:space="preserve"><value>Sort by latency</value></data>
   <data name="SortByLatencyTooltip" xml:space="preserve"><value>Sort profiles by latency (fastest first)</value></data>

@@ -15,6 +15,7 @@ using Khors.Engines.Connection;
 using Khors.Engines.Latency;
 using Khors.Engines.Storage;
 using Khors.Engines.Subscriptions;
+using Khors.Ipc;
 using Khors.Platform;
 
 namespace Khors.App.ViewModels;
@@ -30,6 +31,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     private readonly ICoreLauncher _launcher;
     private readonly SubscriptionUpdater _subscriptionUpdater;
     private readonly AutoConnector _auto;
+    private readonly IServiceControl _service;
+    private readonly IIpcClientTransport _serviceTransport;
     private readonly DispatcherTimer _sessionTimer;
     private readonly Dictionary<Guid, LatencyResult> _latency = [];
     private Khors.Engines.Processes.CoreLogBuffer? _liveLog;
@@ -43,9 +46,13 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         IDesktopDialogs dialogs,
         ICoreLauncher launcher,
         SubscriptionUpdater subscriptionUpdater,
-        AutoConnector auto)
+        AutoConnector auto,
+        IServiceControl service,
+        IIpcClientTransport serviceTransport)
     {
         _auto = auto;
+        _service = service;
+        _serviceTransport = serviceTransport;
         _subscriptionUpdater = subscriptionUpdater;
         _profiles = profiles;
         _settings = settings;
@@ -71,6 +78,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         _connection.StatusChanged += OnConnectionStatusChanged;
         _auto.StatusChanged += OnAutoStatusChanged;
         _auto.Measured += OnAutoMeasured;
+        _ = RefreshServiceStatusAsync();
     }
 
     public ObservableCollection<ProfileItemViewModel> Profiles { get; } = [];
@@ -151,6 +159,25 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     [ObservableProperty]
     public partial bool SortByLatency { get; set; }
+
+    /// <summary>«Служба KHORS (режим TUN): работает, версия …».</summary>
+    [ObservableProperty]
+    public partial string ServiceStatusText { get; set; } = Localizer.Format("ServiceLabelFormat", Localizer.Get("ServiceState_Unknown"));
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(InstallServiceCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RemoveServiceCommand))]
+    public partial bool CanInstallService { get; set; }
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(InstallServiceCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RemoveServiceCommand))]
+    public partial bool CanRemoveService { get; set; }
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(InstallServiceCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RemoveServiceCommand))]
+    public partial bool IsServiceBusy { get; set; }
 
     public bool HasMessage => !string.IsNullOrEmpty(Message);
 
@@ -235,6 +262,70 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     [RelayCommand]
     private void SelectAuto() => IsAutoSelected = true;
+
+    [RelayCommand(CanExecute = nameof(CanRunInstallService))]
+    private Task InstallServiceAsync() => RunServiceSetupAsync(ServiceSetupAction.Install);
+
+    [RelayCommand(CanExecute = nameof(CanRunRemoveService))]
+    private Task RemoveServiceAsync() => RunServiceSetupAsync(ServiceSetupAction.Uninstall);
+
+    private bool CanRunInstallService() => CanInstallService && !IsServiceBusy;
+
+    private bool CanRunRemoveService() => CanRemoveService && !IsServiceBusy;
+
+    /// <summary>Установка и удаление — отдельным процессом с повышением прав; окно остаётся без прав администратора.</summary>
+    private async Task RunServiceSetupAsync(ServiceSetupAction action)
+    {
+        IsServiceBusy = true;
+        try
+        {
+            var result = await _service.RunElevatedSetupAsync(action, CancellationToken.None).ConfigureAwait(true);
+            Message = result is ServiceSetupResult.Cancelled or ServiceSetupResult.SetupNotFound
+                ? Localizer.Get($"ServiceSetup_{result}")
+                : Localizer.Get($"ServiceSetup_{action}_{result}");
+        }
+        finally
+        {
+            IsServiceBusy = false;
+        }
+
+        await RefreshServiceStatusAsync().ConfigureAwait(true);
+    }
+
+    /// <summary>Состояние службы; если запущена — рукопожатие по IPC (версия, тот ли процесс на другом конце канала).</summary>
+    private async Task RefreshServiceStatusAsync()
+    {
+        var state = await Task.Run(_service.GetState).ConfigureAwait(true);
+        var text = Localizer.Get($"ServiceState_{state}");
+        var mismatch = false;
+        if (state == ServiceState.Running)
+        {
+            try
+            {
+                await using var client = await IpcClient.ConnectAsync(_serviceTransport, AppVersion, TimeSpan.FromSeconds(3)).ConfigureAwait(true);
+                text = Localizer.Format("ServiceRunningFormat", client.Service.ServiceVersion);
+            }
+            catch (IpcVersionMismatchException)
+            {
+                text = Localizer.Get("ServiceVersionMismatch");
+                mismatch = true;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                text = Localizer.Get("ServiceUntrusted");
+            }
+            catch (Exception ex) when (ex is TimeoutException or IOException or IpcDisconnectedException or IpcProtocolException or OperationCanceledException)
+            {
+                text = Localizer.Get("ServiceNotResponding");
+            }
+        }
+
+        ServiceStatusText = Localizer.Format("ServiceLabelFormat", text);
+        CanInstallService = state == ServiceState.NotInstalled || mismatch;
+        CanRemoveService = state is not ServiceState.NotInstalled and not ServiceState.Unknown;
+    }
+
+    private static string AppVersion { get; } = typeof(MainWindowViewModel).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
 
     private TimeSpan AutoRecheckInterval() => TimeSpan.FromMinutes(Math.Clamp(_settings.Current.AutoRecheckMinutes, 1, 1440));
 

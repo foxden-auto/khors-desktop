@@ -1,7 +1,11 @@
+using Khors.Ipc;
+using Khors.Platform.Windows.Ipc;
 using Khors.Platform.Windows.Processes;
 using Khors.Platform.Windows.Proxy;
 using Khors.Platform.Windows.Screen;
+using Khors.Platform.Windows.Service;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Khors.Platform.Windows;
 
@@ -15,8 +19,25 @@ public static class WindowsPlatform
         services.AddSingleton<IChildProcessGuard, JobObjectChildProcessGuard>();
         services.AddSingleton<ISystemProxy>(_ => new WindowsSystemProxy(StateDirectory));
         services.AddSingleton<IScreenCapture, GdiScreenCapture>();
+        services.AddSingleton<IServiceControl, WindowsServiceControl>();
+
+        // Клиент IPC доверяет только процессу службы KhorsService (канал мог занять чужой процесс).
+        services.AddSingleton<IIpcClientTransport>(sp =>
+        {
+            var service = sp.GetRequiredService<IServiceControl>();
+            return new NamedPipeIpcClient(NamedPipeIpcServer.ServicePipeName, pid => service.GetProcessId() == pid);
+        });
 
         // Остальные реализации — по мере появления (ROADMAP 3.x, 4.x).
+        return services;
+    }
+
+    /// <summary>Для процесса службы: жизненный цикл службы Windows и сервер IPC на named pipe.</summary>
+    public static IServiceCollection AddWindowsServiceHost(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        services.AddWindowsService(options => options.ServiceName = WindowsServiceControl.ServiceName);
+        services.AddSingleton<IIpcServerTransport>(_ => NamedPipeIpcServer.ForCurrentProcess());
         return services;
     }
 

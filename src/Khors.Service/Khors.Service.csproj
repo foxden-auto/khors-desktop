@@ -2,6 +2,7 @@
   <!-- Привилегированная служба. API ОС — только через Khors.Platform.* из PlatformComposition.cs. -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <AssemblyName>khors-service</AssemblyName>
     <UserSecretsId />
   </PropertyGroup>
   <ItemGroup>

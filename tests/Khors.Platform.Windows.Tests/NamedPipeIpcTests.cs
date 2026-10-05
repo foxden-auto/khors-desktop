@@ -63,7 +63,7 @@ public class NamedPipeIpcTests
         var client = new NamedPipeIpcClient(name, _ => false);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => client.ConnectAsync(TimeSpan.FromSeconds(5), Ct));
-        (await accept).DisposeAsync().AsTask().Wait(Ct);
+        await (await accept).DisposeAsync();
     }
 
     [Fact]

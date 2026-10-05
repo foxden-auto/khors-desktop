@@ -45,11 +45,14 @@ CommunityToolkit.Mvvm 8.4.2      MIT            https://github.com/CommunityTool
 YamlDotNet 18.1.0                MIT            https://github.com/aaubry/YamlDotNet
 ZXing.Net 0.16.11                Apache-2.0     https://github.com/micjahn/ZXing.Net
 Microsoft.Extensions.* 10.0.12   MIT            https://github.com/dotnet/runtime
-  (Hosting, DependencyInjection,
+  (Hosting, Hosting.WindowsServices,
+  DependencyInjection,
   Configuration, Logging,
   Options and dependencies)
 System.Diagnostics.EventLog      MIT            https://github.com/dotnet/runtime
   10.0.12
+System.ServiceProcess            MIT            https://github.com/dotnet/runtime
+  .ServiceController 10.0.12
 
 Build-time only (not shipped): Avalonia.BuildServices 11.3.2 (MIT); its
 build telemetry is disabled in Directory.Build.targets.

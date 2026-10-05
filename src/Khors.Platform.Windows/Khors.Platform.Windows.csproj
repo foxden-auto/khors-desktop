@@ -10,6 +10,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <!-- Хост службы Windows (MIT, dotnet/runtime) — в NOTICE. -->
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Khors.Platform.Windows.Tests" />

@@ -55,18 +55,13 @@ public sealed record ErrorResponse(IpcErrorCode Code, int? ServiceProtocolVersio
 /// <summary>Кадр протокола: запрос и ответ на него с одинаковым <see cref="Id"/>; события службы — с <c>Id = 0</c>.</summary>
 public sealed record IpcEnvelope(long Id, IpcPayload Payload);
 
-/// <summary>Сериализация кадров. Сообщения не содержат секретов в открытом виде сверх нужного для команды.</summary>
+/// <summary>
+/// Сериализация кадров через генератор исходников (<see cref="IpcJsonContext"/>): не зависит от отражения,
+/// обрезки и AOT. Сообщения не содержат секретов сверх нужного для команды.
+/// </summary>
 public static class IpcSerializer
 {
-    private static readonly JsonSerializerOptions s_options = new(JsonSerializerDefaults.Web)
-    {
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        RespectNullableAnnotations = true,
-        RespectRequiredConstructorParameters = true,
-    };
-
-    public static byte[] Serialize(IpcEnvelope envelope) => JsonSerializer.SerializeToUtf8Bytes(envelope, s_options);
+    public static byte[] Serialize(IpcEnvelope envelope) => JsonSerializer.SerializeToUtf8Bytes(envelope, IpcJsonContext.Default.IpcEnvelope);
 
     /// <summary>
     /// Разбор кадра. При ошибке — <c>false</c>, <paramref name="error"/> и, если удалось прочитать, <paramref name="id"/>,
@@ -97,7 +92,7 @@ public static class IpcSerializer
                 return false;
             }
 
-            envelope = new IpcEnvelope(id, payload.Deserialize<IpcPayload>(s_options)!);
+            envelope = new IpcEnvelope(id, payload.Deserialize(IpcJsonContext.Default.IpcPayload)!);
             return true;
         }
         catch (Exception ex) when (ex is JsonException or NotSupportedException)
@@ -115,3 +110,12 @@ public static class IpcSerializer
 
     private static bool IsKnownType(string? type) => type is not null && s_knownTypes.Contains(type);
 }
+
+[JsonSourceGenerationOptions(
+    JsonSerializerDefaults.Web,
+    UseStringEnumConverter = true,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    RespectNullableAnnotations = true,
+    RespectRequiredConstructorParameters = true)]
+[JsonSerializable(typeof(IpcEnvelope))]
+internal sealed partial class IpcJsonContext : JsonSerializerContext;

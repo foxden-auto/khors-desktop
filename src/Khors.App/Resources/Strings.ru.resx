@@ -21,6 +21,7 @@
   <data name="ButtonDelete" xml:space="preserve"><value>Удалить</value></data>
   <data name="ButtonDisconnect" xml:space="preserve"><value>Отключить</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Вставить из буфера</value></data>
+  <data name="ButtonInstallService" xml:space="preserve"><value>Установить</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Задержка</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Обновить</value></data>
   <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} ГБ</value></data>
@@ -130,6 +131,25 @@
   <data name="QrWindowTitle" xml:space="preserve"><value>QR-код профиля</value></data>
   <data name="ScreenCaptureFailed" xml:space="preserve"><value>Не удалось сделать снимок экрана.</value></data>
   <data name="ScreenNoQr" xml:space="preserve"><value>На экране не найден QR-код. Откройте картинку с кодом поверх других окон и повторите.</value></data>
+  <data name="ServiceInstallTooltip" xml:space="preserve"><value>Установить службу KHORS (Windows спросит права администратора)</value></data>
+  <data name="ServiceLabelFormat" xml:space="preserve"><value>Служба KHORS (режим TUN): {0}</value></data>
+  <data name="ServiceNotResponding" xml:space="preserve"><value>запущена, но не отвечает</value></data>
+  <data name="ServiceRemoveTooltip" xml:space="preserve"><value>Удалить службу KHORS (Windows спросит права администратора)</value></data>
+  <data name="ServiceRunningFormat" xml:space="preserve"><value>работает, версия {0}</value></data>
+  <data name="ServiceSetup_Cancelled" xml:space="preserve"><value>Отменено: права администратора не выданы.</value></data>
+  <data name="ServiceSetup_Install_Failed" xml:space="preserve"><value>Не удалось установить службу. Чтобы увидеть причину, выполните «khors-service.exe install» в командной строке от имени администратора.</value></data>
+  <data name="ServiceSetup_Install_Succeeded" xml:space="preserve"><value>Служба KHORS установлена и запущена.</value></data>
+  <data name="ServiceSetup_SetupNotFound" xml:space="preserve"><value>Рядом с KHORS нет файла khors-service.exe — нужна полная сборка KHORS.</value></data>
+  <data name="ServiceSetup_Uninstall_Failed" xml:space="preserve"><value>Не удалось удалить службу. Чтобы увидеть причину, выполните «khors-service.exe uninstall» в командной строке от имени администратора.</value></data>
+  <data name="ServiceSetup_Uninstall_Succeeded" xml:space="preserve"><value>Служба KHORS удалена.</value></data>
+  <data name="ServiceState_NotInstalled" xml:space="preserve"><value>не установлена</value></data>
+  <data name="ServiceState_Running" xml:space="preserve"><value>работает</value></data>
+  <data name="ServiceState_Starting" xml:space="preserve"><value>запускается</value></data>
+  <data name="ServiceState_Stopped" xml:space="preserve"><value>остановлена</value></data>
+  <data name="ServiceState_Stopping" xml:space="preserve"><value>останавливается</value></data>
+  <data name="ServiceState_Unknown" xml:space="preserve"><value>состояние неизвестно</value></data>
+  <data name="ServiceUntrusted" xml:space="preserve"><value>канал службы занят другим процессом</value></data>
+  <data name="ServiceVersionMismatch" xml:space="preserve"><value>другой версии — установите заново</value></data>
   <data name="SessionTimeFormat" xml:space="preserve"><value>Время сессии: {0}</value></data>
   <data name="SortByLatency" xml:space="preserve"><value>Сортировать по задержке</value></data>
   <data name="SortByLatencyTooltip" xml:space="preserve"><value>Сортировать профили по задержке (сначала самые быстрые)</value></data>
