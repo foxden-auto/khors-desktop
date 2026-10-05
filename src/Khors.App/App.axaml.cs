@@ -88,7 +88,7 @@ public partial class App : Application, IDisposable
         services.AddSingleton(new SecretMasker());
         services.AddSingleton(sp => ProfileRepository.Open(sp.GetRequiredService<AppPaths>().ProfilesFile));
         services.AddSingleton(sp => SettingsStore.Open(sp.GetRequiredService<AppPaths>().SettingsFile));
-        services.AddSingleton<ICoreLauncher>(sp => new XrayCoreLauncher(sp.GetRequiredService<SecretMasker>(), sp.GetService<IChildProcessGuard>()));
+        services.AddSingleton<ICoreLauncher>(sp => new SelectingCoreLauncher(sp.GetRequiredService<SecretMasker>(), sp.GetService<IChildProcessGuard>()));
         services.AddSingleton(sp => new ConnectionManager(sp.GetRequiredService<ICoreLauncher>(), sp.GetService<ISystemProxy>(), SystemProxyWatchdog.EnsureStarted));
         services.AddSingleton<IClipboardText>(_ => new WindowClipboardText(() => _window));
         services.AddSingleton(sp =>

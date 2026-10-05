@@ -18,12 +18,12 @@
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Latency: {0}</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a vless://, vmess://, trojan:// or ss:// link and press “Paste from clipboard”.</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Core log</value></data>
-  <data name="Failure_CoreCrashed" xml:space="preserve"><value>Xray exited unexpectedly (code {0}). System proxy restored.</value></data>
-  <data name="Failure_CoreNotFound" xml:space="preserve"><value>The Xray executable was not found. Reinstall KHORS.</value></data>
-  <data name="Failure_CoreStartFailed" xml:space="preserve"><value>Xray failed to start (code {0}). See the log below.</value></data>
+  <data name="Failure_CoreCrashed" xml:space="preserve"><value>The {0} core exited unexpectedly (code {1}). System proxy restored.</value></data>
+  <data name="Failure_CoreNotFound" xml:space="preserve"><value>The {0} core executable was not found. Reinstall KHORS.</value></data>
+  <data name="Failure_CoreStartFailed" xml:space="preserve"><value>The {0} core failed to start (code {1}). See the log below.</value></data>
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>The profile has an error: {0}.</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Could not enable the Windows system proxy.</value></data>
-  <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>Xray does not support this profile: {0}.</value></data>
+  <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>The {0} core does not support this profile: {1}.</value></data>
   <data name="ImportLineErrorFormat" xml:space="preserve"><value>Link {0}: {1}</value></data>
   <data name="ImportResultFormat" xml:space="preserve"><value>Added: {0}. Already present: {1}. Not recognized: {2}.</value></data>
   <data name="Issue_AlterIdNegative" xml:space="preserve"><value>alterId is negative</value></data>
@@ -75,7 +75,7 @@
   <data name="LinkError_UnsupportedScheme" xml:space="preserve"><value>unsupported link type</value></data>
   <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>security type is not supported</value></data>
   <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>transport is not supported yet</value></data>
-  <data name="LocalProxyFormat" xml:space="preserve"><value>Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
+  <data name="LocalProxyFormat" xml:space="preserve"><value>Core: {2}. Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Mode: system proxy</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Select a profile below</value></data>
   <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Link parameters KHORS does not understand yet: {0}</value></data>
@@ -112,10 +112,18 @@
   <data name="TrayShow" xml:space="preserve"><value>Show window</value></data>
   <data name="TrayTooltipFormat" xml:space="preserve"><value>KHORS — {0}</value></data>
   <data name="Unsupported_Other" xml:space="preserve"><value>an unsupported feature</value></data>
-  <data name="Unsupported_core" xml:space="preserve"><value>the profile is assigned to sing-box</value></data>
-  <data name="Unsupported_protocol" xml:space="preserve"><value>Hysteria2, TUIC and WireGuard run through sing-box, coming in the next version</value></data>
+  <data name="Unsupported_core" xml:space="preserve"><value>the profile is manually assigned to another core</value></data>
+  <data name="Unsupported_protocol" xml:space="preserve"><value>Hysteria2, TUIC and WireGuard work only through sing-box</value></data>
   <data name="Unsupported_protocol_alterId" xml:space="preserve"><value>legacy VMess (alterId greater than 0)</value></data>
+  <data name="Unsupported_protocol_encryption" xml:space="preserve"><value>VLESS Encryption is available only in Xray</value></data>
   <data name="Unsupported_protocol_plugin" xml:space="preserve"><value>Shadowsocks plugins</value></data>
   <data name="Unsupported_security" xml:space="preserve"><value>VLESS/Trojan without TLS to a public address</value></data>
   <data name="Unsupported_security_allowInsecure" xml:space="preserve"><value>disabled certificate verification (allowInsecure) was removed in Xray 26</value></data>
+  <data name="Unsupported_security_mlDsa65Verify" xml:space="preserve"><value>the ML-DSA-65 key (pqv) is available only in Xray</value></data>
+  <data name="Unsupported_security_pinnedPeerCertSha256" xml:space="preserve"><value>pinned certificate (pinSHA256): sing-box pins the public key, not the certificate — use a certificate from a trusted CA (e.g. Let's Encrypt)</value></data>
+  <data name="Unsupported_security_supportsX25519MlKem768" xml:space="preserve"><value>the server expects X25519MLKEM768, which sing-box does not send — use the Xray core</value></data>
+  <data name="Unsupported_security_verifyPeerCertByName" xml:space="preserve"><value>certificate verification by name (vcn) is available only in Xray</value></data>
+  <data name="Unsupported_transport" xml:space="preserve"><value>the XHTTP transport is available only in Xray</value></data>
+  <data name="Unsupported_transport_headerType" xml:space="preserve"><value>TCP HTTP header obfuscation is available only in Xray</value></data>
+  <data name="Unsupported_transport_mode" xml:space="preserve"><value>gRPC multi mode is available only in Xray</value></data>
 </root>

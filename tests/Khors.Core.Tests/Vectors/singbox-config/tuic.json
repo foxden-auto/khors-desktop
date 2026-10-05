@@ -1,0 +1,73 @@
+{
+  "description": "TUIC: bbr, UDP через QUIC, 0-RTT, ALPN h3",
+  "link": "tuic://8d2e6f10-4b3a-4c5d-9e8f-0a1b2c3d4e5f:TuicPa55@203.0.113.20:443?congestion_control=bbr&udp_relay_mode=quic&alpn=h3&sni=tuic.example.com&allow_insecure=0&reduce_rtt=1#TUIC",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "expected": {
+    "log": {
+      "level": "warn",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "tuic",
+        "tag": "proxy",
+        "server": "203.0.113.20",
+        "server_port": 443,
+        "uuid": "8d2e6f10-4b3a-4c5d-9e8f-0a1b2c3d4e5f",
+        "password": "TuicPa55",
+        "congestion_control": "bbr",
+        "udp_relay_mode": "quic",
+        "zero_rtt_handshake": true,
+        "tls": {
+          "enabled": true,
+          "server_name": "tuic.example.com",
+          "alpn": [
+            "h3"
+          ]
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}

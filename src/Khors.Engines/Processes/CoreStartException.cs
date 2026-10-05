@@ -55,4 +55,7 @@ public sealed class CoreStartException : Exception
 
     /// <summary>Причина <see cref="CoreStartFailure.ConfigNotGenerated"/>.</summary>
     public CoreConfigError? ConfigError { get; init; }
+
+    /// <summary>Ядро, которое не запустилось.</summary>
+    public CoreKind? Core { get; init; }
 }

@@ -22,7 +22,7 @@ public class XrayLauncherTests
     private static readonly SecretMasker s_masker = new(Encoding.UTF8.GetBytes("engines-test"));
 
     // Порты выбирает ОС, чтобы тесты не конфликтовали между собой и с запущенным прокси разработчика.
-    private static readonly XrayStartOptions s_anyPorts = new() { PreferredSocksPort = null, PreferredHttpPort = null };
+    private static readonly CoreStartOptions s_anyPorts = new() { PreferredSocksPort = null, PreferredHttpPort = null };
 
     private static Profile LocalProfile() => new()
     {

@@ -6,6 +6,8 @@ namespace Khors.Engines.Connection;
 /// <summary>Запущенное ядро с локальными входами.</summary>
 public interface ICoreSession : IAsyncDisposable
 {
+    CoreKind Core { get; }
+
     int SocksPort { get; }
 
     int HttpPort { get; }

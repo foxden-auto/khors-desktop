@@ -1,0 +1,83 @@
+{
+  "description": "VMess WS: ?ed=2048 из пути → max_early_data",
+  "link": "vmess://eyJ2IjogIjIiLCAicHMiOiAi0J3QuNC00LXRgNC70LDQvdC00YsiLCAiYWRkIjogInZtLmV4YW1wbGUuY29tIiwgInBvcnQiOiAiNDQzIiwgImlkIjogIjNmMWMyYTllLTdiNGQtNGU4YS05YzIxLTVkNmU3ZjgwOWExYiIsICJhaWQiOiAiMCIsICJzY3kiOiAiYXV0byIsICJuZXQiOiAid3MiLCAidHlwZSI6ICJub25lIiwgImhvc3QiOiAiY2RuLmV4YW1wbGUubmV0IiwgInBhdGgiOiAiL3ZtIiwgInRscyI6ICJ0bHMiLCAic25pIjogImNkbi5leGFtcGxlLm5ldCIsICJhbHBuIjogImgyLGh0dHAvMS4xIiwgImZwIjogImNocm9tZSIsICJ0ZXN0IjogIngifQ==",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "expected": {
+    "log": {
+      "level": "warn",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "vmess",
+        "tag": "proxy",
+        "server": "vm.example.com",
+        "server_port": 443,
+        "uuid": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+        "security": "auto",
+        "alter_id": 0,
+        "tls": {
+          "enabled": true,
+          "server_name": "cdn.example.net",
+          "alpn": [
+            "h2",
+            "http/1.1"
+          ],
+          "utls": {
+            "enabled": true,
+            "fingerprint": "chrome"
+          }
+        },
+        "transport": {
+          "type": "ws",
+          "path": "/vm",
+          "headers": {
+            "Host": "cdn.example.net"
+          }
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}

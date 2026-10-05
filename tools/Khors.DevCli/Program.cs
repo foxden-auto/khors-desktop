@@ -160,12 +160,12 @@ static async Task<int> RunAsync(string[] args)
 
     using var onClose = PosixSignalRegistration.Create(PosixSignal.SIGHUP, _ => RestoreSystemProxy("закрытие окна"));
     using var onTerminate = PosixSignalRegistration.Create(PosixSignal.SIGTERM, _ => RestoreSystemProxy("завершение"));
-    XraySession session;
+    CoreSession session;
     try
     {
         session = await XrayLauncher.StartAsync(
             profile,
-            new XrayStartOptions { PreferredSocksPort = socksPort, PreferredHttpPort = httpPort, LogLevel = logLevel },
+            new CoreStartOptions { PreferredSocksPort = socksPort, PreferredHttpPort = httpPort, LogLevel = logLevel },
             masker,
             guard,
             stop.Token);

@@ -90,7 +90,7 @@ public sealed class ConnectionManager : IAsyncDisposable
             }
 
             Volatile.Write(ref _session, session);
-            SetStatus(new ConnectionStatus(ConnectionState.Connected, profile, session.SocksPort, session.HttpPort, _time.GetUtcNow()));
+            SetStatus(new ConnectionStatus(ConnectionState.Connected, profile, session.SocksPort, session.HttpPort, _time.GetUtcNow(), Core: session.Core));
             _ = WatchForCrashAsync(session);
         }
         finally
@@ -171,7 +171,8 @@ public sealed class ConnectionManager : IAsyncDisposable
             SetStatus(new ConnectionStatus(
                 ConnectionState.Failed,
                 profile,
-                Failure: new ConnectionFailure(ConnectionFailureKind.CoreCrashed, ExitCode: exit.ExitCode, LogTail: new EquatableArray<string>(session.Log.Tail(20)))));
+                Failure: new ConnectionFailure(ConnectionFailureKind.CoreCrashed, ExitCode: exit.ExitCode, LogTail: new EquatableArray<string>(session.Log.Tail(20)), Core: session.Core),
+                Core: session.Core));
         }
         finally
         {
@@ -181,9 +182,9 @@ public sealed class ConnectionManager : IAsyncDisposable
 
     private static ConnectionFailure FromStartException(CoreStartException ex) => ex.Failure switch
     {
-        CoreStartFailure.ExecutableNotFound => new ConnectionFailure(ConnectionFailureKind.CoreNotFound),
-        CoreStartFailure.ConfigNotGenerated => new ConnectionFailure(ConnectionFailureKind.UnsupportedByCore, ConfigError: ex.ConfigError),
-        _ => new ConnectionFailure(ConnectionFailureKind.CoreStartFailed, ExitCode: ex.ExitCode, LogTail: new EquatableArray<string>(ex.LogTail)),
+        CoreStartFailure.ExecutableNotFound => new ConnectionFailure(ConnectionFailureKind.CoreNotFound, Core: ex.Core),
+        CoreStartFailure.ConfigNotGenerated => new ConnectionFailure(ConnectionFailureKind.UnsupportedByCore, ConfigError: ex.ConfigError, Core: ex.Core),
+        _ => new ConnectionFailure(ConnectionFailureKind.CoreStartFailed, ExitCode: ex.ExitCode, LogTail: new EquatableArray<string>(ex.LogTail), Core: ex.Core),
     };
 
     private void SetStatus(ConnectionStatus status)

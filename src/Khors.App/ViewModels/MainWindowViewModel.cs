@@ -397,7 +397,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
 
         StatusDetail = status switch
         {
-            { State: ConnectionState.Connected, HttpPort: { } http, SocksPort: { } socks } => Localizer.Format("LocalProxyFormat", http, socks),
+            { State: ConnectionState.Connected, HttpPort: { } http, SocksPort: { } socks } => Localizer.Format("LocalProxyFormat", http, socks, Localizer.CoreName(status.Core)),
             { State: ConnectionState.Failed, Failure: { } failure } => Localizer.Describe(failure),
             { State: ConnectionState.Disconnected } when SelectedProfile is null => Localizer.Get("NoProfileSelected"),
             _ => null,

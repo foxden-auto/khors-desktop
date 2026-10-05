@@ -1,0 +1,67 @@
+{
+  "description": "Hysteria2 без диапазона портов",
+  "link": "hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com",
+  "options": {
+    "socksPort": 20808,
+    "httpPort": 20809,
+    "logLevel": "debug"
+  },
+  "expected": {
+    "log": {
+      "level": "debug",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 20808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 20809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "hysteria2",
+        "tag": "proxy",
+        "server": "hy.example.com",
+        "server_port": 443,
+        "password": "Hy2Pa55",
+        "tls": {
+          "enabled": true,
+          "server_name": "hy.example.com"
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}

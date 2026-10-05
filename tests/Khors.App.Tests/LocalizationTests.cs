@@ -16,8 +16,13 @@ public class LocalizationTests
 {
     private static readonly CultureInfo s_russian = CultureInfo.GetCultureInfo("ru");
 
-    // Поля, которые XrayConfigGenerator возвращает в CoreConfigError (UnsupportedFeature).
-    private static readonly string[] s_unsupportedFields = ["protocol.plugin", "protocol.alterId", "security.allowInsecure", "security", "protocol"];
+    // Поля, которые генераторы Xray и sing-box возвращают в CoreConfigError (UnsupportedFeature).
+    private static readonly string[] s_unsupportedFields =
+    [
+        "protocol.plugin", "protocol.alterId", "security.allowInsecure", "security", "protocol",
+        "protocol.encryption", "transport", "transport.headerType", "transport.mode",
+        "security.pinnedPeerCertSha256", "security.verifyPeerCertByName", "security.supportsX25519MlKem768", "security.mlDsa65Verify",
+    ];
 
     public static TheoryData<string> RequiredKeys
     {

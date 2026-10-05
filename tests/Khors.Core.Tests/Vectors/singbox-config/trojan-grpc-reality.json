@@ -1,0 +1,79 @@
+{
+  "description": "Trojan gRPC (gun) с REALITY",
+  "link": "trojan://Fictional-Pa55@vpn.example.com:443?type=grpc&serviceName=tr&security=reality&sni=www.example.org&pbk=Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM&sid=ab#r",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "expected": {
+    "log": {
+      "level": "warn",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "trojan",
+        "tag": "proxy",
+        "server": "vpn.example.com",
+        "server_port": 443,
+        "password": "Fictional-Pa55",
+        "tls": {
+          "enabled": true,
+          "server_name": "www.example.org",
+          "utls": {
+            "enabled": true,
+            "fingerprint": "chrome"
+          },
+          "reality": {
+            "enabled": true,
+            "public_key": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM",
+            "short_id": "ab"
+          }
+        },
+        "transport": {
+          "type": "grpc",
+          "service_name": "tr"
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}

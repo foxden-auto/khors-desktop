@@ -18,12 +18,12 @@
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Задержка: {0}</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку vless://, vmess://, trojan:// или ss:// и нажмите «Вставить из буфера».</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Лог ядра</value></data>
-  <data name="Failure_CoreCrashed" xml:space="preserve"><value>Xray неожиданно завершился (код {0}). Системный прокси возвращён.</value></data>
-  <data name="Failure_CoreNotFound" xml:space="preserve"><value>Не найден исполняемый файл Xray. Переустановите KHORS.</value></data>
-  <data name="Failure_CoreStartFailed" xml:space="preserve"><value>Xray не запустился (код {0}). Подробности — в логе ниже.</value></data>
+  <data name="Failure_CoreCrashed" xml:space="preserve"><value>Ядро {0} неожиданно завершилось (код {1}). Системный прокси возвращён.</value></data>
+  <data name="Failure_CoreNotFound" xml:space="preserve"><value>Не найден исполняемый файл ядра {0}. Переустановите KHORS.</value></data>
+  <data name="Failure_CoreStartFailed" xml:space="preserve"><value>Ядро {0} не запустилось (код {1}). Подробности — в логе ниже.</value></data>
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>В профиле ошибка: {0}.</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Не удалось включить системный прокси Windows.</value></data>
-  <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>Xray не поддерживает этот профиль: {0}.</value></data>
+  <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>Ядро {0} не поддерживает этот профиль: {1}.</value></data>
   <data name="ImportLineErrorFormat" xml:space="preserve"><value>Ссылка {0}: {1}</value></data>
   <data name="ImportResultFormat" xml:space="preserve"><value>Добавлено: {0}. Уже были: {1}. Не распознано: {2}.</value></data>
   <data name="Issue_AlterIdNegative" xml:space="preserve"><value>alterId меньше нуля</value></data>
@@ -75,7 +75,7 @@
   <data name="LinkError_UnsupportedScheme" xml:space="preserve"><value>неподдерживаемый тип ссылки</value></data>
   <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>тип шифрования не поддерживается</value></data>
   <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>транспорт пока не поддерживается</value></data>
-  <data name="LocalProxyFormat" xml:space="preserve"><value>Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
+  <data name="LocalProxyFormat" xml:space="preserve"><value>Ядро {2}. Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Выберите профиль в списке</value></data>
   <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Параметры ссылки, которые KHORS пока не понимает: {0}</value></data>
@@ -112,10 +112,18 @@
   <data name="TrayShow" xml:space="preserve"><value>Показать окно</value></data>
   <data name="TrayTooltipFormat" xml:space="preserve"><value>KHORS — {0}</value></data>
   <data name="Unsupported_Other" xml:space="preserve"><value>неподдерживаемая возможность</value></data>
-  <data name="Unsupported_core" xml:space="preserve"><value>профилю назначено ядро sing-box</value></data>
-  <data name="Unsupported_protocol" xml:space="preserve"><value>Hysteria2, TUIC и WireGuard работают через sing-box — он появится в следующей версии</value></data>
+  <data name="Unsupported_core" xml:space="preserve"><value>профилю вручную назначено другое ядро</value></data>
+  <data name="Unsupported_protocol" xml:space="preserve"><value>Hysteria2, TUIC и WireGuard работают только через sing-box</value></data>
   <data name="Unsupported_protocol_alterId" xml:space="preserve"><value>устаревший VMess (alterId больше 0)</value></data>
+  <data name="Unsupported_protocol_encryption" xml:space="preserve"><value>VLESS Encryption есть только в Xray</value></data>
   <data name="Unsupported_protocol_plugin" xml:space="preserve"><value>плагины Shadowsocks</value></data>
   <data name="Unsupported_security" xml:space="preserve"><value>VLESS/Trojan без TLS к публичному адресу</value></data>
   <data name="Unsupported_security_allowInsecure" xml:space="preserve"><value>отключённая проверка сертификата (allowInsecure) удалена в Xray 26</value></data>
+  <data name="Unsupported_security_mlDsa65Verify" xml:space="preserve"><value>ключ ML-DSA-65 (pqv) есть только в Xray</value></data>
+  <data name="Unsupported_security_pinnedPeerCertSha256" xml:space="preserve"><value>закреплённый сертификат (pinSHA256): sing-box закрепляет ключ, а не сертификат — используйте сертификат от доверенного центра (например, Let's Encrypt)</value></data>
+  <data name="Unsupported_security_supportsX25519MlKem768" xml:space="preserve"><value>сервер ждёт X25519MLKEM768, а sing-box его не отправляет — выберите ядро Xray</value></data>
+  <data name="Unsupported_security_verifyPeerCertByName" xml:space="preserve"><value>проверка сертификата по имени (vcn) есть только в Xray</value></data>
+  <data name="Unsupported_transport" xml:space="preserve"><value>транспорт XHTTP есть только в Xray</value></data>
+  <data name="Unsupported_transport_headerType" xml:space="preserve"><value>маскировка TCP под HTTP есть только в Xray</value></data>
+  <data name="Unsupported_transport_mode" xml:space="preserve"><value>gRPC в режиме multi есть только в Xray</value></data>
 </root>

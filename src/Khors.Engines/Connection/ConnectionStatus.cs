@@ -22,7 +22,8 @@ public sealed record ConnectionStatus(
     int? SocksPort = null,
     int? HttpPort = null,
     DateTimeOffset? ConnectedAt = null,
-    ConnectionFailure? Failure = null)
+    ConnectionFailure? Failure = null,
+    CoreKind? Core = null)
 {
     public static ConnectionStatus Disconnected { get; } = new(ConnectionState.Disconnected);
 }
@@ -49,9 +50,11 @@ public enum ConnectionFailureKind
 }
 
 /// <summary>Причина неудачи. <see cref="LogTail"/> — последние строки лога ядра, уже замаскированные.</summary>
+/// <param name="Core">Ядро, с которым произошла неудача; <c>null</c> — до запуска ядра.</param>
 public sealed record ConnectionFailure(
     ConnectionFailureKind Kind,
     ProfileIssueCode? Issue = null,
     CoreConfigError? ConfigError = null,
     int? ExitCode = null,
-    EquatableArray<string> LogTail = default);
+    EquatableArray<string> LogTail = default,
+    CoreKind? Core = null);

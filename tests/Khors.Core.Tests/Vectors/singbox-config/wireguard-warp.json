@@ -1,0 +1,76 @@
+{
+  "description": "WireGuard в короткой форме (адрес /32)",
+  "link": "wg://RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14%3D@wg.example.net:51820?public_key=S2BGSyYNxTf1wij4Qk%2F8nbbFhbbGfzsDwb4shXmfImw%3D&ip=172.16.0.2#WARP",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "expected": {
+    "log": {
+      "level": "warn",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "endpoints": [
+      {
+        "type": "wireguard",
+        "tag": "proxy",
+        "address": [
+          "172.16.0.2/32"
+        ],
+        "private_key": "RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14=",
+        "peers": [
+          {
+            "address": "wg.example.net",
+            "port": 51820,
+            "public_key": "S2BGSyYNxTf1wij4Qk/8nbbFhbbGfzsDwb4shXmfImw=",
+            "allowed_ips": [
+              "0.0.0.0/0",
+              "::/0"
+            ]
+          }
+        ]
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}

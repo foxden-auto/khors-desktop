@@ -1,0 +1,12 @@
+{
+  "description": "gRPC multi есть только в Xray",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@grpc.example.net:443?type=grpc&serviceName=tun&mode=multi&authority=grpc.example.net&security=tls&sni=grpc.example.net#grpc",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "error": {
+    "code": "UnsupportedFeature",
+    "field": "transport.mode"
+  }
+}

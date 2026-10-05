@@ -61,7 +61,7 @@ public class LatencyTesterTests
         RequireXray();
         var ct = TestContext.Current.CancellationToken;
         await using var server = new LocalHttpServer("HTTP/1.1 204 No Content");
-        var launcher = new XrayCoreLauncher(s_masker, guard: null);
+        var launcher = new CoreKindLauncher(CoreKind.Xray, s_masker, guard: null);
         await using var session = await launcher.StartAsync(LocalProfile(), new CoreStartPreferences(null, null), ct);
 
         var result = await LatencyTester.MeasureThroughProxyAsync(session.HttpPort, server.Url, TimeSpan.FromSeconds(5), ct);
@@ -80,7 +80,7 @@ public class LatencyTesterTests
         RequireXray();
         var ct = TestContext.Current.CancellationToken;
         await using var server = new LocalHttpServer("HTTP/1.1 500 Internal Server Error");
-        var launcher = new XrayCoreLauncher(s_masker, guard: null);
+        var launcher = new CoreKindLauncher(CoreKind.Xray, s_masker, guard: null);
         await using var session = await launcher.StartAsync(LocalProfile(), new CoreStartPreferences(null, null), ct);
 
         var result = await LatencyTester.MeasureThroughProxyAsync(session.HttpPort, server.Url, TimeSpan.FromSeconds(5), ct);
@@ -94,7 +94,7 @@ public class LatencyTesterTests
         RequireXray();
         var ct = TestContext.Current.CancellationToken;
         await using var server = new LocalHttpServer(response: null);
-        var launcher = new XrayCoreLauncher(s_masker, guard: null);
+        var launcher = new CoreKindLauncher(CoreKind.Xray, s_masker, guard: null);
         await using var session = await launcher.StartAsync(LocalProfile(), new CoreStartPreferences(null, null), ct);
 
         var result = await LatencyTester.MeasureThroughProxyAsync(session.HttpPort, server.Url, TimeSpan.FromSeconds(1), ct);
@@ -108,7 +108,7 @@ public class LatencyTesterTests
         RequireXray();
         var ct = TestContext.Current.CancellationToken;
         await using var server = new LocalHttpServer("HTTP/1.1 204 No Content");
-        var launcher = new RecordingLauncher(new XrayCoreLauncher(s_masker, guard: null));
+        var launcher = new RecordingLauncher(new CoreKindLauncher(CoreKind.Xray, s_masker, guard: null));
 
         var result = await LatencyTester.MeasureProfileAsync(LocalProfile(), launcher, server.Url, TimeSpan.FromSeconds(5), ct);
 
@@ -121,7 +121,7 @@ public class LatencyTesterTests
     public async Task ProfileUnsupportedByCoreIsReportedWithoutStartingCore()
     {
         var profile = LocalProfile() with { Security = new TlsSecurity { Sni = "local.example.com", AllowInsecure = true } };
-        var launcher = new RecordingLauncher(new XrayCoreLauncher(s_masker, guard: null));
+        var launcher = new RecordingLauncher(new CoreKindLauncher(CoreKind.Xray, s_masker, guard: null));
 
         var result = await LatencyTester.MeasureProfileAsync(profile, launcher, new Uri("http://127.0.0.1:1/"), TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
 

@@ -21,7 +21,7 @@ STRINGS = {
     "ModeSystemProxy": ("Режим: системный прокси", "Mode: system proxy"),
     "NoProfileSelected": ("Выберите профиль в списке", "Select a profile below"),
     "SessionTimeFormat": ("Время сессии: {0}", "Session time: {0}"),
-    "LocalProxyFormat": ("Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}", "Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}"),
+    "LocalProxyFormat": ("Ядро {2}. Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}", "Core: {2}. Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}"),
     "FailureDetails": ("Лог ядра", "Core log"),
     # Профили
     "ProfilesHeader": ("Профили", "Profiles"),
@@ -120,10 +120,10 @@ STRINGS = {
     "Issue_UnknownParameters": ("в ссылке есть параметры, которые KHORS пока не понимает", "the link has parameters KHORS does not understand yet"),
     # Причины неудачи подключения (ConnectionFailureKind)
     "Failure_ProfileInvalid": ("В профиле ошибка: {0}.", "The profile has an error: {0}."),
-    "Failure_UnsupportedByCore": ("Xray не поддерживает этот профиль: {0}.", "Xray does not support this profile: {0}."),
-    "Failure_CoreNotFound": ("Не найден исполняемый файл Xray. Переустановите KHORS.", "The Xray executable was not found. Reinstall KHORS."),
-    "Failure_CoreStartFailed": ("Xray не запустился (код {0}). Подробности — в логе ниже.", "Xray failed to start (code {0}). See the log below."),
-    "Failure_CoreCrashed": ("Xray неожиданно завершился (код {0}). Системный прокси возвращён.", "Xray exited unexpectedly (code {0}). System proxy restored."),
+    "Failure_UnsupportedByCore": ("Ядро {0} не поддерживает этот профиль: {1}.", "The {0} core does not support this profile: {1}."),
+    "Failure_CoreNotFound": ("Не найден исполняемый файл ядра {0}. Переустановите KHORS.", "The {0} core executable was not found. Reinstall KHORS."),
+    "Failure_CoreStartFailed": ("Ядро {0} не запустилось (код {1}). Подробности — в логе ниже.", "The {0} core failed to start (code {1}). See the log below."),
+    "Failure_CoreCrashed": ("Ядро {0} неожиданно завершилось (код {1}). Системный прокси возвращён.", "The {0} core exited unexpectedly (code {1}). System proxy restored."),
     "Failure_SystemProxyFailed": ("Не удалось включить системный прокси Windows.", "Could not enable the Windows system proxy."),
     # Что именно не поддерживает Xray (CoreConfigError.Field, точки заменены на _)
     "Unsupported_security_allowInsecure": ("отключённая проверка сертификата (allowInsecure) удалена в Xray 26",
@@ -131,8 +131,16 @@ STRINGS = {
     "Unsupported_security": ("VLESS/Trojan без TLS к публичному адресу", "VLESS/Trojan without TLS to a public address"),
     "Unsupported_protocol_plugin": ("плагины Shadowsocks", "Shadowsocks plugins"),
     "Unsupported_protocol_alterId": ("устаревший VMess (alterId больше 0)", "legacy VMess (alterId greater than 0)"),
-    "Unsupported_protocol": ("Hysteria2, TUIC и WireGuard работают через sing-box — он появится в следующей версии", "Hysteria2, TUIC and WireGuard run through sing-box, coming in the next version"),
-    "Unsupported_core": ("профилю назначено ядро sing-box", "the profile is assigned to sing-box"),
+    "Unsupported_protocol": ("Hysteria2, TUIC и WireGuard работают только через sing-box", "Hysteria2, TUIC and WireGuard work only through sing-box"),
+    "Unsupported_protocol_encryption": ("VLESS Encryption есть только в Xray", "VLESS Encryption is available only in Xray"),
+    "Unsupported_transport": ("транспорт XHTTP есть только в Xray", "the XHTTP transport is available only in Xray"),
+    "Unsupported_transport_headerType": ("маскировка TCP под HTTP есть только в Xray", "TCP HTTP header obfuscation is available only in Xray"),
+    "Unsupported_transport_mode": ("gRPC в режиме multi есть только в Xray", "gRPC multi mode is available only in Xray"),
+    "Unsupported_security_pinnedPeerCertSha256": ("закреплённый сертификат (pinSHA256): sing-box закрепляет ключ, а не сертификат — используйте сертификат от доверенного центра (например, Let's Encrypt)", "pinned certificate (pinSHA256): sing-box pins the public key, not the certificate — use a certificate from a trusted CA (e.g. Let's Encrypt)"),
+    "Unsupported_security_verifyPeerCertByName": ("проверка сертификата по имени (vcn) есть только в Xray", "certificate verification by name (vcn) is available only in Xray"),
+    "Unsupported_security_supportsX25519MlKem768": ("сервер ждёт X25519MLKEM768, а sing-box его не отправляет — выберите ядро Xray", "the server expects X25519MLKEM768, which sing-box does not send — use the Xray core"),
+    "Unsupported_security_mlDsa65Verify": ("ключ ML-DSA-65 (pqv) есть только в Xray", "the ML-DSA-65 key (pqv) is available only in Xray"),
+    "Unsupported_core": ("профилю вручную назначено другое ядро", "the profile is manually assigned to another core"),
     "Unsupported_Other": ("неподдерживаемая возможность", "an unsupported feature"),
 }
 

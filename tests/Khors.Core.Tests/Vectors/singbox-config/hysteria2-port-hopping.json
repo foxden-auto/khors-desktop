@@ -1,0 +1,71 @@
+{
+  "description": "Hysteria2: диапазон портов → server_ports «a:b», без server_port; скорость",
+  "link": "hy2://user%3AHy2Pa55@[2001:db8::30]:443,20000-30000/?sni=hy.example.com&up=50%20Mbps&down=200#Hopping",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809
+  },
+  "expected": {
+    "log": {
+      "level": "warn",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "hysteria2",
+        "tag": "proxy",
+        "server": "2001:db8::30",
+        "server_ports": [
+          "443:443",
+          "20000:30000"
+        ],
+        "password": "user:Hy2Pa55",
+        "up_mbps": 50,
+        "down_mbps": 200,
+        "tls": {
+          "enabled": true,
+          "server_name": "hy.example.com"
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}

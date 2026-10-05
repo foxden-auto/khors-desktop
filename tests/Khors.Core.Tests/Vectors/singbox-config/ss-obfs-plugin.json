@@ -1,0 +1,65 @@
+{
+  "description": "Shadowsocks с плагином obfs-local",
+  "link": "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpTc1BhNTV3MHJk@192.0.2.44:8388/?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dobfs.example.com#ss",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809,
+    "logLevel": "none"
+  },
+  "expected": {
+    "log": {
+      "disabled": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "shadowsocks",
+        "tag": "proxy",
+        "server": "192.0.2.44",
+        "server_port": 8388,
+        "method": "chacha20-ietf-poly1305",
+        "password": "SsPa55w0rd",
+        "plugin": "obfs-local",
+        "plugin_opts": "obfs=http;obfs-host=obfs.example.com"
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}

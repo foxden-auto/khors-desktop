@@ -181,6 +181,8 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
     {
         private readonly TaskCompletionSource<CoreExit> _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
+        public CoreKind Core => CoreKind.Xray;
+
         public int SocksPort => 2000;
 
         public int HttpPort => 2001;

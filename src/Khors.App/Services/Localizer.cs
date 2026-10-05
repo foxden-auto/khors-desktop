@@ -4,6 +4,7 @@ using Khors.Core.Generators;
 using Khors.Core.Import;
 using Khors.Core.Profiles;
 using Khors.Core.Subscriptions;
+using Khors.Engines;
 using Khors.Engines.Connection;
 using Khors.Engines.Latency;
 
@@ -46,14 +47,24 @@ public static class Localizer
     {
         ArgumentNullException.ThrowIfNull(failure);
         var exitCode = failure.ExitCode?.ToString(CultureInfo.CurrentCulture) ?? "?";
+        var core = CoreName(failure.Core);
         return failure.Kind switch
         {
             ConnectionFailureKind.ProfileInvalid => Format("Failure_ProfileInvalid", failure.Issue is { } issue ? Describe(issue) : string.Empty),
-            ConnectionFailureKind.UnsupportedByCore => Format("Failure_UnsupportedByCore", DescribeUnsupported(failure.ConfigError)),
-            ConnectionFailureKind.CoreStartFailed or ConnectionFailureKind.CoreCrashed => Format($"Failure_{failure.Kind}", exitCode),
+            ConnectionFailureKind.UnsupportedByCore => Format("Failure_UnsupportedByCore", core, DescribeUnsupported(failure.ConfigError)),
+            ConnectionFailureKind.CoreStartFailed or ConnectionFailureKind.CoreCrashed => Format($"Failure_{failure.Kind}", core, exitCode),
+            ConnectionFailureKind.CoreNotFound => Format("Failure_CoreNotFound", core),
             _ => Get($"Failure_{failure.Kind}"),
         };
     }
+
+    /// <summary>Название ядра — как у проекта (не переводится).</summary>
+    public static string CoreName(CoreKind? core) => core switch
+    {
+        CoreKind.Xray => "Xray",
+        CoreKind.SingBox => "sing-box",
+        _ => string.Empty,
+    };
 
     private static string DescribeUnsupported(CoreConfigError? error) => error switch
     {
