@@ -16,6 +16,9 @@
   <Color x:Key="KhorsDestructiveColor">#FF9999</Color>
   <Color x:Key="KhorsBorderColor">#2D3335</Color>
   <Color x:Key="KhorsInputColor">#656969</Color>
+  <!-- QR-код: чёрный на белом при любой теме, иначе его не прочитают камеры. -->
+  <Color x:Key="KhorsQrDarkColor">#000000</Color>
+  <Color x:Key="KhorsQrLightColor">#FFFFFF</Color>
 
   <SolidColorBrush x:Key="KhorsBackgroundBrush" Color="{StaticResource KhorsBackgroundColor}" />
   <SolidColorBrush x:Key="KhorsForegroundBrush" Color="{StaticResource KhorsForegroundColor}" />

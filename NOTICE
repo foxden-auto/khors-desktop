@@ -43,6 +43,7 @@ MicroCom.Runtime 0.11.6          MIT            https://github.com/kekekeks/Micr
 Tmds.DBus.Protocol 0.94.1        MIT            https://github.com/tmds/Tmds.DBus
 CommunityToolkit.Mvvm 8.4.2      MIT            https://github.com/CommunityToolkit/dotnet
 YamlDotNet 18.1.0                MIT            https://github.com/aaubry/YamlDotNet
+ZXing.Net 0.16.11                Apache-2.0     https://github.com/micjahn/ZXing.Net
 Microsoft.Extensions.* 10.0.12   MIT            https://github.com/dotnet/runtime
   (Hosting, DependencyInjection,
   Configuration, Logging,

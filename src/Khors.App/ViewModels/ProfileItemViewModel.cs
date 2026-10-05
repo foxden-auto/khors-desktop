@@ -80,6 +80,9 @@ public sealed partial class ProfileItemViewModel(Profile profile, IProfileAction
     [RelayCommand]
     private Task CopyLinkAsync() => actions?.CopyLinkAsync(this) ?? Task.CompletedTask;
 
+    [RelayCommand]
+    private Task ShowQrAsync() => actions?.ShowQrAsync(this) ?? Task.CompletedTask;
+
     private static string? DescribeCore(Profile profile) => CoreSelection.Select(profile) is { Unsupported: { } field } choice
         ? Localizer.Format("Failure_UnsupportedByCore", Localizer.CoreName(choice.Core), Localizer.DescribeUnsupported(field))
         : null;
@@ -125,4 +128,6 @@ public interface IProfileActions
     Task SetCoreAsync(ProfileItemViewModel item, CorePreference core);
 
     Task CopyLinkAsync(ProfileItemViewModel item);
+
+    Task ShowQrAsync(ProfileItemViewModel item);
 }

@@ -6,8 +6,10 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
+  <data name="ButtonClose" xml:space="preserve"><value>Close</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Connect</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Copy the whole log</value></data>
+  <data name="ButtonCopyImage" xml:space="preserve"><value>Copy image</value></data>
   <data name="ButtonDelete" xml:space="preserve"><value>Delete</value></data>
   <data name="ButtonDisconnect" xml:space="preserve"><value>Disconnect</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Paste from clipboard</value></data>
@@ -15,12 +17,13 @@
   <data name="ButtonUpdate" xml:space="preserve"><value>Update</value></data>
   <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} GB</value></data>
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} MB</value></data>
-  <data name="ClipboardEmpty" xml:space="preserve"><value>The clipboard contains no text.</value></data>
+  <data name="ClipboardEmpty" xml:space="preserve"><value>The clipboard contains neither a link nor a QR code image.</value></data>
+  <data name="ClipboardNoQr" xml:space="preserve"><value>No QR code was found in the clipboard image.</value></data>
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Latency: {0}</value></data>
   <data name="CoreAutoFormat" xml:space="preserve"><value>Automatic (now {0})</value></data>
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>The {0} core cannot run this profile: {1}. The core choice was not changed.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Core log copied to the clipboard: {0} lines. Addresses and keys are masked.</value></data>
-  <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a vless://, vmess://, trojan:// or ss:// link and press “Paste from clipboard”.</value></data>
+  <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a link, a subscription address or a QR code image and press “Paste from clipboard”.</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Core log</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>The {0} core exited unexpectedly (code {1}). System proxy restored.</value></data>
   <data name="Failure_CoreNotFound" xml:space="preserve"><value>The {0} core executable was not found. Reinstall KHORS.</value></data>
@@ -28,6 +31,12 @@
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>The profile has an error: {0}.</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Could not enable the Windows system proxy.</value></data>
   <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>The {0} core does not support this profile: {1}.</value></data>
+  <data name="FileEmpty" xml:space="preserve"><value>The file is empty.</value></data>
+  <data name="FileNoQr" xml:space="preserve"><value>No QR code was found in the file.</value></data>
+  <data name="FileReadFailed" xml:space="preserve"><value>Could not read the file.</value></data>
+  <data name="FileTooLarge" xml:space="preserve"><value>The file is larger than 5 MB — it is not a config or a QR code image.</value></data>
+  <data name="FileTypeImportable" xml:space="preserve"><value>QR code images, links and configs</value></data>
+  <data name="ImportFileDialogTitle" xml:space="preserve"><value>Import: QR code, links or config</value></data>
   <data name="ImportLineErrorFormat" xml:space="preserve"><value>Link {0}: {1}</value></data>
   <data name="ImportResultFormat" xml:space="preserve"><value>Added: {0}. Already present: {1}. Not recognized: {2}.</value></data>
   <data name="Issue_AlterIdNegative" xml:space="preserve"><value>alterId is negative</value></data>
@@ -83,12 +92,18 @@
   <data name="LocalProxyFormat" xml:space="preserve"><value>Core: {2}. Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
   <data name="MenuCopyLink" xml:space="preserve"><value>Copy link</value></data>
   <data name="MenuCore" xml:space="preserve"><value>Core</value></data>
+  <data name="MenuImportFile" xml:space="preserve"><value>From file…</value></data>
+  <data name="MenuShowQr" xml:space="preserve"><value>Show QR code</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Mode: system proxy</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Select a profile below</value></data>
   <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Link parameters KHORS does not understand yet: {0}</value></data>
   <data name="ProfileWarningsFormat" xml:space="preserve"><value>Warning: {0}</value></data>
   <data name="ProfilesHeader" xml:space="preserve"><value>Profiles</value></data>
   <data name="ProxyRecoveredAfterCrash" xml:space="preserve"><value>System proxy restored after KHORS terminated unexpectedly.</value></data>
+  <data name="QrImageCopied" xml:space="preserve"><value>The image was copied to the clipboard.</value></data>
+  <data name="QrTooLong" xml:space="preserve"><value>The link is too long for a QR code — use “Copy link”.</value></data>
+  <data name="QrWarning" xml:space="preserve"><value>The code contains server access keys. Show it only to people you trust.</value></data>
+  <data name="QrWindowTitle" xml:space="preserve"><value>Profile QR code</value></data>
   <data name="SessionTimeFormat" xml:space="preserve"><value>Session time: {0}</value></data>
   <data name="StatusConnected" xml:space="preserve"><value>Connected</value></data>
   <data name="StatusConnecting" xml:space="preserve"><value>Connecting…</value></data>

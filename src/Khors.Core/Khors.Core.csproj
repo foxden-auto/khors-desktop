@@ -6,5 +6,6 @@
   <ItemGroup>
     <!-- Разбор подписок Clash/mihomo (ROADMAP 2.1б). Чистая библиотека без ОС и UI; разрешена в Architecture.Tests. -->
     <PackageReference Include="YamlDotNet" />
+    <PackageReference Include="ZXing.Net" />
   </ItemGroup>
 </Project>

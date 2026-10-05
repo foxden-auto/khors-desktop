@@ -6,8 +6,10 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
+  <data name="ButtonClose" xml:space="preserve"><value>Закрыть</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Подключить</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Копировать весь лог</value></data>
+  <data name="ButtonCopyImage" xml:space="preserve"><value>Копировать картинку</value></data>
   <data name="ButtonDelete" xml:space="preserve"><value>Удалить</value></data>
   <data name="ButtonDisconnect" xml:space="preserve"><value>Отключить</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Вставить из буфера</value></data>
@@ -15,12 +17,13 @@
   <data name="ButtonUpdate" xml:space="preserve"><value>Обновить</value></data>
   <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} ГБ</value></data>
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} МБ</value></data>
-  <data name="ClipboardEmpty" xml:space="preserve"><value>В буфере обмена нет текста.</value></data>
+  <data name="ClipboardEmpty" xml:space="preserve"><value>В буфере обмена нет ни ссылки, ни картинки с QR-кодом.</value></data>
+  <data name="ClipboardNoQr" xml:space="preserve"><value>На картинке в буфере обмена не найден QR-код.</value></data>
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Задержка: {0}</value></data>
   <data name="CoreAutoFormat" xml:space="preserve"><value>Автоматически (сейчас {0})</value></data>
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>Ядро {0} не запустит этот профиль: {1}. Выбор ядра не изменён.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Лог ядра скопирован в буфер обмена: строк {0}. Адреса и ключи в нём замаскированы.</value></data>
-  <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку vless://, vmess://, trojan:// или ss:// и нажмите «Вставить из буфера».</value></data>
+  <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку, адрес подписки или картинку с QR-кодом и нажмите «Вставить из буфера».</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Лог ядра</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>Ядро {0} неожиданно завершилось (код {1}). Системный прокси возвращён.</value></data>
   <data name="Failure_CoreNotFound" xml:space="preserve"><value>Не найден исполняемый файл ядра {0}. Переустановите KHORS.</value></data>
@@ -28,6 +31,12 @@
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>В профиле ошибка: {0}.</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Не удалось включить системный прокси Windows.</value></data>
   <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>Ядро {0} не поддерживает этот профиль: {1}.</value></data>
+  <data name="FileEmpty" xml:space="preserve"><value>Файл пустой.</value></data>
+  <data name="FileNoQr" xml:space="preserve"><value>В файле не найден QR-код.</value></data>
+  <data name="FileReadFailed" xml:space="preserve"><value>Не удалось прочитать файл.</value></data>
+  <data name="FileTooLarge" xml:space="preserve"><value>Файл больше 5 МБ — это не конфиг и не картинка с QR-кодом.</value></data>
+  <data name="FileTypeImportable" xml:space="preserve"><value>Картинки с QR-кодом, ссылки и конфиги</value></data>
+  <data name="ImportFileDialogTitle" xml:space="preserve"><value>Импорт: QR-код, ссылки или конфиг</value></data>
   <data name="ImportLineErrorFormat" xml:space="preserve"><value>Ссылка {0}: {1}</value></data>
   <data name="ImportResultFormat" xml:space="preserve"><value>Добавлено: {0}. Уже были: {1}. Не распознано: {2}.</value></data>
   <data name="Issue_AlterIdNegative" xml:space="preserve"><value>alterId меньше нуля</value></data>
@@ -83,12 +92,18 @@
   <data name="LocalProxyFormat" xml:space="preserve"><value>Ядро {2}. Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
   <data name="MenuCopyLink" xml:space="preserve"><value>Копировать ссылку</value></data>
   <data name="MenuCore" xml:space="preserve"><value>Ядро</value></data>
+  <data name="MenuImportFile" xml:space="preserve"><value>Из файла…</value></data>
+  <data name="MenuShowQr" xml:space="preserve"><value>Показать QR-код</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Выберите профиль в списке</value></data>
   <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Параметры ссылки, которые KHORS пока не понимает: {0}</value></data>
   <data name="ProfileWarningsFormat" xml:space="preserve"><value>Предупреждение: {0}</value></data>
   <data name="ProfilesHeader" xml:space="preserve"><value>Профили</value></data>
   <data name="ProxyRecoveredAfterCrash" xml:space="preserve"><value>Системный прокси восстановлен после аварийного завершения KHORS.</value></data>
+  <data name="QrImageCopied" xml:space="preserve"><value>Картинка скопирована в буфер обмена.</value></data>
+  <data name="QrTooLong" xml:space="preserve"><value>Ссылка слишком длинная для QR-кода — используйте «Копировать ссылку».</value></data>
+  <data name="QrWarning" xml:space="preserve"><value>В коде — ключи доступа к серверу. Показывайте его только тем, кому доверяете.</value></data>
+  <data name="QrWindowTitle" xml:space="preserve"><value>QR-код профиля</value></data>
   <data name="SessionTimeFormat" xml:space="preserve"><value>Время сессии: {0}</value></data>
   <data name="StatusConnected" xml:space="preserve"><value>Подключено</value></data>
   <data name="StatusConnecting" xml:space="preserve"><value>Подключение…</value></data>

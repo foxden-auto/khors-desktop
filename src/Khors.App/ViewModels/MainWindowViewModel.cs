@@ -4,7 +4,10 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Khors.App.Services;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Khors.Core.Import;
+using Khors.Core.Qr;
 using Khors.Core.Profiles;
 using Khors.Core.Storage;
 using Khors.Engines.Connection;
@@ -20,7 +23,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     private readonly ProfileRepository _profiles;
     private readonly SettingsStore _settings;
     private readonly ConnectionManager _connection;
-    private readonly IClipboardText _clipboard;
+    private readonly IAppClipboard _clipboard;
+    private readonly IDesktopDialogs _dialogs;
     private readonly ICoreLauncher _launcher;
     private readonly SubscriptionUpdater _subscriptionUpdater;
     private readonly DispatcherTimer _sessionTimer;
@@ -32,7 +36,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         ProfileRepository profiles,
         SettingsStore settings,
         ConnectionManager connection,
-        IClipboardText clipboard,
+        IAppClipboard clipboard,
+        IDesktopDialogs dialogs,
         ICoreLauncher launcher,
         SubscriptionUpdater subscriptionUpdater)
     {
@@ -41,6 +46,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         _settings = settings;
         _connection = connection;
         _clipboard = clipboard;
+        _dialogs = dialogs;
         _launcher = launcher;
         _sessionTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => UpdateSessionTime());
 
@@ -171,16 +177,98 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         State is ConnectionState.Connected or ConnectionState.Connecting
         || (State is ConnectionState.Disconnected or ConnectionState.Failed && SelectedProfile is not null);
 
+    /// <summary>Текст из буфера; если текста нет — QR-коды с картинки в буфере.</summary>
     [RelayCommand]
     private async Task ImportFromClipboardAsync()
     {
         var text = await _clipboard.GetTextAsync().ConfigureAwait(true);
         if (string.IsNullOrWhiteSpace(text))
         {
-            Message = Localizer.Get("ClipboardEmpty");
+            using var bitmap = await _clipboard.GetBitmapAsync().ConfigureAwait(true);
+            if (bitmap is null)
+            {
+                Message = Localizer.Get("ClipboardEmpty");
+                return;
+            }
+
+            text = await DecodeQrAsync(bitmap).ConfigureAwait(true);
+            if (text is null)
+            {
+                Message = Localizer.Get("ClipboardNoQr");
+                return;
+            }
+        }
+
+        await ImportTextAsync(text).ConfigureAwait(true);
+    }
+
+    /// <summary>Файл: картинка — QR-коды с неё, иначе текст (ссылки, base64, конфиг Clash/sing-box/Xray).</summary>
+    [RelayCommand]
+    private async Task ImportFromFileAsync()
+    {
+        PickedFile? file;
+        try
+        {
+            file = await _dialogs.PickImportFileAsync().ConfigureAwait(true);
+        }
+        catch (FileTooLargeException)
+        {
+            Message = Localizer.Get("FileTooLarge");
+            return;
+        }
+        catch (IOException)
+        {
+            Message = Localizer.Get("FileReadFailed");
             return;
         }
 
+        if (file is null)
+        {
+            return;
+        }
+
+        string? text;
+        if (file.IsImage)
+        {
+            try
+            {
+                using var bitmap = new Bitmap(new MemoryStream(file.Content));
+                text = await DecodeQrAsync(bitmap).ConfigureAwait(true);
+            }
+            catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or NotSupportedException or IOException)
+            {
+                text = null;
+            }
+
+            if (text is null)
+            {
+                Message = Localizer.Get("FileNoQr");
+                return;
+            }
+        }
+        else
+        {
+            text = System.Text.Encoding.UTF8.GetString(file.Content);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                Message = Localizer.Get("FileEmpty");
+                return;
+            }
+        }
+
+        await ImportTextAsync(text).ConfigureAwait(true);
+    }
+
+    /// <summary>Тексты всех QR-кодов картинки построчно; <c>null</c> — кодов нет. Распознавание — не в потоке окна.</summary>
+    private static async Task<string?> DecodeQrAsync(Bitmap bitmap)
+    {
+        var (pixels, width, height) = BitmapPixels.ToBgra(bitmap);
+        var codes = await Task.Run(() => QrCodes.Decode(pixels, width, height)).ConfigureAwait(true);
+        return codes.Count > 0 ? string.Join('\n', codes) : null;
+    }
+
+    private async Task ImportTextAsync(string text)
+    {
         if (_profiles.IsReadOnly)
         {
             Message = Localizer.Get("StorageReadOnly");
@@ -389,6 +477,23 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         await _clipboard.SetTextAsync(ShareLinkExporter.Export(item.Profile)).ConfigureAwait(true);
         Message = Localizer.Format("LinkCopiedFormat", item.Name);
     }
+
+    /// <summary>QR-код ссылки профиля в отдельном окне.</summary>
+    public async Task ShowQrAsync(ProfileItemViewModel item)
+    {
+        if (QrCodes.Encode(ShareLinkExporter.Export(item.Profile)) is not { } matrix)
+        {
+            Message = Localizer.Get("QrTooLong");
+            return;
+        }
+
+        // Около 1000 пикселей: чёткий код и в окне, и в скопированной картинке. Освобождает окно QR при закрытии.
+        var bitmap = BitmapPixels.Render(matrix, scale: Math.Max(4, 1000 / (matrix.Size + 8)), ThemeColor("KhorsQrDarkColor"), ThemeColor("KhorsQrLightColor"));
+        await _dialogs.ShowQrAsync(item.Name, bitmap).ConfigureAwait(true);
+    }
+
+    private static Color ThemeColor(string key) =>
+        Avalonia.Application.Current?.TryGetResource(key, null, out var value) == true && value is Color color ? color : default;
 
     partial void OnSelectedProfileChanged(ProfileItemViewModel? value)
     {

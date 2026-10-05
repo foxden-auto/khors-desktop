@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Khors.App.ViewModels"
+        xmlns:res="using:Khors.App.Resources"
+        x:Class="Khors.App.Views.QrWindow"
+        x:DataType="vm:QrWindowViewModel"
+        Title="{x:Static res:Strings.QrWindowTitle}"
+        Icon="/Assets/khors.ico"
+        Width="420" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner">
+  <StackPanel Margin="20" Spacing="12">
+    <TextBlock Text="{Binding ProfileName}" Classes="section" TextTrimming="CharacterEllipsis" />
+    <Border Classes="card" Padding="12" HorizontalAlignment="Center">
+      <Image Source="{Binding Qr}" Width="340" Height="340" RenderOptions.BitmapInterpolationMode="HighQuality" />
+    </Border>
+    <TextBlock Text="{x:Static res:Strings.QrWarning}" Classes="warning small" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Message}" Classes="muted small" IsVisible="{Binding Message, Converter={x:Static ObjectConverters.IsNotNull}}" />
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Classes="secondary" Command="{Binding CopyImageCommand}" Content="{x:Static res:Strings.ButtonCopyImage}" />
+      <Button Classes="secondary" Click="OnCloseClick" Content="{x:Static res:Strings.ButtonClose}" IsCancel="True" />
+    </StackPanel>
+  </StackPanel>
+</Window>

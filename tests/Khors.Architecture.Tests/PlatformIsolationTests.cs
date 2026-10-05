@@ -30,7 +30,10 @@ public partial class PlatformIsolationTests
     }
 
     /// <summary>Пакеты, которые Khors.Core может использовать: чистые библиотеки без ОС и UI (каждый — в NOTICE).</summary>
-    private static readonly string[] s_coreAllowedPackages = ["YamlDotNet"];
+    private static readonly string[] s_coreAllowedPackages = ["YamlDotNet", "ZXing.Net"];
+
+    /// <summary>Сборки этих пакетов (у ZXing.Net сборка называется zxing).</summary>
+    private static readonly string[] s_coreAllowedAssemblies = ["YamlDotNet", "zxing"];
 
     [Fact]
     public void CoreDependsOnlyOnBaseLibraryAndAllowedPackages()
@@ -40,7 +43,7 @@ public partial class PlatformIsolationTests
 
         var references = Assembly.Load("Khors.Core").GetReferencedAssemblies().Select(a => a.Name!);
         Assert.All(references, r => Assert.True(
-            r.StartsWith("System.", StringComparison.Ordinal) || r is "System" or "netstandard" || s_coreAllowedPackages.Contains(r),
+            r.StartsWith("System.", StringComparison.Ordinal) || r is "System" or "netstandard" || s_coreAllowedAssemblies.Contains(r),
             $"Khors.Core references {r}"));
     }
 

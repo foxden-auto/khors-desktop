@@ -78,7 +78,13 @@
       <TextBlock Text="{x:Static res:Strings.ProfilesHeader}" Classes="section" VerticalAlignment="Center" />
       <Button Grid.Column="1" Classes="secondary" Margin="0,0,8,0" Command="{Binding TestLatencyCommand}"
               Content="{x:Static res:Strings.ButtonTestLatency}" ToolTip.Tip="{x:Static res:Strings.TestLatencyTooltip}" />
-      <Button Grid.Column="2" Classes="secondary" Command="{Binding ImportFromClipboardCommand}" Content="{x:Static res:Strings.ButtonImportClipboard}" />
+      <SplitButton Grid.Column="2" Classes="secondary" Command="{Binding ImportFromClipboardCommand}" Content="{x:Static res:Strings.ButtonImportClipboard}">
+        <SplitButton.Flyout>
+          <MenuFlyout Placement="BottomEdgeAlignedRight">
+            <MenuItem Header="{x:Static res:Strings.MenuImportFile}" Command="{Binding ImportFromFileCommand}" />
+          </MenuFlyout>
+        </SplitButton.Flyout>
+      </SplitButton>
     </Grid>
 
     <Panel>
@@ -89,6 +95,7 @@
               <Grid.ContextMenu>
                 <ContextMenu>
                   <MenuItem Header="{x:Static res:Strings.MenuCopyLink}" Command="{Binding CopyLinkCommand}" />
+                  <MenuItem Header="{x:Static res:Strings.MenuShowQr}" Command="{Binding ShowQrCommand}" />
                   <MenuItem Header="{x:Static res:Strings.MenuCore}">
                     <MenuItem Header="{Binding CoreAutoText}" ToggleType="Radio" IsChecked="{Binding IsCoreAuto, Mode=OneWay}"
                               Command="{Binding SetCoreCommand}" CommandParameter="{x:Static profiles:CorePreference.Auto}" />

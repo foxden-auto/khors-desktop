@@ -90,7 +90,8 @@ public partial class App : Application, IDisposable
         services.AddSingleton(sp => SettingsStore.Open(sp.GetRequiredService<AppPaths>().SettingsFile));
         services.AddSingleton<ICoreLauncher>(sp => new SelectingCoreLauncher(sp.GetRequiredService<SecretMasker>(), sp.GetService<IChildProcessGuard>()));
         services.AddSingleton(sp => new ConnectionManager(sp.GetRequiredService<ICoreLauncher>(), sp.GetService<ISystemProxy>(), SystemProxyWatchdog.EnsureStarted));
-        services.AddSingleton<IClipboardText>(_ => new WindowClipboardText(() => _window));
+        services.AddSingleton<IAppClipboard>(_ => new WindowClipboard(() => _window));
+        services.AddSingleton<IDesktopDialogs>(sp => new WindowDialogs(() => _window, sp.GetRequiredService<IAppClipboard>()));
         services.AddSingleton(sp =>
         {
             var connection = sp.GetRequiredService<ConnectionManager>();
