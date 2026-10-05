@@ -107,6 +107,19 @@ public sealed class SubscriptionSchedulerTests : IDisposable
         Assert.Equal(1, maxRunning);
     }
 
+    /// <summary>Приложение останавливает планировщик при выходе, затем это же делает контейнер зависимостей.</summary>
+    [Fact]
+    public async Task RepeatedDisposeIsSafe()
+    {
+        var (_, updater, scheduler) = Create();
+        using (updater)
+        {
+            scheduler.Start();
+            await scheduler.DisposeAsync();
+            await scheduler.DisposeAsync();
+        }
+    }
+
     [Fact]
     public async Task BackgroundLoopRunsAfterStartDelayAndStopsOnDispose()
     {

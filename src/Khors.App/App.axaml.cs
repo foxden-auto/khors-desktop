@@ -135,6 +135,19 @@ public partial class App : Application, IDisposable
         _window.Activate();
     }
 
+    /// <summary>Шаг выхода: ошибка записывается в трассировку и не мешает следующим шагам и завершению.</summary>
+    private static async Task RunExitStepAsync(Func<Task> step)
+    {
+        try
+        {
+            await step().ConfigureAwait(true);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            System.Diagnostics.Trace.TraceError($"KHORS exit step failed: {ex.GetType().Name}");
+        }
+    }
+
     private async Task ExitAsync(IClassicDesktopStyleApplicationLifetime desktop)
     {
         if (_exiting)
@@ -148,23 +161,34 @@ public partial class App : Application, IDisposable
             _window.AllowClose = true;
         }
 
-        if (_services is not null)
+        // Каждый шаг очистки — отдельно: сбой одного не должен оставить процесс висеть без окна и трея.
+        // Завершение приложения выполняется всегда (finally).
+        try
         {
-            await _services.GetRequiredService<SubscriptionScheduler>().DisposeAsync().ConfigureAwait(true);
+            if (_services is not null)
+            {
+                await RunExitStepAsync(() => _services.GetRequiredService<SubscriptionScheduler>().DisposeAsync().AsTask()).ConfigureAwait(true);
 
-            // Отключение возвращает системный прокси и останавливает ядро.
-            await _services.GetRequiredService<ConnectionManager>().DisposeAsync().ConfigureAwait(true);
-            _services.GetRequiredService<MainWindowViewModel>().Dispose();
+                // Отключение возвращает системный прокси и останавливает ядро.
+                await RunExitStepAsync(() => _services.GetRequiredService<ConnectionManager>().DisposeAsync().AsTask()).ConfigureAwait(true);
+                await RunExitStepAsync(() =>
+                {
+                    _services.GetRequiredService<MainWindowViewModel>().Dispose();
+                    return Task.CompletedTask;
+                }).ConfigureAwait(true);
+            }
+
+            _tray?.Dispose();
+            _tray = null;
+            if (_services is not null)
+            {
+                await RunExitStepAsync(() => _services.DisposeAsync().AsTask()).ConfigureAwait(true);
+                _services = null;
+            }
         }
-
-        _tray?.Dispose();
-        _tray = null;
-        if (_services is not null)
+        finally
         {
-            await _services.DisposeAsync().ConfigureAwait(true);
-            _services = null;
+            desktop.Shutdown();
         }
-
-        desktop.Shutdown();
     }
 }

@@ -19,6 +19,7 @@ public sealed class SubscriptionScheduler : IAsyncDisposable
     private readonly TimeSpan _startDelay;
     private readonly CancellationTokenSource _stop = new();
     private Task? _loop;
+    private int _disposed;
 
     public SubscriptionScheduler(
         ProfileRepository repository,
@@ -67,8 +68,14 @@ public sealed class SubscriptionScheduler : IAsyncDisposable
         return due.Count;
     }
 
+    /// <summary>Останавливает проверки. Повторный вызов ничего не делает (приложение и контейнер зависимостей вызывают оба).</summary>
     public async ValueTask DisposeAsync()
     {
+        if (Interlocked.Exchange(ref _disposed, 1) == 1)
+        {
+            return;
+        }
+
         await _stop.CancelAsync().ConfigureAwait(false);
         if (_loop is not null)
         {
