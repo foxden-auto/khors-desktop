@@ -93,6 +93,7 @@
   <data name="MenuCopyLink" xml:space="preserve"><value>Копировать ссылку</value></data>
   <data name="MenuCore" xml:space="preserve"><value>Ядро</value></data>
   <data name="MenuImportFile" xml:space="preserve"><value>Из файла…</value></data>
+  <data name="MenuImportScreen" xml:space="preserve"><value>QR-код с экрана</value></data>
   <data name="MenuShowQr" xml:space="preserve"><value>Показать QR-код</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Выберите профиль в списке</value></data>
@@ -104,6 +105,8 @@
   <data name="QrTooLong" xml:space="preserve"><value>Ссылка слишком длинная для QR-кода — используйте «Копировать ссылку».</value></data>
   <data name="QrWarning" xml:space="preserve"><value>В коде — ключи доступа к серверу. Показывайте его только тем, кому доверяете.</value></data>
   <data name="QrWindowTitle" xml:space="preserve"><value>QR-код профиля</value></data>
+  <data name="ScreenCaptureFailed" xml:space="preserve"><value>Не удалось сделать снимок экрана.</value></data>
+  <data name="ScreenNoQr" xml:space="preserve"><value>На экране не найден QR-код. Откройте картинку с кодом поверх других окон и повторите.</value></data>
   <data name="SessionTimeFormat" xml:space="preserve"><value>Время сессии: {0}</value></data>
   <data name="StatusConnected" xml:space="preserve"><value>Подключено</value></data>
   <data name="StatusConnecting" xml:space="preserve"><value>Подключение…</value></data>

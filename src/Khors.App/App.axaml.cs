@@ -91,7 +91,7 @@ public partial class App : Application, IDisposable
         services.AddSingleton<ICoreLauncher>(sp => new SelectingCoreLauncher(sp.GetRequiredService<SecretMasker>(), sp.GetService<IChildProcessGuard>()));
         services.AddSingleton(sp => new ConnectionManager(sp.GetRequiredService<ICoreLauncher>(), sp.GetService<ISystemProxy>(), SystemProxyWatchdog.EnsureStarted));
         services.AddSingleton<IAppClipboard>(_ => new WindowClipboard(() => _window));
-        services.AddSingleton<IDesktopDialogs>(sp => new WindowDialogs(() => _window, sp.GetRequiredService<IAppClipboard>()));
+        services.AddSingleton<IDesktopDialogs>(sp => new WindowDialogs(() => _window, sp.GetRequiredService<IAppClipboard>(), sp.GetService<IScreenCapture>()));
         services.AddSingleton(sp =>
         {
             var connection = sp.GetRequiredService<ConnectionManager>();

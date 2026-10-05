@@ -82,6 +82,7 @@
         <SplitButton.Flyout>
           <MenuFlyout Placement="BottomEdgeAlignedRight">
             <MenuItem Header="{x:Static res:Strings.MenuImportFile}" Command="{Binding ImportFromFileCommand}" />
+            <MenuItem Header="{x:Static res:Strings.MenuImportScreen}" Command="{Binding ImportFromScreenCommand}" />
           </MenuFlyout>
         </SplitButton.Flyout>
       </SplitButton>

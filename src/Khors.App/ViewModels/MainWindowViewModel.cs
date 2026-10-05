@@ -1,19 +1,20 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Khors.App.Services;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using Khors.Core.Import;
-using Khors.Core.Qr;
 using Khors.Core.Profiles;
+using Khors.Core.Qr;
 using Khors.Core.Storage;
 using Khors.Engines.Connection;
 using Khors.Engines.Latency;
 using Khors.Engines.Storage;
 using Khors.Engines.Subscriptions;
+using Khors.Platform;
 
 namespace Khors.App.ViewModels;
 
@@ -257,6 +258,36 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         }
 
         await ImportTextAsync(text).ConfigureAwait(true);
+    }
+
+    /// <summary>QR-коды со всех мониторов (окно KHORS на время снимка прячется).</summary>
+    [RelayCommand]
+    private async Task ImportFromScreenAsync()
+    {
+        ScreenImage? image;
+        try
+        {
+            image = await _dialogs.CaptureScreenAsync().ConfigureAwait(true);
+        }
+        catch (InvalidOperationException)
+        {
+            image = null;
+        }
+
+        if (image is null)
+        {
+            Message = Localizer.Get("ScreenCaptureFailed");
+            return;
+        }
+
+        var codes = await Task.Run(() => QrCodes.Decode(image.Bgra, image.Width, image.Height)).ConfigureAwait(true);
+        if (codes.Count == 0)
+        {
+            Message = Localizer.Get("ScreenNoQr");
+            return;
+        }
+
+        await ImportTextAsync(string.Join('\n', codes)).ConfigureAwait(true);
     }
 
     /// <summary>Тексты всех QR-кодов картинки построчно; <c>null</c> — кодов нет. Распознавание — не в потоке окна.</summary>

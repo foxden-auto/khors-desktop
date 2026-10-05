@@ -93,6 +93,7 @@
   <data name="MenuCopyLink" xml:space="preserve"><value>Copy link</value></data>
   <data name="MenuCore" xml:space="preserve"><value>Core</value></data>
   <data name="MenuImportFile" xml:space="preserve"><value>From file…</value></data>
+  <data name="MenuImportScreen" xml:space="preserve"><value>QR code from screen</value></data>
   <data name="MenuShowQr" xml:space="preserve"><value>Show QR code</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Mode: system proxy</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Select a profile below</value></data>
@@ -104,6 +105,8 @@
   <data name="QrTooLong" xml:space="preserve"><value>The link is too long for a QR code — use “Copy link”.</value></data>
   <data name="QrWarning" xml:space="preserve"><value>The code contains server access keys. Show it only to people you trust.</value></data>
   <data name="QrWindowTitle" xml:space="preserve"><value>Profile QR code</value></data>
+  <data name="ScreenCaptureFailed" xml:space="preserve"><value>Could not capture the screen.</value></data>
+  <data name="ScreenNoQr" xml:space="preserve"><value>No QR code was found on the screen. Open the image with the code on top of other windows and try again.</value></data>
   <data name="SessionTimeFormat" xml:space="preserve"><value>Session time: {0}</value></data>
   <data name="StatusConnected" xml:space="preserve"><value>Connected</value></data>
   <data name="StatusConnecting" xml:space="preserve"><value>Connecting…</value></data>

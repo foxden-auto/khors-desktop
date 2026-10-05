@@ -1,5 +1,6 @@
 using Khors.Platform.Windows.Processes;
 using Khors.Platform.Windows.Proxy;
+using Khors.Platform.Windows.Screen;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Khors.Platform.Windows;
@@ -13,6 +14,7 @@ public static class WindowsPlatform
         services.AddSingleton(new AppPaths(DataDirectory, StateDirectory));
         services.AddSingleton<IChildProcessGuard, JobObjectChildProcessGuard>();
         services.AddSingleton<ISystemProxy>(_ => new WindowsSystemProxy(StateDirectory));
+        services.AddSingleton<IScreenCapture, GdiScreenCapture>();
 
         // Остальные реализации — по мере появления (ROADMAP 3.x, 4.x).
         return services;
