@@ -34,7 +34,10 @@
                    IsVisible="{Binding ConnectionLatency, Converter={x:Static ObjectConverters.IsNotNull}}" />
         <TextBlock Text="{Binding ModeText}" Classes="muted" HorizontalAlignment="Center" />
         <Expander Header="{x:Static res:Strings.FailureDetails}" IsVisible="{Binding HasLogTail}" HorizontalAlignment="Stretch">
-          <SelectableTextBlock Text="{Binding LogTail}" Classes="log" TextWrapping="Wrap" />
+          <StackPanel Spacing="8">
+            <SelectableTextBlock Text="{Binding LogTail}" Classes="log" TextWrapping="Wrap" />
+            <Button Classes="secondary" HorizontalAlignment="Left" Command="{Binding CopyCoreLogCommand}" Content="{x:Static res:Strings.ButtonCopyCoreLog}" />
+          </StackPanel>
         </Expander>
       </StackPanel>
     </Border>

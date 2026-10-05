@@ -8,4 +8,12 @@ public sealed class WindowClipboardText(Func<TopLevel?> topLevel) : IClipboardTe
 {
     public async Task<string?> GetTextAsync() =>
         topLevel()?.Clipboard is { } clipboard ? await clipboard.TryGetTextAsync().ConfigureAwait(true) : null;
+
+    public async Task SetTextAsync(string text)
+    {
+        if (topLevel()?.Clipboard is { } clipboard)
+        {
+            await clipboard.SetTextAsync(text).ConfigureAwait(true);
+        }
+    }
 }

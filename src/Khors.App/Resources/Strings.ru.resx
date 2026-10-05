@@ -7,6 +7,7 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Подключить</value></data>
+  <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Копировать весь лог</value></data>
   <data name="ButtonDelete" xml:space="preserve"><value>Удалить</value></data>
   <data name="ButtonDisconnect" xml:space="preserve"><value>Отключить</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Вставить из буфера</value></data>
@@ -16,6 +17,7 @@
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} МБ</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>В буфере обмена нет текста.</value></data>
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Задержка: {0}</value></data>
+  <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Лог ядра скопирован в буфер обмена: строк {0}. Адреса и ключи в нём замаскированы.</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку vless://, vmess://, trojan:// или ss:// и нажмите «Вставить из буфера».</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Лог ядра</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>Ядро {0} неожиданно завершилось (код {1}). Системный прокси возвращён.</value></data>

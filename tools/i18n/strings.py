@@ -23,6 +23,8 @@ STRINGS = {
     "SessionTimeFormat": ("Время сессии: {0}", "Session time: {0}"),
     "LocalProxyFormat": ("Ядро {2}. Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}", "Core: {2}. Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}"),
     "FailureDetails": ("Лог ядра", "Core log"),
+    "ButtonCopyCoreLog": ("Копировать весь лог", "Copy the whole log"),
+    "CoreLogCopiedFormat": ("Лог ядра скопирован в буфер обмена: строк {0}. Адреса и ключи в нём замаскированы.", "Core log copied to the clipboard: {0} lines. Addresses and keys are masked."),
     # Профили
     "ProfilesHeader": ("Профили", "Profiles"),
     "ButtonImportClipboard": ("Вставить из буфера", "Paste from clipboard"),

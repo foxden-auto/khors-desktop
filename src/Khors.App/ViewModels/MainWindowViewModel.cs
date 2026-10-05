@@ -275,6 +275,18 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>Весь лог ядра (до 1000 строк, уже замаскирован) — в буфер обмена, чтобы приложить к сообщению об ошибке.</summary>
+    [RelayCommand]
+    private async Task CopyCoreLogAsync()
+    {
+        var lines = _connection.Log?.Snapshot().Select(l => l.Text).ToList() is { Count: > 0 } live ? live : LogTail?.Split(Environment.NewLine).ToList();
+        if (lines is { Count: > 0 })
+        {
+            await _clipboard.SetTextAsync(string.Join(Environment.NewLine, lines)).ConfigureAwait(true);
+            Message = Localizer.Format("CoreLogCopiedFormat", lines.Count);
+        }
+    }
+
     [RelayCommand]
     private Task UpdateSubscriptionAsync(SubscriptionItemViewModel? item) =>
         item is null ? Task.CompletedTask : UpdateSubscriptionCoreAsync(item.Id, added: false);

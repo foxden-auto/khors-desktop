@@ -7,6 +7,7 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Connect</value></data>
+  <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Copy the whole log</value></data>
   <data name="ButtonDelete" xml:space="preserve"><value>Delete</value></data>
   <data name="ButtonDisconnect" xml:space="preserve"><value>Disconnect</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Paste from clipboard</value></data>
@@ -16,6 +17,7 @@
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} MB</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>The clipboard contains no text.</value></data>
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Latency: {0}</value></data>
+  <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Core log copied to the clipboard: {0} lines. Addresses and keys are masked.</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a vless://, vmess://, trojan:// or ss:// link and press “Paste from clipboard”.</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Core log</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>The {0} core exited unexpectedly (code {1}). System proxy restored.</value></data>
