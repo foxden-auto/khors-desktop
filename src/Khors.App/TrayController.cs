@@ -71,6 +71,7 @@ internal sealed class TrayController : IDisposable
                 UpdateStatus();
                 break;
             case nameof(MainWindowViewModel.SelectedProfile):
+            case nameof(MainWindowViewModel.IsAutoSelected):
                 RebuildProfiles();
                 break;
         }
@@ -88,6 +89,18 @@ internal sealed class TrayController : IDisposable
     private void RebuildProfiles()
     {
         _profilesMenu.Items.Clear();
+        if (_viewModel.HasProfiles)
+        {
+            var auto = new NativeMenuItem(Localizer.Get("AutoName"))
+            {
+                ToggleType = MenuItemToggleType.Radio,
+                IsChecked = _viewModel.IsAutoSelected,
+                Command = _viewModel.SelectAutoCommand,
+            };
+            _profilesMenu.Items.Add(auto);
+            _profilesMenu.Items.Add(new NativeMenuItemSeparator());
+        }
+
         foreach (var profile in _viewModel.Profiles)
         {
             var item = new NativeMenuItem(profile.Name)

@@ -6,6 +6,14 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
+  <data name="AutoCurrentFormat" xml:space="preserve"><value>Сейчас: {0}</value></data>
+  <data name="AutoIdleFormat" xml:space="preserve"><value>Самый быстрый профиль, перепроверка каждые {0} мин</value></data>
+  <data name="AutoName" xml:space="preserve"><value>Авто</value></data>
+  <data name="AutoNoWorkingProfile" xml:space="preserve"><value>Ни один профиль не ответил на тест задержки.</value></data>
+  <data name="AutoSelectingFormat" xml:space="preserve"><value>Подбор сервера: проверено {0} из {1}</value></data>
+  <data name="AutoTooltip" xml:space="preserve"><value>Подключиться к самому быстрому профилю и переключаться при сбое</value></data>
+  <data name="AutoWaiting" xml:space="preserve"><value>Ни один сервер сейчас не отвечает — «Авто» повторит подбор при следующей проверке.</value></data>
+  <data name="AutoWaitingShort" xml:space="preserve"><value>Ни один сервер сейчас не отвечает</value></data>
   <data name="ButtonClose" xml:space="preserve"><value>Закрыть</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Подключить</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Копировать весь лог</value></data>
@@ -123,6 +131,9 @@
   <data name="ScreenCaptureFailed" xml:space="preserve"><value>Не удалось сделать снимок экрана.</value></data>
   <data name="ScreenNoQr" xml:space="preserve"><value>На экране не найден QR-код. Откройте картинку с кодом поверх других окон и повторите.</value></data>
   <data name="SessionTimeFormat" xml:space="preserve"><value>Время сессии: {0}</value></data>
+  <data name="SortByLatency" xml:space="preserve"><value>Сортировать по задержке</value></data>
+  <data name="SortByLatencyTooltip" xml:space="preserve"><value>Сортировать профили по задержке (сначала самые быстрые)</value></data>
+  <data name="StatusAutoSelecting" xml:space="preserve"><value>Подбор сервера…</value></data>
   <data name="StatusConnected" xml:space="preserve"><value>Подключено</value></data>
   <data name="StatusConnecting" xml:space="preserve"><value>Подключение…</value></data>
   <data name="StatusDisconnected" xml:space="preserve"><value>Отключено</value></data>

@@ -25,6 +25,9 @@ public sealed record ProfileDocument
 /// <param name="LatencyTestUrl">Адрес теста задержки: запрос через прокси, ожидается ответ 204 или 200.</param>
 /// <param name="SubscriptionAutoUpdate">Обновлять подписки автоматически (ROADMAP 2.2).</param>
 /// <param name="SubscriptionUpdateIntervalHours">Интервал, если подписка не сообщила свой (<c>profile-update-interval</c>).</param>
+/// <param name="AutoSelect">Выбрана группа «Авто» вместо одного профиля (ROADMAP 2.8).</param>
+/// <param name="AutoRecheckMinutes">Как часто «Авто» перепроверяет задержку (1…1440 минут).</param>
+/// <param name="SortProfilesByLatency">Список профилей — по возрастанию задержки.</param>
 public sealed record AppSettings(
     int SchemaVersion = AppSettings.CurrentSchemaVersion,
     Guid? SelectedProfileId = null,
@@ -34,7 +37,10 @@ public sealed record AppSettings(
     string? Language = null,
     string LatencyTestUrl = "https://cp.cloudflare.com/generate_204",
     bool SubscriptionAutoUpdate = true,
-    int SubscriptionUpdateIntervalHours = 12)
+    int SubscriptionUpdateIntervalHours = 12,
+    bool AutoSelect = false,
+    int AutoRecheckMinutes = 10,
+    bool SortProfilesByLatency = false)
 {
     public const int CurrentSchemaVersion = 1;
 }

@@ -10,7 +10,9 @@ using Khors.App.ViewModels;
 using Khors.App.Views;
 using Khors.Core.Diagnostics;
 using Khors.Engines;
+using Khors.Engines.Auto;
 using Khors.Engines.Connection;
+using Khors.Engines.Latency;
 using Khors.Engines.Storage;
 using Khors.Engines.Subscriptions;
 using Khors.Platform;
@@ -20,6 +22,9 @@ namespace Khors.App;
 
 public partial class App : Application, IDisposable
 {
+    // Замер профиля для «Авто»: короче обычного теста — неответивший сервер не задерживает подбор.
+    private static readonly TimeSpan s_autoProbeTimeout = TimeSpan.FromSeconds(6);
+
     private ServiceProvider? _services;
     private MainWindow? _window;
     private TrayController? _tray;
@@ -104,6 +109,18 @@ public partial class App : Application, IDisposable
             sp.GetRequiredService<ProfileRepository>(),
             sp.GetRequiredService<SubscriptionUpdater>(),
             () => sp.GetRequiredService<SettingsStore>().Current));
+        services.AddSingleton(sp =>
+        {
+            var connection = sp.GetRequiredService<ConnectionManager>();
+            var settings = sp.GetRequiredService<SettingsStore>();
+            var profiles = sp.GetRequiredService<ProfileRepository>();
+            var probe = new LatencyProbe(
+                connection,
+                sp.GetRequiredService<ICoreLauncher>(),
+                () => LatencyTester.TestUrlOrDefault(settings.Current.LatencyTestUrl),
+                s_autoProbeTimeout);
+            return new AutoConnector(connection, probe, () => profiles.Profiles, () => CoreStartPreferences.From(settings.Current));
+        });
         services.AddSingleton<MainWindowViewModel>();
         return services.BuildServiceProvider();
     }
@@ -169,6 +186,9 @@ public partial class App : Application, IDisposable
             if (_services is not null)
             {
                 await RunExitStepAsync(() => _services.GetRequiredService<SubscriptionScheduler>().DisposeAsync().AsTask()).ConfigureAwait(true);
+
+                // «Авто» — до отключения, чтобы не начало подбирать сервер заново.
+                await RunExitStepAsync(() => _services.GetRequiredService<AutoConnector>().DisposeAsync().AsTask()).ConfigureAwait(true);
 
                 // Отключение возвращает системный прокси и останавливает ядро.
                 await RunExitStepAsync(() => _services.GetRequiredService<ConnectionManager>().DisposeAsync().AsTask()).ConfigureAwait(true);

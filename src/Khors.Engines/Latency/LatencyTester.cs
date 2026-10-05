@@ -43,6 +43,10 @@ public static class LatencyTester
 
     public static TimeSpan DefaultTimeout { get; } = TimeSpan.FromSeconds(10);
 
+    /// <summary>Адрес теста из настроек (<c>latencyTestUrl</c>), если это http(s), иначе <see cref="DefaultTestUrl"/>.</summary>
+    public static Uri TestUrlOrDefault(string? configured) =>
+        Uri.TryCreate(configured, UriKind.Absolute, out var url) && url.Scheme is "http" or "https" ? url : DefaultTestUrl;
+
     // Ядро пишет причину неудачи примерно тогда же, когда закрывает соединение, — даём строке дойти до буфера.
     private static readonly TimeSpan s_problemLogGrace = TimeSpan.FromMilliseconds(500);
 

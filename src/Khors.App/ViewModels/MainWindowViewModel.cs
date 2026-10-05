@@ -10,6 +10,7 @@ using Khors.Core.Import;
 using Khors.Core.Profiles;
 using Khors.Core.Qr;
 using Khors.Core.Storage;
+using Khors.Engines.Auto;
 using Khors.Engines.Connection;
 using Khors.Engines.Latency;
 using Khors.Engines.Storage;
@@ -28,6 +29,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     private readonly IDesktopDialogs _dialogs;
     private readonly ICoreLauncher _launcher;
     private readonly SubscriptionUpdater _subscriptionUpdater;
+    private readonly AutoConnector _auto;
     private readonly DispatcherTimer _sessionTimer;
     private readonly Dictionary<Guid, LatencyResult> _latency = [];
     private Khors.Engines.Processes.CoreLogBuffer? _liveLog;
@@ -40,8 +42,10 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         IAppClipboard clipboard,
         IDesktopDialogs dialogs,
         ICoreLauncher launcher,
-        SubscriptionUpdater subscriptionUpdater)
+        SubscriptionUpdater subscriptionUpdater,
+        AutoConnector auto)
     {
+        _auto = auto;
         _subscriptionUpdater = subscriptionUpdater;
         _profiles = profiles;
         _settings = settings;
@@ -51,12 +55,22 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         _launcher = launcher;
         _sessionTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => UpdateSessionTime());
 
+        // «Авто» — до загрузки списка, чтобы загрузка не выбрала первый профиль поверх сохранённого выбора.
+        IsAutoSelected = settings.Current.AutoSelect;
+        SortByLatency = settings.Current.SortProfilesByLatency;
         ReloadProfiles();
-        SelectedProfile = Profiles.FirstOrDefault(p => p.Id == settings.Current.SelectedProfileId) ?? Profiles.FirstOrDefault();
+        if (!IsAutoSelected)
+        {
+            SelectedProfile = Profiles.FirstOrDefault(p => p.Id == settings.Current.SelectedProfileId) ?? Profiles.FirstOrDefault();
+        }
+
+        UpdateAutoSummary();
         ApplyStatus(connection.Status);
 
         _profiles.Changed += OnProfilesChanged;
         _connection.StatusChanged += OnConnectionStatusChanged;
+        _auto.StatusChanged += OnAutoStatusChanged;
+        _auto.Measured += OnAutoMeasured;
     }
 
     public ObservableCollection<ProfileItemViewModel> Profiles { get; } = [];
@@ -116,6 +130,28 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     public bool HasNoProfiles => Profiles.Count == 0;
 
+    public bool HasProfiles => Profiles.Count > 0;
+
+    /// <summary>Выбрана группа «Авто» (самый быстрый профиль) вместо одного профиля.</summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ToggleConnectionCommand))]
+    public partial bool IsAutoSelected { get; set; }
+
+    /// <summary>Вторая строка «Авто»: ход подбора, текущий профиль или как работает.</summary>
+    [ObservableProperty]
+    public partial string AutoSummary { get; set; } = string.Empty;
+
+    /// <summary>Задержка профиля, к которому подключено «Авто».</summary>
+    [ObservableProperty]
+    public partial string? AutoLatencyText { get; set; }
+
+    /// <summary>«Авто» подключено — отметка в строке, как у активного профиля.</summary>
+    [ObservableProperty]
+    public partial bool IsAutoActive { get; set; }
+
+    [ObservableProperty]
+    public partial bool SortByLatency { get; set; }
+
     public bool HasMessage => !string.IsNullOrEmpty(Message);
 
     public string ModeText { get; } = Localizer.Get("ModeSystemProxy");
@@ -155,14 +191,30 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         _sessionTimer.Stop();
         _profiles.Changed -= OnProfilesChanged;
         _connection.StatusChanged -= OnConnectionStatusChanged;
+        _auto.StatusChanged -= OnAutoStatusChanged;
+        _auto.Measured -= OnAutoMeasured;
     }
 
     [RelayCommand(CanExecute = nameof(CanToggleConnection))]
     private async Task ToggleConnectionAsync()
     {
+        if (_auto.IsActive)
+        {
+            await _auto.StopAsync(disconnect: true).ConfigureAwait(true);
+            return;
+        }
+
         if (State is ConnectionState.Connected or ConnectionState.Connecting)
         {
             await _connection.DisconnectAsync().ConfigureAwait(true);
+            return;
+        }
+
+        Message = null;
+        if (IsAutoSelected)
+        {
+            _auto.RecheckInterval = AutoRecheckInterval();
+            await _auto.StartAsync().ConfigureAwait(true);
             return;
         }
 
@@ -171,16 +223,20 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             return;
         }
 
-        var settings = _settings.Current;
-        Message = null;
-        await _connection.ConnectAsync(
-            SelectedProfile.Profile,
-            new CoreStartPreferences(settings.SocksPort, settings.HttpPort, settings.CoreLogLevel)).ConfigureAwait(true);
+        // Итог прошлого запуска «Авто» не должен описывать ошибку обычного подключения.
+        await _auto.StopAsync(disconnect: false).ConfigureAwait(true);
+        await _connection.ConnectAsync(SelectedProfile.Profile, CoreStartPreferences.From(_settings.Current)).ConfigureAwait(true);
     }
 
     private bool CanToggleConnection() =>
         State is ConnectionState.Connected or ConnectionState.Connecting
-        || (State is ConnectionState.Disconnected or ConnectionState.Failed && SelectedProfile is not null);
+        || _auto.IsActive
+        || (State is ConnectionState.Disconnected or ConnectionState.Failed && (SelectedProfile is not null || (IsAutoSelected && HasProfiles)));
+
+    [RelayCommand]
+    private void SelectAuto() => IsAutoSelected = true;
+
+    private TimeSpan AutoRecheckInterval() => TimeSpan.FromMinutes(Math.Clamp(_settings.Current.AutoRecheckMinutes, 1, 1440));
 
     /// <summary>Текст из буфера; если текста нет — QR-коды с картинки в буфере.</summary>
     [RelayCommand]
@@ -323,7 +379,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         lines.AddRange(result.Errors.Take(5).Select(e => Localizer.Format("ImportLineErrorFormat", e.Line, Localizer.Describe(e.Error))));
         Message = string.Join(Environment.NewLine, lines);
 
-        if (result.Added.Count > 0)
+        // С выбранным «Авто» новый профиль просто становится ещё одним кандидатом.
+        if (result.Added.Count > 0 && !IsAutoSelected)
         {
             var firstAdded = result.Added[0].Id;
             SelectedProfile = Profiles.FirstOrDefault(p => p.Id == firstAdded) ?? SelectedProfile;
@@ -359,6 +416,11 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
                     parallel.Release();
                 }
             })).ConfigureAwait(true);
+
+            if (SortByLatency)
+            {
+                ReloadProfiles();
+            }
         }
         finally
         {
@@ -376,10 +438,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             : LatencyTester.MeasureProfileAsync(item.Profile, _launcher, url, LatencyTester.DefaultTimeout);
     }
 
-    private Uri LatencyUrl() =>
-        Uri.TryCreate(_settings.Current.LatencyTestUrl, UriKind.Absolute, out var url) && url.Scheme is "http" or "https"
-            ? url
-            : LatencyTester.DefaultTestUrl;
+    private Uri LatencyUrl() => LatencyTester.TestUrlOrDefault(_settings.Current.LatencyTestUrl);
 
     /// <summary>После подключения — один замер через текущее ядро.</summary>
     private async Task MeasureConnectionAsync(ConnectionStatus status)
@@ -512,8 +571,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         _profiles.Update(updated);
         if (reconnect)
         {
-            var settings = _settings.Current;
-            await _connection.ConnectAsync(updated, new CoreStartPreferences(settings.SocksPort, settings.HttpPort, settings.CoreLogLevel)).ConfigureAwait(true);
+            await _connection.ConnectAsync(updated, CoreStartPreferences.From(_settings.Current)).ConfigureAwait(true);
         }
     }
 
@@ -543,10 +601,81 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     partial void OnSelectedProfileChanged(ProfileItemViewModel? value)
     {
-        if (value is not null && value.Id != _settings.Current.SelectedProfileId)
+        if (value is null)
+        {
+            return;
+        }
+
+        if (value.Id != _settings.Current.SelectedProfileId)
         {
             _settings.Update(s => s with { SelectedProfileId = value.Id });
         }
+
+        // Выбран обычный профиль — «Авто» перестаёт переключать серверы, текущее подключение остаётся.
+        IsAutoSelected = false;
+        if (_auto.IsActive)
+        {
+            _ = _auto.StopAsync(disconnect: false);
+        }
+    }
+
+    partial void OnIsAutoSelectedChanged(bool value)
+    {
+        if (value)
+        {
+            SelectedProfile = null;
+        }
+
+        if (value != _settings.Current.AutoSelect)
+        {
+            _settings.Update(s => s with { AutoSelect = value });
+        }
+
+        UpdateAutoSummary();
+        ApplyStatus(_connection.Status);
+    }
+
+    partial void OnSortByLatencyChanged(bool value)
+    {
+        if (value != _settings.Current.SortProfilesByLatency)
+        {
+            _settings.Update(s => s with { SortProfilesByLatency = value });
+        }
+
+        ReloadProfiles();
+    }
+
+    private void OnAutoStatusChanged(object? sender, AutoStatus status) => Dispatcher.UIThread.Post(() =>
+    {
+        UpdateAutoSummary();
+        ApplyStatus(_connection.Status);
+        ToggleConnectionCommand.NotifyCanExecuteChanged();
+        if (status.State == AutoState.Connected && SortByLatency)
+        {
+            ReloadProfiles();
+        }
+    });
+
+    private void OnAutoMeasured(object? sender, ProfileLatency measured) => Dispatcher.UIThread.Post(() =>
+    {
+        _latency[measured.ProfileId] = measured.Result;
+        Profiles.FirstOrDefault(p => p.Id == measured.ProfileId)?.SetLatency(measured.Result);
+        UpdateAutoSummary();
+    });
+
+    private void UpdateAutoSummary()
+    {
+        var auto = _auto.Status;
+        var current = auto.ProfileId is { } id ? Profiles.FirstOrDefault(p => p.Id == id) : null;
+        AutoSummary = auto switch
+        {
+            { State: AutoState.Selecting } => Localizer.Format("AutoSelectingFormat", auto.Measured, auto.Total),
+            { State: AutoState.Connected } when current is not null => Localizer.Format("AutoCurrentFormat", current.Name),
+            { State: AutoState.Waiting } => Localizer.Get("AutoWaitingShort"),
+            _ => Localizer.Format("AutoIdleFormat", (int)AutoRecheckInterval().TotalMinutes),
+        };
+        AutoLatencyText = auto.State == AutoState.Connected && current is { LatencyOk: true } ? current.LatencyText : null;
+        IsAutoActive = auto.State is AutoState.Connected or AutoState.Waiting;
     }
 
     partial void OnStateChanged(ConnectionState value)
@@ -567,7 +696,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     {
         var selectedId = SelectedProfile?.Id;
         Profiles.Clear();
-        foreach (var profile in _profiles.Profiles)
+        foreach (var profile in SortByLatency ? _profiles.Profiles.OrderBy(p => LatencyOrder(p.Id)) : _profiles.Profiles.AsEnumerable())
         {
             var item = new ProfileItemViewModel(profile, this);
             if (_latency.TryGetValue(profile.Id, out var latency))
@@ -578,9 +707,16 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             Profiles.Add(item);
         }
 
-        SelectedProfile = Profiles.FirstOrDefault(p => p.Id == selectedId) ?? Profiles.FirstOrDefault();
+        SelectedProfile = IsAutoSelected ? null : Profiles.FirstOrDefault(p => p.Id == selectedId) ?? Profiles.FirstOrDefault();
+        if (IsAutoSelected && Profiles.Count == 0)
+        {
+            IsAutoSelected = false;
+        }
+
         MarkActiveProfile();
+        UpdateAutoSummary();
         OnPropertyChanged(nameof(HasNoProfiles));
+        OnPropertyChanged(nameof(HasProfiles));
 
         Subscriptions.Clear();
         var now = DateTimeOffset.UtcNow;
@@ -592,6 +728,14 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         OnPropertyChanged(nameof(HasSubscriptions));
         OnPropertyChanged(nameof(SubscriptionsHeader));
     }
+
+    // Сортировка по задержке: ответившие по возрастанию, затем непроверенные, затем неответившие (порядок внутри — как в списке).
+    private long LatencyOrder(Guid id) => _latency.GetValueOrDefault(id) switch
+    {
+        { Status: LatencyStatus.Ok, Delay: { } delay } => delay.Ticks,
+        null => long.MaxValue - 1,
+        _ => long.MaxValue,
+    };
 
     private void ApplyStatus(ConnectionStatus status)
     {
@@ -605,7 +749,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         {
             { State: ConnectionState.Connected, HttpPort: { } http, SocksPort: { } socks } => Localizer.Format("LocalProxyFormat", http, socks, Localizer.CoreName(status.Core)),
             { State: ConnectionState.Failed, Failure: { } failure } => Localizer.Describe(failure),
-            { State: ConnectionState.Disconnected } when SelectedProfile is null => Localizer.Get("NoProfileSelected"),
+            { State: ConnectionState.Disconnected } when SelectedProfile is null && !IsAutoSelected => Localizer.Get("NoProfileSelected"),
             _ => null,
         };
 
@@ -613,8 +757,25 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         {
             { State: ConnectionState.Connected, Problem: { } problem } => Localizer.Format("ConnectionProblemFormat", Localizer.Describe(problem)),
             { State: ConnectionState.Failed, Failure.Problem: { } problem } => Localizer.Describe(problem),
+            _ when _auto.Status.State == AutoState.Waiting => Localizer.Get("AutoWaiting"),
             _ => null,
         };
+
+        // «Авто»: подбор до подключения и итог неудачного запуска поверх состояния подключения.
+        switch (_auto.Status)
+        {
+            case { State: AutoState.Selecting } auto when status.State is not ConnectionState.Connected:
+                StatusText = Localizer.Get("StatusAutoSelecting");
+                StatusDetail = Localizer.Format("AutoSelectingFormat", auto.Measured, auto.Total);
+                ConnectButtonText = Localizer.Get("ButtonDisconnect");
+                break;
+            case { State: AutoState.Failed } when status.State is ConnectionState.Disconnected or ConnectionState.Failed:
+                StatusText = Localizer.Get("StatusFailed");
+                StatusDetail = status.Failure is { } failure
+                    ? Localizer.Get("AutoNoWorkingProfile") + " " + Localizer.Describe(failure)
+                    : Localizer.Get("AutoNoWorkingProfile");
+                break;
+        }
 
         // Лог ядра: при ошибке — хвост из причины, при подключении — живой (уже замаскирован при поступлении).
         WatchLiveLog(status.State == ConnectionState.Connected ? _connection.Log : null);

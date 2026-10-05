@@ -1,4 +1,5 @@
 using Khors.Core.Profiles;
+using Khors.Core.Storage;
 using Khors.Engines.Processes;
 
 namespace Khors.Engines.Connection;
@@ -27,4 +28,11 @@ public interface ICoreLauncher
 }
 
 /// <summary>Пожелания к запуску из настроек пользователя.</summary>
-public sealed record CoreStartPreferences(int? SocksPort = 10808, int? HttpPort = 10809, string LogLevel = "warning");
+public sealed record CoreStartPreferences(int? SocksPort = 10808, int? HttpPort = 10809, string LogLevel = "warning")
+{
+    public static CoreStartPreferences From(AppSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        return new CoreStartPreferences(settings.SocksPort, settings.HttpPort, settings.CoreLogLevel);
+    }
+}

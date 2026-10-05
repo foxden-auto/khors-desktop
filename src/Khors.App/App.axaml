@@ -127,6 +127,35 @@
       <Setter Property="Background" Value="{DynamicResource KhorsAccentBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource KhorsPrimaryBrush}" />
     </Style>
+    <!-- Строка «Авто» над списком — как строка ListBox.profiles. -->
+    <Style Selector="Button.auto-row">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsForegroundBrush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="12,8" />
+      <Setter Property="Margin" Value="0,2" />
+    </Style>
+    <Style Selector="Button.auto-row:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource KhorsMutedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsForegroundBrush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.auto-row:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource KhorsMutedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsForegroundBrush}" />
+    </Style>
+    <Style Selector="Button.auto-row.selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource KhorsCardBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource KhorsPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.auto-row.selected:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource KhorsAccentBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource KhorsPrimaryBrush}" />
+    </Style>
     <Style Selector="TextBlock.latency">
       <Setter Property="Foreground" Value="{DynamicResource KhorsMutedForegroundBrush}" />
     </Style>

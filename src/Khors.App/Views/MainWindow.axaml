@@ -90,6 +90,23 @@
       </SplitButton>
     </Grid>
 
+    <CheckBox DockPanel.Dock="Top" Margin="0,0,0,4" IsChecked="{Binding SortByLatency}" IsVisible="{Binding HasProfiles}"
+              Content="{x:Static res:Strings.SortByLatency}" ToolTip.Tip="{x:Static res:Strings.SortByLatencyTooltip}" />
+
+    <!-- «Авто»: самый быстрый профиль; выглядит как строка списка, выбирается вместо профиля. -->
+    <Button DockPanel.Dock="Top" Classes="auto-row" Classes.selected="{Binding IsAutoSelected}"
+            Command="{Binding SelectAutoCommand}" IsVisible="{Binding HasProfiles}"
+            ToolTip.Tip="{x:Static res:Strings.AutoTooltip}">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <Ellipse Width="8" Height="8" Margin="0,0,10,0" Classes="active-marker" IsVisible="{Binding IsAutoActive}" VerticalAlignment="Center" />
+        <StackPanel Grid.Column="1" Spacing="2">
+          <TextBlock Text="{x:Static res:Strings.AutoName}" FontWeight="SemiBold" />
+          <TextBlock Text="{Binding AutoSummary}" Classes="muted small" TextWrapping="Wrap" />
+        </StackPanel>
+        <TextBlock Grid.Column="2" Text="{Binding AutoLatencyText}" Classes="small latency ok" VerticalAlignment="Center" Margin="8,0,0,0" />
+      </Grid>
+    </Button>
+
     <Panel>
       <ListBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Classes="profiles">
         <ListBox.ItemTemplate>

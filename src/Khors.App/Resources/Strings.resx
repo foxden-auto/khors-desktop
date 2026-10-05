@@ -6,6 +6,14 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
+  <data name="AutoCurrentFormat" xml:space="preserve"><value>Now: {0}</value></data>
+  <data name="AutoIdleFormat" xml:space="preserve"><value>Fastest profile, rechecked every {0} min</value></data>
+  <data name="AutoName" xml:space="preserve"><value>Auto</value></data>
+  <data name="AutoNoWorkingProfile" xml:space="preserve"><value>No profile responded to the latency test.</value></data>
+  <data name="AutoSelectingFormat" xml:space="preserve"><value>Choosing a server: {0} of {1} checked</value></data>
+  <data name="AutoTooltip" xml:space="preserve"><value>Connect to the fastest profile and switch on failure</value></data>
+  <data name="AutoWaiting" xml:space="preserve"><value>No server responds right now — Auto will try again at the next check.</value></data>
+  <data name="AutoWaitingShort" xml:space="preserve"><value>No server responds right now</value></data>
   <data name="ButtonClose" xml:space="preserve"><value>Close</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Connect</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Copy the whole log</value></data>
@@ -123,6 +131,9 @@
   <data name="ScreenCaptureFailed" xml:space="preserve"><value>Could not capture the screen.</value></data>
   <data name="ScreenNoQr" xml:space="preserve"><value>No QR code was found on the screen. Open the image with the code on top of other windows and try again.</value></data>
   <data name="SessionTimeFormat" xml:space="preserve"><value>Session time: {0}</value></data>
+  <data name="SortByLatency" xml:space="preserve"><value>Sort by latency</value></data>
+  <data name="SortByLatencyTooltip" xml:space="preserve"><value>Sort profiles by latency (fastest first)</value></data>
+  <data name="StatusAutoSelecting" xml:space="preserve"><value>Choosing a server…</value></data>
   <data name="StatusConnected" xml:space="preserve"><value>Connected</value></data>
   <data name="StatusConnecting" xml:space="preserve"><value>Connecting…</value></data>
   <data name="StatusDisconnected" xml:space="preserve"><value>Disconnected</value></data>
