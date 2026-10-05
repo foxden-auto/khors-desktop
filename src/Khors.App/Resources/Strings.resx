@@ -58,6 +58,7 @@
   <data name="LocalProxyFormat" xml:space="preserve"><value>Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Mode: system proxy</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Select a profile below</value></data>
+  <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Link parameters KHORS does not understand yet: {0}</value></data>
   <data name="ProfileWarningsFormat" xml:space="preserve"><value>Warning: {0}</value></data>
   <data name="ProfilesHeader" xml:space="preserve"><value>Profiles</value></data>
   <data name="ProxyRecoveredAfterCrash" xml:space="preserve"><value>System proxy restored after KHORS terminated unexpectedly.</value></data>

@@ -33,6 +33,7 @@ STRINGS = {
     "ImportLineErrorFormat": ("Ссылка {0}: {1}", "Link {0}: {1}"),
     "ClipboardEmpty": ("В буфере обмена нет текста.", "The clipboard contains no text."),
     "ProfileWarningsFormat": ("Предупреждение: {0}", "Warning: {0}"),
+    "ProfileUnknownParamsFormat": ("Параметры ссылки, которые KHORS пока не понимает: {0}", "Link parameters KHORS does not understand yet: {0}"),
     # Хранилище и восстановление
     "ProxyRecoveredAfterCrash": ("Системный прокси восстановлен после аварийного завершения KHORS.", "System proxy restored after KHORS terminated unexpectedly."),
     "StorageRestoredFromBackup": ("Файл профилей был повреждён — профили восстановлены из резервной копии.", "The profiles file was damaged — profiles restored from the backup."),

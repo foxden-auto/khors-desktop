@@ -58,6 +58,7 @@
   <data name="LocalProxyFormat" xml:space="preserve"><value>Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Выберите профиль в списке</value></data>
+  <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Параметры ссылки, которые KHORS пока не понимает: {0}</value></data>
   <data name="ProfileWarningsFormat" xml:space="preserve"><value>Предупреждение: {0}</value></data>
   <data name="ProfilesHeader" xml:space="preserve"><value>Профили</value></data>
   <data name="ProxyRecoveredAfterCrash" xml:space="preserve"><value>Системный прокси восстановлен после аварийного завершения KHORS.</value></data>

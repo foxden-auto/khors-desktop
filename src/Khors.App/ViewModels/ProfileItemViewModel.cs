@@ -18,13 +18,18 @@ public sealed partial class ProfileItemViewModel(Profile profile) : ObservableOb
 
     public string? Warning { get; } = ProfileValidator.Validate(profile)
         .Where(i => i.Severity == ProfileIssueSeverity.Warning)
-        .Select(i => Localizer.Format("ProfileWarningsFormat", Localizer.Describe(i.Code)))
+        .Select(i => DescribeWarning(profile, i.Code))
         .FirstOrDefault();
 
     public bool HasWarning => Warning is not null;
 
     [ObservableProperty]
     public partial bool IsActive { get; set; }
+
+    // Имена неизвестных параметров не секретны (секретны значения) — показываем их, чтобы было ясно, что не поддержано.
+    private static string DescribeWarning(Profile profile, ProfileIssueCode code) => code == ProfileIssueCode.UnknownParameters
+        ? Localizer.Format("ProfileUnknownParamsFormat", string.Join(", ", profile.UnknownParams.Select(p => p.Key).Distinct(StringComparer.Ordinal)))
+        : Localizer.Format("ProfileWarningsFormat", Localizer.Describe(code));
 
     private static string ProtocolName(ProtocolSettings protocol) => protocol switch
     {
