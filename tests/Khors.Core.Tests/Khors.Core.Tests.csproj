@@ -2,6 +2,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <!-- CA1861 (массивы-литералы в аргументах) — о производительности повторных вызовов; в данных тестов не нужно. -->
+    <NoWarn>$(NoWarn);CA1861</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Khors.Core\Khors.Core.csproj" />

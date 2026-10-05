@@ -26,6 +26,27 @@ internal static class ProfileSecrets
             case ShadowsocksSettings ss:
                 yield return ss.Password.Value;
                 break;
+            case Hysteria2Settings hysteria:
+                yield return hysteria.Password.Value;
+                if (hysteria.ObfsPassword is { } obfs)
+                {
+                    yield return obfs.Value;
+                }
+
+                break;
+            case TuicSettings tuic:
+                yield return tuic.Uuid.Value;
+                yield return tuic.Password.Value;
+                break;
+            case WireGuardSettings wireGuard:
+                yield return wireGuard.PrivateKey.Value;
+                yield return wireGuard.PeerPublicKey.Value;
+                if (wireGuard.PreSharedKey is { } psk)
+                {
+                    yield return psk.Value;
+                }
+
+                break;
         }
 
         switch (profile.Security)

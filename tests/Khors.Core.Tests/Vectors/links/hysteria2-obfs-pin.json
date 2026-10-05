@@ -1,0 +1,25 @@
+{
+  "description": "Hysteria2: обфускация salamander, закреплённый сертификат, insecure",
+  "link": "hysteria2://Hy2Pa55@hy.example.com:443?sni=hy.example.com&obfs=salamander&obfs-password=0bfsPa55w0rd&insecure=1&pinSHA256=9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08#Hy2",
+  "expected": {
+    "name": "Hy2",
+    "server": {
+      "host": "hy.example.com",
+      "port": 443
+    },
+    "protocol": {
+      "type": "hysteria2",
+      "password": "Hy2Pa55",
+      "obfs": "salamander",
+      "obfsPassword": "0bfsPa55w0rd"
+    },
+    "security": {
+      "type": "tls",
+      "sni": "hy.example.com",
+      "allowInsecure": true,
+      "pinnedPeerCertSha256": [
+        "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+      ]
+    }
+  }
+}

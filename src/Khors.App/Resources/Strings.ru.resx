@@ -36,11 +36,15 @@
   <data name="Issue_IdInvalid" xml:space="preserve"><value>неверный UUID</value></data>
   <data name="Issue_InsecureTls" xml:space="preserve"><value>проверка сертификата отключена (allowInsecure)</value></data>
   <data name="Issue_MethodEmpty" xml:space="preserve"><value>не задан метод шифрования</value></data>
+  <data name="Issue_MtuOutOfRange" xml:space="preserve"><value>MTU вне диапазона 576–65535</value></data>
   <data name="Issue_MuxConcurrencyOutOfRange" xml:space="preserve"><value>неверное число соединений mux</value></data>
   <data name="Issue_MuxIncompatibleWithFlow" xml:space="preserve"><value>mux несовместим с flow</value></data>
   <data name="Issue_NameEmpty" xml:space="preserve"><value>не задано имя</value></data>
+  <data name="Issue_ObfsInvalid" xml:space="preserve"><value>обфускация: нужен salamander с паролем</value></data>
   <data name="Issue_PasswordEmpty" xml:space="preserve"><value>не задан пароль</value></data>
   <data name="Issue_PortOutOfRange" xml:space="preserve"><value>порт вне диапазона 1–65535</value></data>
+  <data name="Issue_PortsInvalid" xml:space="preserve"><value>неверный список портов</value></data>
+  <data name="Issue_QuicRequiresTls" xml:space="preserve"><value>Hysteria2 и TUIC работают только с TLS</value></data>
   <data name="Issue_RealityMlDsa65VerifyInvalid" xml:space="preserve"><value>REALITY: неверный ключ pqv</value></data>
   <data name="Issue_RealityPostQuantumRequiresXray" xml:space="preserve"><value>сервер требует X25519MLKEM768 — нужно ядро Xray, sing-box не подключится</value></data>
   <data name="Issue_RealityPublicKeyInvalid" xml:space="preserve"><value>REALITY: неверный публичный ключ</value></data>
@@ -49,7 +53,11 @@
   <data name="Issue_RealityTransportUnsupported" xml:space="preserve"><value>REALITY не работает с этим транспортом</value></data>
   <data name="Issue_TlsPinnedCertInvalid" xml:space="preserve"><value>неверный отпечаток сертификата (pcs)</value></data>
   <data name="Issue_TransportModeUnknown" xml:space="preserve"><value>неизвестный режим транспорта</value></data>
+  <data name="Issue_TuicModeUnknown" xml:space="preserve"><value>TUIC: неизвестный congestion control или режим UDP</value></data>
   <data name="Issue_UnknownParameters" xml:space="preserve"><value>в ссылке есть параметры, которые KHORS пока не понимает</value></data>
+  <data name="Issue_WireGuardAddressInvalid" xml:space="preserve"><value>WireGuard: неверный адрес интерфейса (нужно вида 10.0.0.2/32)</value></data>
+  <data name="Issue_WireGuardKeyInvalid" xml:space="preserve"><value>WireGuard: неверный ключ (нужно 32 байта в base64)</value></data>
+  <data name="Issue_WireGuardReservedInvalid" xml:space="preserve"><value>WireGuard: reserved — три числа 0–255</value></data>
   <data name="Issue_XhttpExtraInvalid" xml:space="preserve"><value>параметр extra XHTTP — не JSON-объект</value></data>
   <data name="LatencyTesting" xml:space="preserve"><value>проверка…</value></data>
   <data name="LatencyTooltipFormat" xml:space="preserve"><value>Задержка через туннель по готовому соединению. Первое соединение (с установкой туннеля и TLS): {0} мс</value></data>
@@ -105,6 +113,7 @@
   <data name="TrayTooltipFormat" xml:space="preserve"><value>KHORS — {0}</value></data>
   <data name="Unsupported_Other" xml:space="preserve"><value>неподдерживаемая возможность</value></data>
   <data name="Unsupported_core" xml:space="preserve"><value>профилю назначено ядро sing-box</value></data>
+  <data name="Unsupported_protocol" xml:space="preserve"><value>Hysteria2, TUIC и WireGuard работают через sing-box — он появится в следующей версии</value></data>
   <data name="Unsupported_protocol_alterId" xml:space="preserve"><value>устаревший VMess (alterId больше 0)</value></data>
   <data name="Unsupported_protocol_plugin" xml:space="preserve"><value>плагины Shadowsocks</value></data>
   <data name="Unsupported_security" xml:space="preserve"><value>VLESS/Trojan без TLS к публичному адресу</value></data>

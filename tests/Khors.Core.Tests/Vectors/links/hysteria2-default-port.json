@@ -1,0 +1,19 @@
+{
+  "description": "Hysteria2 без порта — 443",
+  "link": "hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com",
+  "expected": {
+    "name": "hy.example.com:443",
+    "server": {
+      "host": "hy.example.com",
+      "port": 443
+    },
+    "protocol": {
+      "type": "hysteria2",
+      "password": "Hy2Pa55"
+    },
+    "security": {
+      "type": "tls",
+      "sni": "hy.example.com"
+    }
+  }
+}

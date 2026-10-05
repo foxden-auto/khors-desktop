@@ -15,7 +15,7 @@ namespace Khors.Core.Tests.Import;
 public class ShareLinkVectorTests
 {
     private static readonly string s_directory = Path.Combine(AppContext.BaseDirectory, "Vectors", "links");
-    private static readonly string[] s_schemes = ["vless://", "vmess://", "trojan://", "ss://"];
+    private static readonly string[] s_schemes = ["vless://", "vmess://", "trojan://", "ss://", "hysteria2://", "hy2://", "tuic://", "wireguard://", "wg://"];
 
     public static TheoryData<string> AllVectors => new(VectorNames(_ => true));
 

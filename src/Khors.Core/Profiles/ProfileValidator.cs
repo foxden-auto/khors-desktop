@@ -11,6 +11,7 @@ public static class ProfileValidator
     private const int MaxShortIdLength = 16;
     private const int MlDsa65PublicKeyBytes = 1952;
     private const int Sha256Bytes = 32;
+    private const int WireGuardKeyBytes = 32;
 
     private static readonly HashSet<string> s_flows = new(StringComparer.Ordinal)
     {
@@ -33,7 +34,11 @@ public static class ProfileValidator
 
         ValidateServer(profile.Server, Error);
         ValidateProtocol(profile, Error);
-        ValidateTransport(profile.Transport, Error);
+        if (!profile.Protocol.HasOwnTransport)
+        {
+            ValidateTransport(profile.Transport, Error);
+        }
+
         ValidateSecurity(profile, Error, Warning);
 
         if (profile.Mux is { Concurrency: < -1 or > 1024 })
@@ -86,6 +91,69 @@ public static class ProfileValidator
 
             case TrojanSettings trojan when trojan.Password.IsEmpty:
                 error(ProfileIssueCode.PasswordEmpty, "protocol.password");
+                break;
+
+            case Hysteria2Settings hysteria:
+                if (hysteria.Password.IsEmpty)
+                {
+                    error(ProfileIssueCode.PasswordEmpty, "protocol.password");
+                }
+
+                if (hysteria.Obfs is not null && (hysteria.Obfs != "salamander" || hysteria.ObfsPassword is not { IsEmpty: false }))
+                {
+                    error(ProfileIssueCode.ObfsInvalid, "protocol.obfs");
+                }
+
+                if (hysteria.Ports is not null && !IsPortList(hysteria.Ports))
+                {
+                    error(ProfileIssueCode.PortsInvalid, "protocol.ports");
+                }
+
+                RequireQuicTls(profile, error);
+                break;
+
+            case TuicSettings tuic:
+                if (!Guid.TryParseExact(tuic.Uuid.Value, "D", out _))
+                {
+                    error(tuic.Uuid.IsEmpty ? ProfileIssueCode.IdEmpty : ProfileIssueCode.IdInvalid, "protocol.uuid");
+                }
+
+                if (tuic.Password.IsEmpty)
+                {
+                    error(ProfileIssueCode.PasswordEmpty, "protocol.password");
+                }
+
+                if (tuic.CongestionControl is not ("cubic" or "new_reno" or "bbr") || tuic.UdpRelayMode is not ("native" or "quic"))
+                {
+                    error(ProfileIssueCode.TuicModeUnknown, "protocol");
+                }
+
+                RequireQuicTls(profile, error);
+                break;
+
+            case WireGuardSettings wireGuard:
+                if (DecodedLength(wireGuard.PrivateKey.Value) != WireGuardKeyBytes
+                    || DecodedLength(wireGuard.PeerPublicKey.Value) != WireGuardKeyBytes
+                    || (wireGuard.PreSharedKey is { } psk && DecodedLength(psk.Value) != WireGuardKeyBytes))
+                {
+                    error(ProfileIssueCode.WireGuardKeyInvalid, "protocol");
+                }
+
+                if (wireGuard.LocalAddresses.Count == 0 || !wireGuard.LocalAddresses.All(IsCidr))
+                {
+                    error(ProfileIssueCode.WireGuardAddressInvalid, "protocol.localAddresses");
+                }
+
+                if (wireGuard.Reserved.Count is not (0 or 3) || wireGuard.Reserved.Any(b => b is < 0 or > 255))
+                {
+                    error(ProfileIssueCode.WireGuardReservedInvalid, "protocol.reserved");
+                }
+
+                if (wireGuard.Mtu is < 576 or > 65535)
+                {
+                    error(ProfileIssueCode.MtuOutOfRange, "protocol.mtu");
+                }
+
                 break;
 
             case ShadowsocksSettings ss:
@@ -237,6 +305,37 @@ public static class ProfileValidator
         base64 += new string('=', (4 - (base64.Length % 4)) % 4);
         var buffer = new byte[base64.Length];
         return Convert.TryFromBase64String(base64, buffer, out var written) ? written : -1;
+    }
+
+    /// <summary>Hysteria2 и TUIC работают поверх QUIC — только с TLS.</summary>
+    private static void RequireQuicTls(Profile profile, Action<ProfileIssueCode, string> error)
+    {
+        if (profile.Security is not TlsSecurity)
+        {
+            error(ProfileIssueCode.QuicRequiresTls, "security");
+        }
+    }
+
+    /// <summary>Список портов и диапазонов: <c>443</c>, <c>443,20000-30000</c>.</summary>
+    private static bool IsPortList(string value) =>
+        value.Split(',', StringSplitOptions.TrimEntries).All(part =>
+        {
+            var range = part.Split('-', StringSplitOptions.TrimEntries);
+            return range.Length is 1 or 2
+                && range.All(p => int.TryParse(p, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var port) && port is >= 1 and <= 65535)
+                && (range.Length == 1 || int.Parse(range[0], System.Globalization.CultureInfo.InvariantCulture) <= int.Parse(range[1], System.Globalization.CultureInfo.InvariantCulture));
+        });
+
+    private static bool IsCidr(string value)
+    {
+        var slash = value.IndexOf('/', StringComparison.Ordinal);
+        if (slash <= 0 || !System.Net.IPAddress.TryParse(value[..slash], out var ip)
+            || !int.TryParse(value[(slash + 1)..], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var prefix))
+        {
+            return false;
+        }
+
+        return prefix <= (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6 ? 128 : 32);
     }
 
     private static bool IsSha256Hex(string value)

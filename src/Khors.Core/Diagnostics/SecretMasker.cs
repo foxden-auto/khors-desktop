@@ -177,6 +177,7 @@ public sealed partial class SecretMasker
     [GeneratedRegex(@"^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]*[a-z0-9]\.?$", RegexOptions.IgnoreCase)]
     private static partial Regex DomainPattern();
 
-    [GeneratedRegex(@"^(?<host>\[[^\]]+\]|[^:\[\]]+):(?<port>\d{1,5})$")]
+    // Порт — число или список портов и диапазонов (Hysteria2: «:443,20000-30000»).
+    [GeneratedRegex(@"^(?<host>\[[^\]]+\]|[^:\[\]]+):(?<port>\d{1,5}(?:[,\-]\d{1,5})*)$")]
     private static partial Regex HostWithPort();
 }

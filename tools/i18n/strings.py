@@ -108,6 +108,14 @@ STRINGS = {
     "Issue_RealityMlDsa65VerifyInvalid": ("REALITY: неверный ключ pqv", "REALITY: invalid pqv key"),
     "Issue_RealityPostQuantumRequiresXray": ("сервер требует X25519MLKEM768 — нужно ядро Xray, sing-box не подключится", "the server requires X25519MLKEM768 — use the Xray core, sing-box cannot connect"),
     "Issue_TlsPinnedCertInvalid": ("неверный отпечаток сертификата (pcs)", "invalid certificate fingerprint (pcs)"),
+    "Issue_QuicRequiresTls": ("Hysteria2 и TUIC работают только с TLS", "Hysteria2 and TUIC require TLS"),
+    "Issue_ObfsInvalid": ("обфускация: нужен salamander с паролем", "obfuscation: salamander with a password is required"),
+    "Issue_PortsInvalid": ("неверный список портов", "invalid port list"),
+    "Issue_TuicModeUnknown": ("TUIC: неизвестный congestion control или режим UDP", "TUIC: unknown congestion control or UDP mode"),
+    "Issue_WireGuardKeyInvalid": ("WireGuard: неверный ключ (нужно 32 байта в base64)", "WireGuard: invalid key (32 bytes in base64 expected)"),
+    "Issue_WireGuardAddressInvalid": ("WireGuard: неверный адрес интерфейса (нужно вида 10.0.0.2/32)", "WireGuard: invalid interface address (like 10.0.0.2/32)"),
+    "Issue_WireGuardReservedInvalid": ("WireGuard: reserved — три числа 0–255", "WireGuard: reserved must be three numbers 0–255"),
+    "Issue_MtuOutOfRange": ("MTU вне диапазона 576–65535", "MTU outside 576–65535"),
     "Issue_InsecureTls": ("проверка сертификата отключена (allowInsecure)", "certificate verification is disabled (allowInsecure)"),
     "Issue_UnknownParameters": ("в ссылке есть параметры, которые KHORS пока не понимает", "the link has parameters KHORS does not understand yet"),
     # Причины неудачи подключения (ConnectionFailureKind)
@@ -123,6 +131,7 @@ STRINGS = {
     "Unsupported_security": ("VLESS/Trojan без TLS к публичному адресу", "VLESS/Trojan without TLS to a public address"),
     "Unsupported_protocol_plugin": ("плагины Shadowsocks", "Shadowsocks plugins"),
     "Unsupported_protocol_alterId": ("устаревший VMess (alterId больше 0)", "legacy VMess (alterId greater than 0)"),
+    "Unsupported_protocol": ("Hysteria2, TUIC и WireGuard работают через sing-box — он появится в следующей версии", "Hysteria2, TUIC and WireGuard run through sing-box, coming in the next version"),
     "Unsupported_core": ("профилю назначено ядро sing-box", "the profile is assigned to sing-box"),
     "Unsupported_Other": ("неподдерживаемая возможность", "an unsupported feature"),
 }

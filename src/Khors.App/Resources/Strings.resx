@@ -36,11 +36,15 @@
   <data name="Issue_IdInvalid" xml:space="preserve"><value>invalid UUID</value></data>
   <data name="Issue_InsecureTls" xml:space="preserve"><value>certificate verification is disabled (allowInsecure)</value></data>
   <data name="Issue_MethodEmpty" xml:space="preserve"><value>cipher is empty</value></data>
+  <data name="Issue_MtuOutOfRange" xml:space="preserve"><value>MTU outside 576–65535</value></data>
   <data name="Issue_MuxConcurrencyOutOfRange" xml:space="preserve"><value>invalid mux concurrency</value></data>
   <data name="Issue_MuxIncompatibleWithFlow" xml:space="preserve"><value>mux cannot be used with flow</value></data>
   <data name="Issue_NameEmpty" xml:space="preserve"><value>name is empty</value></data>
+  <data name="Issue_ObfsInvalid" xml:space="preserve"><value>obfuscation: salamander with a password is required</value></data>
   <data name="Issue_PasswordEmpty" xml:space="preserve"><value>password is empty</value></data>
   <data name="Issue_PortOutOfRange" xml:space="preserve"><value>port is outside 1–65535</value></data>
+  <data name="Issue_PortsInvalid" xml:space="preserve"><value>invalid port list</value></data>
+  <data name="Issue_QuicRequiresTls" xml:space="preserve"><value>Hysteria2 and TUIC require TLS</value></data>
   <data name="Issue_RealityMlDsa65VerifyInvalid" xml:space="preserve"><value>REALITY: invalid pqv key</value></data>
   <data name="Issue_RealityPostQuantumRequiresXray" xml:space="preserve"><value>the server requires X25519MLKEM768 — use the Xray core, sing-box cannot connect</value></data>
   <data name="Issue_RealityPublicKeyInvalid" xml:space="preserve"><value>REALITY: invalid public key</value></data>
@@ -49,7 +53,11 @@
   <data name="Issue_RealityTransportUnsupported" xml:space="preserve"><value>REALITY does not work with this transport</value></data>
   <data name="Issue_TlsPinnedCertInvalid" xml:space="preserve"><value>invalid certificate fingerprint (pcs)</value></data>
   <data name="Issue_TransportModeUnknown" xml:space="preserve"><value>unknown transport mode</value></data>
+  <data name="Issue_TuicModeUnknown" xml:space="preserve"><value>TUIC: unknown congestion control or UDP mode</value></data>
   <data name="Issue_UnknownParameters" xml:space="preserve"><value>the link has parameters KHORS does not understand yet</value></data>
+  <data name="Issue_WireGuardAddressInvalid" xml:space="preserve"><value>WireGuard: invalid interface address (like 10.0.0.2/32)</value></data>
+  <data name="Issue_WireGuardKeyInvalid" xml:space="preserve"><value>WireGuard: invalid key (32 bytes in base64 expected)</value></data>
+  <data name="Issue_WireGuardReservedInvalid" xml:space="preserve"><value>WireGuard: reserved must be three numbers 0–255</value></data>
   <data name="Issue_XhttpExtraInvalid" xml:space="preserve"><value>XHTTP extra is not a JSON object</value></data>
   <data name="LatencyTesting" xml:space="preserve"><value>testing…</value></data>
   <data name="LatencyTooltipFormat" xml:space="preserve"><value>Latency through the tunnel over an established connection. First connection (tunnel and TLS setup): {0} ms</value></data>
@@ -105,6 +113,7 @@
   <data name="TrayTooltipFormat" xml:space="preserve"><value>KHORS — {0}</value></data>
   <data name="Unsupported_Other" xml:space="preserve"><value>an unsupported feature</value></data>
   <data name="Unsupported_core" xml:space="preserve"><value>the profile is assigned to sing-box</value></data>
+  <data name="Unsupported_protocol" xml:space="preserve"><value>Hysteria2, TUIC and WireGuard run through sing-box, coming in the next version</value></data>
   <data name="Unsupported_protocol_alterId" xml:space="preserve"><value>legacy VMess (alterId greater than 0)</value></data>
   <data name="Unsupported_protocol_plugin" xml:space="preserve"><value>Shadowsocks plugins</value></data>
   <data name="Unsupported_security" xml:space="preserve"><value>VLESS/Trojan without TLS to a public address</value></data>

@@ -17,7 +17,7 @@ public class LocalizationTests
     private static readonly CultureInfo s_russian = CultureInfo.GetCultureInfo("ru");
 
     // Поля, которые XrayConfigGenerator возвращает в CoreConfigError (UnsupportedFeature).
-    private static readonly string[] s_unsupportedFields = ["protocol.plugin", "protocol.alterId", "security.allowInsecure", "security"];
+    private static readonly string[] s_unsupportedFields = ["protocol.plugin", "protocol.alterId", "security.allowInsecure", "security", "protocol"];
 
     public static TheoryData<string> RequiredKeys
     {

@@ -92,6 +92,12 @@ public static class XrayConfigGenerator
     /// </summary>
     private static string? FindUnsupported(Profile profile)
     {
+        // Hysteria2, TUIC и WireGuard запускаются через sing-box (docs/SPEC.md, 3.4).
+        if (profile.Protocol.HasOwnTransport)
+        {
+            return "protocol";
+        }
+
         switch (profile.Protocol)
         {
             // SIP003-плагинов в Xray нет.

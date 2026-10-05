@@ -1,0 +1,27 @@
+{
+  "description": "WireGuard: ключи, pre-shared key, адреса IPv4 и IPv6, reserved, MTU",
+  "link": "wireguard://RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14%3D@198.51.100.9:51820?publickey=S2BGSyYNxTf1wij4Qk%2F8nbbFhbbGfzsDwb4shXmfImw%3D&presharedkey=yZFSXD5CEPmcBaINbhEO0qJt7hLnqy6WwX%2FDiPcRLbs%3D&address=10.0.0.2%2F32%2Cfd00%3A%3A2%2F128&reserved=1%2C2%2C3&mtu=1280#WG",
+  "expected": {
+    "name": "WG",
+    "server": {
+      "host": "198.51.100.9",
+      "port": 51820
+    },
+    "protocol": {
+      "type": "wireguard",
+      "privateKey": "RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14=",
+      "peerPublicKey": "S2BGSyYNxTf1wij4Qk/8nbbFhbbGfzsDwb4shXmfImw=",
+      "preSharedKey": "yZFSXD5CEPmcBaINbhEO0qJt7hLnqy6WwX/DiPcRLbs=",
+      "localAddresses": [
+        "10.0.0.2/32",
+        "fd00::2/128"
+      ],
+      "reserved": [
+        1,
+        2,
+        3
+      ],
+      "mtu": 1280
+    }
+  }
+}

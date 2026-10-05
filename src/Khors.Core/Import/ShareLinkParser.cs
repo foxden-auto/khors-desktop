@@ -3,7 +3,8 @@ using Khors.Core.Profiles;
 namespace Khors.Core.Import;
 
 /// <summary>
-/// Разбор ссылок <c>vless://</c>, <c>vmess://</c>, <c>trojan://</c>, <c>ss://</c> во внутреннюю модель.
+/// Разбор ссылок <c>vless://</c>, <c>vmess://</c>, <c>trojan://</c>, <c>ss://</c>, <c>hysteria2://</c>, <c>tuic://</c>,
+/// <c>wireguard://</c> во внутреннюю модель.
 /// Чистая функция: не обращается к сети и файлам.
 /// </summary>
 /// <remarks>
@@ -39,6 +40,9 @@ public static partial class ShareLinkParser
                 "trojan" => LinkParseResult.Success(ParseTrojan(body)),
                 "vmess" => LinkParseResult.Success(ParseVmess(body)),
                 "ss" => LinkParseResult.Success(ParseShadowsocks(body)),
+                "hysteria2" or "hy2" => LinkParseResult.Success(ParseHysteria2(body)),
+                "tuic" => LinkParseResult.Success(ParseTuic(body)),
+                "wireguard" or "wg" => LinkParseResult.Success(ParseWireGuard(body)),
                 _ => LinkParseResult.Failure(LinkParseErrorCode.UnsupportedScheme, "scheme"),
             };
         }

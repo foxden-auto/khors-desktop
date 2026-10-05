@@ -1,0 +1,22 @@
+{
+  "description": "hy2:// с диапазоном портов в адресе (port hopping), IPv6, пароль «пользователь:пароль», скорость",
+  "link": "hy2://user%3AHy2Pa55@[2001:db8::30]:443,20000-30000/?sni=hy.example.com&up=50%20Mbps&down=200#Hopping",
+  "expected": {
+    "name": "Hopping",
+    "server": {
+      "host": "2001:db8::30",
+      "port": 443
+    },
+    "protocol": {
+      "type": "hysteria2",
+      "password": "user:Hy2Pa55",
+      "ports": "443,20000-30000",
+      "upMbps": 50,
+      "downMbps": 200
+    },
+    "security": {
+      "type": "tls",
+      "sni": "hy.example.com"
+    }
+  }
+}

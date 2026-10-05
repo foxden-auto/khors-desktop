@@ -15,7 +15,14 @@ public sealed partial class ProfileItemViewModel(Profile profile) : ObservableOb
     public string Name => Profile.Name;
 
     /// <summary>Например, «Подписка · VLESS · REALITY · TCP». Названия протоколов не переводятся.</summary>
-    public string Summary => string.Join(" · ", new[] { Profile.Group ?? string.Empty, ProtocolName(Profile.Protocol), SecurityName(Profile.Security), TransportName(Profile.Transport) }.Where(s => s.Length > 0));
+    public string Summary => string.Join(" · ", new[]
+    {
+        Profile.Group ?? string.Empty,
+        ProtocolName(Profile.Protocol),
+        // У Hysteria2/TUIC TLS встроен в QUIC, у WireGuard — свой транспорт: показываем UDP.
+        Profile.Protocol.HasOwnTransport ? string.Empty : SecurityName(Profile.Security),
+        Profile.Protocol.HasOwnTransport ? "UDP" : TransportName(Profile.Transport),
+    }.Where(s => s.Length > 0));
 
     public string? Warning { get; } = ProfileValidator.Validate(profile)
         .Where(i => i.Severity == ProfileIssueSeverity.Warning)
@@ -62,6 +69,9 @@ public sealed partial class ProfileItemViewModel(Profile profile) : ObservableOb
         VmessSettings => "VMess",
         TrojanSettings => "Trojan",
         ShadowsocksSettings => "Shadowsocks",
+        Hysteria2Settings => "Hysteria2",
+        TuicSettings => "TUIC",
+        WireGuardSettings => "WireGuard",
         _ => string.Empty,
     };
 

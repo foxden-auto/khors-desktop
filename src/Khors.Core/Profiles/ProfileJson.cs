@@ -32,4 +32,5 @@ public static class ProfileJson
 [JsonSerializable(typeof(Profile))]
 [JsonSerializable(typeof(UnknownParam[]))]
 [JsonSerializable(typeof(string[]))]
+[JsonSerializable(typeof(int[]))]
 internal sealed partial class ProfileJsonContext : JsonSerializerContext;

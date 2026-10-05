@@ -1,0 +1,8 @@
+{
+  "description": "Hysteria2 с неверным портом",
+  "link": "hysteria2://Hy2Pa55@hy.example.com:abc",
+  "error": {
+    "code": "InvalidPort",
+    "field": "port"
+  }
+}

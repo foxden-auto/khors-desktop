@@ -47,4 +47,5 @@ public static class StorageJson
 [JsonSerializable(typeof(Subscription[]))]
 [JsonSerializable(typeof(UnknownParam[]))]
 [JsonSerializable(typeof(string[]))]
+[JsonSerializable(typeof(int[]))]
 internal sealed partial class StorageJsonContext : JsonSerializerContext;

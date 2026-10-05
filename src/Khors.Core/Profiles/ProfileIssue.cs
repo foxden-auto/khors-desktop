@@ -39,5 +39,13 @@ public enum ProfileIssueCode
     RealityPostQuantumRequiresXray,
     TlsPinnedCertInvalid,
     InsecureTls,
+    QuicRequiresTls,
+    ObfsInvalid,
+    PortsInvalid,
+    TuicModeUnknown,
+    WireGuardKeyInvalid,
+    WireGuardAddressInvalid,
+    WireGuardReservedInvalid,
+    MtuOutOfRange,
     UnknownParameters,
 }

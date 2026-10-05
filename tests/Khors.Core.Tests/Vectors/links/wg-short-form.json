@@ -1,0 +1,19 @@
+{
+  "description": "wg:// с синонимами параметров; адрес без префикса дополняется до /32",
+  "link": "wg://RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14%3D@wg.example.net:51820?public_key=S2BGSyYNxTf1wij4Qk%2F8nbbFhbbGfzsDwb4shXmfImw%3D&ip=172.16.0.2#WARP",
+  "expected": {
+    "name": "WARP",
+    "server": {
+      "host": "wg.example.net",
+      "port": 51820
+    },
+    "protocol": {
+      "type": "wireguard",
+      "privateKey": "RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14=",
+      "peerPublicKey": "S2BGSyYNxTf1wij4Qk/8nbbFhbbGfzsDwb4shXmfImw=",
+      "localAddresses": [
+        "172.16.0.2/32"
+      ]
+    }
+  }
+}
