@@ -82,7 +82,7 @@ public sealed class ProfileRepositoryTests : IDisposable
     [Fact]
     public void FileFromNewerVersionMakesRepositoryReadOnly()
     {
-        const string future = """{ "schemaVersion": 2, "profiles": [] }""";
+        const string future = """{ "schemaVersion": 99, "profiles": [] }""";
         File.WriteAllText(ProfilesPath, future);
 
         var repository = ProfileRepository.Open(ProfilesPath, _time);

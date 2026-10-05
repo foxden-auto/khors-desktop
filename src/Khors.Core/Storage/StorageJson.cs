@@ -2,14 +2,23 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Khors.Core.Profiles;
+using Khors.Core.Subscriptions;
 
 namespace Khors.Core.Storage;
 
 /// <summary>Сериализация файлов профилей и настроек.</summary>
 public static class StorageJson
 {
-    /// <summary>Миграции файла профилей: ключ — исходная версия. Пока нет.</summary>
-    public static IReadOnlyDictionary<int, Func<JsonObject, JsonObject>> ProfileMigrations { get; } = new Dictionary<int, Func<JsonObject, JsonObject>>();
+    /// <summary>Миграции файла профилей: ключ — исходная версия.</summary>
+    public static IReadOnlyDictionary<int, Func<JsonObject, JsonObject>> ProfileMigrations { get; } = new Dictionary<int, Func<JsonObject, JsonObject>>
+    {
+        // 1 → 2: появились подписки.
+        [1] = root =>
+        {
+            root["subscriptions"] ??= new JsonArray();
+            return root;
+        },
+    };
 
     public static string SerializeProfiles(ProfileDocument document) =>
         JsonSerializer.Serialize(document, StorageJsonContext.Default.ProfileDocument);
@@ -35,6 +44,7 @@ public static class StorageJson
 [JsonSerializable(typeof(ProfileDocument))]
 [JsonSerializable(typeof(AppSettings))]
 [JsonSerializable(typeof(Profile[]))]
+[JsonSerializable(typeof(Subscription[]))]
 [JsonSerializable(typeof(UnknownParam[]))]
 [JsonSerializable(typeof(string[]))]
 internal sealed partial class StorageJsonContext : JsonSerializerContext;

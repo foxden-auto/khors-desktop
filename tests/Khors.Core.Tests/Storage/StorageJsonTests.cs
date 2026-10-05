@@ -19,7 +19,55 @@ public partial class StorageJsonTests
 
         Assert.Equal(StorageLoadStatus.Ok, parsed.Status);
         Assert.Equal(document, parsed.Value);
-        Assert.Equal(1, JsonNode.Parse(json)!["schemaVersion"]!.GetValue<int>());
+        Assert.Equal(ProfileDocument.CurrentSchemaVersion, JsonNode.Parse(json)!["schemaVersion"]!.GetValue<int>());
+    }
+
+    [Fact]
+    public void VersionOneFileIsMigratedWithoutLosingProfiles()
+    {
+        // Файл формата 1.7 (до подписок).
+        const string v1 = """
+            {
+              "schemaVersion": 1,
+              "profiles": [
+                {
+                  "id": "0f8e7d6c-5b4a-4392-8170-6f5e4d3c2b1a",
+                  "name": "старый профиль",
+                  "server": { "host": "vpn.example.com", "port": 443 },
+                  "protocol": { "type": "trojan", "password": "Fictional-Pa55" }
+                }
+              ]
+            }
+            """;
+
+        var parsed = StorageJson.ParseProfiles(v1);
+
+        Assert.Equal(StorageLoadStatus.Ok, parsed.Status);
+        Assert.Equal(1, parsed.SchemaVersion);
+        Assert.Equal("старый профиль", Assert.Single(parsed.Value!.Profiles).Name);
+        Assert.Empty(parsed.Value.Subscriptions);
+        Assert.Equal(ProfileDocument.CurrentSchemaVersion, parsed.Value.SchemaVersion);
+        Assert.Equal(2, JsonNode.Parse(StorageJson.SerializeProfiles(parsed.Value))!["schemaVersion"]!.GetValue<int>());
+    }
+
+    /// <summary>Подписка с частично заполненными полями (null опускаются при записи) читается обратно без потерь.</summary>
+    [Fact]
+    public void SubscriptionWithPartialInfoRoundTrips()
+    {
+        var subscription = new Khors.Core.Subscriptions.Subscription
+        {
+            Id = Guid.Parse("9e8d7c6b-5a4f-4e3d-9c2b-1a0f9e8d7c6b"),
+            Name = "Вымышленная",
+            Url = new Secret("https://sub.example.com/s/fictional-token"),
+            UserInfo = new Khors.Core.Subscriptions.SubscriptionUserInfo(Total: 100),
+            LastError = Khors.Core.Subscriptions.SubscriptionUpdateError.Timeout,
+        };
+        var document = new ProfileDocument { Subscriptions = new EquatableArray<Khors.Core.Subscriptions.Subscription>([subscription]) };
+
+        var parsed = StorageJson.ParseProfiles(StorageJson.SerializeProfiles(document));
+
+        Assert.Equal(StorageLoadStatus.Ok, parsed.Status);
+        Assert.Equal(document, parsed.Value);
     }
 
     [Theory]

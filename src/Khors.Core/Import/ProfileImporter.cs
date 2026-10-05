@@ -1,4 +1,5 @@
 using Khors.Core.Profiles;
+using Khors.Core.Text;
 
 namespace Khors.Core.Import;
 
@@ -13,40 +14,36 @@ public sealed record ImportLineError(int Line, LinkParseError Error);
 
 /// <summary>
 /// Импорт одной или нескольких ссылок (каждая с новой строки или через пробел) — например, из буфера обмена.
+/// Понимает и содержимое подписки в base64, скопированное целиком.
 /// Чистая функция: Id и время передаются снаружи.
 /// </summary>
 public static class ProfileImporter
 {
-    private static readonly char[] s_separators = [' ', '\t', '\r', '\n'];
-
     public static ImportResult Import(string text, IReadOnlyCollection<Profile> existing, Func<Guid> newId, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(existing);
         ArgumentNullException.ThrowIfNull(newId);
 
+        // Содержимое подписки, скопированное целиком: base64-блок без «://» внутри.
+        if (!LinkText.LooksLikeLinks(text) && Base64Text.TryDecodeUtf8(text.Trim(), out var decoded) && LinkText.LooksLikeLinks(decoded))
+        {
+            text = decoded;
+        }
+
         var known = existing.Select(Identity).ToHashSet();
         var added = new List<Profile>();
-        var errors = new List<ImportLineError>();
         var duplicates = 0;
-
-        var links = text.Split(s_separators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        for (var i = 0; i < links.Length; i++)
+        var (parsed, errors) = LinkText.Parse(text);
+        foreach (var profile in parsed)
         {
-            var result = ShareLinkParser.Parse(links[i]);
-            if (!result.IsSuccess)
-            {
-                errors.Add(new ImportLineError(i + 1, result.Error));
-                continue;
-            }
-
-            if (!known.Add(Identity(result.Profile)))
+            if (!known.Add(Identity(profile)))
             {
                 duplicates++;
                 continue;
             }
 
-            added.Add(result.Profile with { Id = newId(), UpdatedAt = now });
+            added.Add(profile with { Id = newId(), UpdatedAt = now });
         }
 
         return new ImportResult(new EquatableArray<Profile>(added), duplicates, new EquatableArray<ImportLineError>(errors));

@@ -1,15 +1,19 @@
 using Khors.Core.Profiles;
+using Khors.Core.Subscriptions;
 
 namespace Khors.Core.Storage;
 
 /// <summary>Файл профилей (<c>profiles.json</c>). Версия схемы — в корне (docs/SPEC.md, 4.2).</summary>
+/// <remarks>Версия 2 — добавлены подписки (ROADMAP 2.1).</remarks>
 public sealed record ProfileDocument
 {
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 2;
 
     public int SchemaVersion { get; init; } = CurrentSchemaVersion;
 
     public EquatableArray<Profile> Profiles { get; init; }
+
+    public EquatableArray<Subscription> Subscriptions { get; init; }
 }
 
 /// <summary>Настройки приложения (<c>settings.json</c>). Отсутствующие поля получают значения по умолчанию.</summary>
