@@ -16,6 +16,18 @@ public sealed record ProfileDocument
     public EquatableArray<Subscription> Subscriptions { get; init; }
 }
 
+/// <summary>Режим подключения (docs/SPEC.md, 3.3).</summary>
+public enum ConnectionMode
+{
+    /// <summary>Ядро с локальными входами, системный прокси Windows указывает на HTTP-вход.</summary>
+    [System.Text.Json.Serialization.JsonStringEnumMemberName("systemProxy")]
+    SystemProxy,
+
+    /// <summary>Весь трафик системы через адаптер TUN; ядра запускает служба KHORS.</summary>
+    [System.Text.Json.Serialization.JsonStringEnumMemberName("tun")]
+    Tun,
+}
+
 /// <summary>Настройки приложения (<c>settings.json</c>). Отсутствующие поля получают значения по умолчанию.</summary>
 /// <param name="SelectedProfileId">Профиль, выбранный для подключения.</param>
 /// <param name="SocksPort">Желаемый порт SOCKS-входа; занят — берётся свободный.</param>
@@ -28,6 +40,7 @@ public sealed record ProfileDocument
 /// <param name="AutoSelect">Выбрана группа «Авто» вместо одного профиля (ROADMAP 2.8).</param>
 /// <param name="AutoRecheckMinutes">Как часто «Авто» перепроверяет задержку (1…1440 минут).</param>
 /// <param name="SortProfilesByLatency">Список профилей — по возрастанию задержки.</param>
+/// <param name="ConnectionMode">Режим подключения: системный прокси или TUN через службу (ROADMAP 3.2).</param>
 public sealed record AppSettings(
     int SchemaVersion = AppSettings.CurrentSchemaVersion,
     Guid? SelectedProfileId = null,
@@ -40,7 +53,8 @@ public sealed record AppSettings(
     int SubscriptionUpdateIntervalHours = 12,
     bool AutoSelect = false,
     int AutoRecheckMinutes = 10,
-    bool SortProfilesByLatency = false)
+    bool SortProfilesByLatency = false,
+    ConnectionMode ConnectionMode = ConnectionMode.SystemProxy)
 {
     public const int CurrentSchemaVersion = 1;
 }

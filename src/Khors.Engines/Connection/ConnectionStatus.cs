@@ -53,6 +53,9 @@ public enum ConnectionFailureKind
 
     /// <summary>Не удалось включить системный прокси.</summary>
     SystemProxyFailed,
+
+    /// <summary>Режим TUN: служба KHORS не установлена, не запущена или не отвечает.</summary>
+    ServiceUnavailable,
 }
 
 /// <summary>Причина неудачи. <see cref="LogTail"/> — последние строки лога ядра, уже замаскированные.</summary>

@@ -28,11 +28,12 @@ public interface ICoreLauncher
 }
 
 /// <summary>Пожелания к запуску из настроек пользователя.</summary>
-public sealed record CoreStartPreferences(int? SocksPort = 10808, int? HttpPort = 10809, string LogLevel = "warning")
+/// <param name="Mode">TUN — ядра запускает служба, системный прокси не меняется.</param>
+public sealed record CoreStartPreferences(int? SocksPort = 10808, int? HttpPort = 10809, string LogLevel = "warning", ConnectionMode Mode = ConnectionMode.SystemProxy)
 {
     public static CoreStartPreferences From(AppSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        return new CoreStartPreferences(settings.SocksPort, settings.HttpPort, settings.CoreLogLevel);
+        return new CoreStartPreferences(settings.SocksPort, settings.HttpPort, settings.CoreLogLevel, settings.ConnectionMode);
     }
 }

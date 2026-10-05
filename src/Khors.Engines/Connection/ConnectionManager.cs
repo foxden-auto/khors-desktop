@@ -1,4 +1,5 @@
 using Khors.Core.Profiles;
+using Khors.Core.Storage;
 using Khors.Engines.Diagnostics;
 using Khors.Engines.Processes;
 using Khors.Platform;
@@ -80,7 +81,8 @@ public sealed class ConnectionManager : IAsyncDisposable
 
             try
             {
-                if (_systemProxy is not null)
+                // В режиме TUN трафик и так идёт через адаптер службы — системный прокси не трогаем.
+                if (_systemProxy is not null && preferences.Mode == ConnectionMode.SystemProxy)
                 {
                     _ensureWatchdog?.Invoke();
                     _systemProxy.Enable(SystemProxySettings.ForLocalHttp(session.HttpPort));
@@ -210,13 +212,14 @@ public sealed class ConnectionManager : IAsyncDisposable
     private static ConnectionFailure FromStartException(CoreStartException ex) => ex.Failure switch
     {
         CoreStartFailure.ExecutableNotFound => new ConnectionFailure(ConnectionFailureKind.CoreNotFound, Core: ex.Core),
+        CoreStartFailure.ServiceUnavailable => new ConnectionFailure(ConnectionFailureKind.ServiceUnavailable, Core: ex.Core),
         CoreStartFailure.ConfigNotGenerated => new ConnectionFailure(ConnectionFailureKind.UnsupportedByCore, ConfigError: ex.ConfigError, Core: ex.Core),
         _ => new ConnectionFailure(
             ConnectionFailureKind.CoreStartFailed,
             ExitCode: ex.ExitCode,
             LogTail: new EquatableArray<string>(ex.LogTail),
             Core: ex.Core,
-            Problem: ex.Core is { } core ? CoreErrorClassifier.Diagnose(core, ex.LogTail) : null),
+            Problem: ex.Diagnosis ?? (ex.Core is { } core ? CoreErrorClassifier.Diagnose(core, ex.LogTail) : null)),
     };
 
     private void WatchForProblems(ICoreSession session)

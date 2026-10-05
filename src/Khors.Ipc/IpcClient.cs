@@ -160,8 +160,14 @@ public sealed class IpcClient : IAsyncDisposable
         {
             while (await IpcFraming.ReadFrameAsync(_stream, _closing.Token).ConfigureAwait(false) is { } frame)
             {
-                if (!IpcSerializer.TryDeserialize(frame, out var envelope, out _, out _))
+                if (!IpcSerializer.TryDeserialize(frame, out var envelope, out var badId, out _))
                 {
+                    // Ответ на наш запрос не разбирается — запрос завершается ошибкой, а не ждёт вечно.
+                    if (badId != 0 && _pending.TryGetValue(badId, out var broken))
+                    {
+                        broken.TrySetException(new IpcProtocolException("Unreadable answer from the KHORS service."));
+                    }
+
                     continue;
                 }
 

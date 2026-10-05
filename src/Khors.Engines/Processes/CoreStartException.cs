@@ -15,6 +15,9 @@ public enum CoreStartFailure
 
     /// <summary>Ядро запущено, но локальный вход не начал принимать соединения вовремя.</summary>
     ReadyTimeout,
+
+    /// <summary>Режим TUN: служба KHORS не установлена, не запущена или не отвечает.</summary>
+    ServiceUnavailable,
 }
 
 /// <summary>Ядро не запустилось. Сообщение и хвост лога не содержат секретов.</summary>
@@ -58,4 +61,7 @@ public sealed class CoreStartException : Exception
 
     /// <summary>Ядро, которое не запустилось.</summary>
     public CoreKind? Core { get; init; }
+
+    /// <summary>Причина, известная без лога (например, имя сервера не разрешилось до запуска ядра).</summary>
+    public Diagnostics.CoreDiagnosis? Diagnosis { get; init; }
 }

@@ -34,6 +34,7 @@
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>The {0} core cannot run this profile: {1}. The core choice was not changed.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Core log copied to the clipboard: {0} lines. Addresses and keys are masked.</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a link, a subscription address or a QR code image and press “Paste from clipboard”.</value></data>
+  <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>The KHORS service does not respond — TUN mode is unavailable. Install the service (at the bottom of the window) or switch to System proxy.</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Core log</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>The {0} core exited unexpectedly (code {1}). System proxy restored.</value></data>
   <data name="Failure_CoreNotFound" xml:space="preserve"><value>The {0} core executable was not found. Reinstall KHORS.</value></data>
@@ -121,6 +122,7 @@
   <data name="Problem_RealityRejected_SingBox" xml:space="preserve"><value>The server did not accept the REALITY handshake. Check the public key, short id, SNI and fingerprint; if the server runs Xray 26.9.8 or newer, switch the profile to the Xray core (profile menu → Core).</value></data>
   <data name="Problem_ServerNotFound" xml:space="preserve"><value>The server address was not found. Check the address in the profile and your internet connection.</value></data>
   <data name="Problem_TlsHandshakeFailed" xml:space="preserve"><value>The TLS handshake with the server failed. Check the SNI, fingerprint and port in the profile.</value></data>
+  <data name="Problem_TunUnavailable" xml:space="preserve"><value>Failed to create the TUN adapter. Turn off any other VPN in TUN mode and connect again; if that does not help, reinstall the KHORS service.</value></data>
   <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Link parameters KHORS does not understand yet: {0}</value></data>
   <data name="ProfileWarningsFormat" xml:space="preserve"><value>Warning: {0}</value></data>
   <data name="ProfilesHeader" xml:space="preserve"><value>Profiles</value></data>

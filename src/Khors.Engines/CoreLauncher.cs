@@ -28,6 +28,12 @@ public sealed record CoreStartOptions
     public string? ExecutablePath { get; init; }
 
     public TimeSpan ReadyTimeout { get; init; } = TimeSpan.FromSeconds(10);
+
+    /// <summary>sing-box в режиме TUN (только служба); <c>null</c> — только локальные входы.</summary>
+    public SingBoxTunOptions? Tun { get; init; }
+
+    /// <summary>sing-box в цепочке: выход — SOCKS-вход Xray на этом порту (ROADMAP 3.3).</summary>
+    public int? UpstreamSocksPort { get; init; }
 }
 
 /// <summary>
@@ -53,7 +59,7 @@ public static class CoreLauncher
         var executable = CoreLocator.Find(kind, options.ExecutablePath)
             ?? throw new CoreStartException(CoreStartFailure.ExecutableNotFound, $"{kind} executable not found.") { Core = kind };
 
-        if (kind == CoreKind.SingBox)
+        if (kind == CoreKind.SingBox && options.UpstreamSocksPort is null)
         {
             profile = await ResolveWireGuardServerAsync(profile, cancellationToken).ConfigureAwait(false);
         }
@@ -78,6 +84,8 @@ public static class CoreLauncher
                 SocksPort = ports[0],
                 HttpPort = ports[1],
                 LogLevel = log.Level,
+                Tun = options.Tun,
+                UpstreamSocksPort = options.UpstreamSocksPort,
             }),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
         };

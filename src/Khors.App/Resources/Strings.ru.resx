@@ -34,6 +34,7 @@
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>Ядро {0} не запустит этот профиль: {1}. Выбор ядра не изменён.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Лог ядра скопирован в буфер обмена: строк {0}. Адреса и ключи в нём замаскированы.</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку, адрес подписки или картинку с QR-кодом и нажмите «Вставить из буфера».</value></data>
+  <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>Служба KHORS не отвечает — режим TUN недоступен. Установите службу (внизу окна) или переключитесь на «Системный прокси».</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Лог ядра</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>Ядро {0} неожиданно завершилось (код {1}). Системный прокси возвращён.</value></data>
   <data name="Failure_CoreNotFound" xml:space="preserve"><value>Не найден исполняемый файл ядра {0}. Переустановите KHORS.</value></data>
@@ -121,6 +122,7 @@
   <data name="Problem_RealityRejected_SingBox" xml:space="preserve"><value>Сервер не принял REALITY-рукопожатие. Проверьте публичный ключ, short id, SNI и fingerprint; если сервер на Xray 26.9.8 или новее, переключите профиль на ядро Xray (меню профиля → «Ядро»).</value></data>
   <data name="Problem_ServerNotFound" xml:space="preserve"><value>Адрес сервера не найден. Проверьте адрес в профиле и подключение к интернету.</value></data>
   <data name="Problem_TlsHandshakeFailed" xml:space="preserve"><value>TLS-рукопожатие с сервером не удалось. Проверьте SNI, fingerprint и порт в профиле.</value></data>
+  <data name="Problem_TunUnavailable" xml:space="preserve"><value>Не удалось создать адаптер TUN. Выключите другой VPN в режиме TUN (если он работает) и подключитесь снова; если не поможет — переустановите службу KHORS.</value></data>
   <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Параметры ссылки, которые KHORS пока не понимает: {0}</value></data>
   <data name="ProfileWarningsFormat" xml:space="preserve"><value>Предупреждение: {0}</value></data>
   <data name="ProfilesHeader" xml:space="preserve"><value>Профили</value></data>

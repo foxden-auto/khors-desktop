@@ -19,6 +19,13 @@ public static class IpcProtocol
 [JsonDerivedType(typeof(GetStatusRequest), "getStatus")]
 [JsonDerivedType(typeof(ServiceStatusResponse), "status")]
 [JsonDerivedType(typeof(ErrorResponse), "error")]
+[JsonDerivedType(typeof(StartTunRequest), "startTun")]
+[JsonDerivedType(typeof(TunStartedResponse), "tunStarted")]
+[JsonDerivedType(typeof(TunFailedResponse), "tunFailed")]
+[JsonDerivedType(typeof(StopTunRequest), "stopTun")]
+[JsonDerivedType(typeof(OkResponse), "ok")]
+[JsonDerivedType(typeof(TunLogEvent), "tunLog")]
+[JsonDerivedType(typeof(TunExitedEvent), "tunExited")]
 public abstract record IpcPayload;
 
 /// <summary>Первое сообщение клиента: версия протокола и версия приложения.</summary>
@@ -51,6 +58,67 @@ public enum IpcErrorCode
 
 /// <summary>Отказ службы. <paramref name="ServiceProtocolVersion"/> — при <see cref="IpcErrorCode.ProtocolMismatch"/>.</summary>
 public sealed record ErrorResponse(IpcErrorCode Code, int? ServiceProtocolVersion = null) : IpcPayload;
+
+/// <summary>Команда выполнена.</summary>
+public sealed record OkResponse : IpcPayload;
+
+/// <summary>
+/// Включить режим TUN с профилем. Профиль — JSON модели (<c>StorageJson.SerializeProfile</c>): служба сама проверяет
+/// его и строит конфиги ядер (CLAUDE.md, правила 3 и 8). TUN живёт, пока открыто соединение, которое его включило.
+/// </summary>
+/// <param name="LogLevel">Уровень лога ядер: debug, info, warning, error, none.</param>
+public sealed record StartTunRequest(string Profile, string LogLevel) : IpcPayload
+{
+    // Профиль содержит ключи доступа — в журнал не выводим.
+    public override string ToString() => $"StartTunRequest {{ LogLevel = {LogLevel} }}";
+}
+
+public enum IpcCore
+{
+    Xray,
+    SingBox,
+}
+
+/// <param name="Core">Ядро профиля (Xray — цепочка TUN → Xray).</param>
+/// <param name="SocksPort">Локальные входы sing-box на 127.0.0.1 — для теста задержки.</param>
+public sealed record TunStartedResponse(IpcCore Core, int SocksPort, int HttpPort) : IpcPayload;
+
+public enum IpcTunFailure
+{
+    /// <summary>Конфиг не построен: профиль с ошибкой или возможность не поддерживается ядром.</summary>
+    ConfigNotGenerated,
+
+    /// <summary>Ядро не найдено в каталоге службы.</summary>
+    ExecutableNotFound,
+
+    /// <summary>Ядро завершилось при запуске (в том числе не удалось создать адаптер TUN).</summary>
+    ExitedDuringStart,
+
+    /// <summary>Ядро не открыло локальный вход вовремя.</summary>
+    ReadyTimeout,
+}
+
+/// <summary>Режим TUN не включился. Лог — уже замаскирован службой.</summary>
+/// <param name="ConfigErrorCode">Код <c>CoreConfigErrorCode</c> при <see cref="IpcTunFailure.ConfigNotGenerated"/>.</param>
+/// <param name="Problem">Известная причина (<c>CoreProblem</c>), если служба определила её сама.</param>
+/// <remarks>Пустые поля в JSON не пишутся, поэтому у необязательных параметров — значения по умолчанию.</remarks>
+public sealed record TunFailedResponse(
+    IpcTunFailure Failure,
+    IpcCore? Core = null,
+    string? Field = null,
+    string? ConfigErrorCode = null,
+    int? ExitCode = null,
+    IReadOnlyList<string>? LogTail = null,
+    string? Problem = null) : IpcPayload;
+
+/// <summary>Выключить режим TUN.</summary>
+public sealed record StopTunRequest : IpcPayload;
+
+/// <summary>Событие: строка лога ядра (уже замаскирована службой).</summary>
+public sealed record TunLogEvent(string Line) : IpcPayload;
+
+/// <summary>Событие: ядро режима TUN завершилось само (не по команде). Адаптер и маршруты сняты.</summary>
+public sealed record TunExitedEvent(int ExitCode, IReadOnlyList<string> LogTail) : IpcPayload;
 
 /// <summary>Кадр протокола: запрос и ответ на него с одинаковым <see cref="Id"/>; события службы — с <c>Id = 0</c>.</summary>
 public sealed record IpcEnvelope(long Id, IpcPayload Payload);

@@ -28,6 +28,7 @@ public class CoreErrorClassifierTests
         { CoreKind.Xray, "Failed to start: main: failed to load config files: [stdin:] > infra/conf: failed to build outbound config with tag  > infra/conf: VLESS users: please add/set \"encryption\":\"none\" for every user", CoreProblem.ConfigRejected },
         { CoreKind.SingBox, "FATAL[0000] decode config at stdin: outbounds[0].uuid: invalid UUID", CoreProblem.ConfigRejected },
         { CoreKind.SingBox, "FATAL[0000] start service: start inbound/socks[0]: listen tcp 127.0.0.1:10808: bind: address already in use", CoreProblem.PortInUse },
+        { CoreKind.SingBox, "FATAL[0000] start service: start inbound/tun[tun-in]: configure tun interface: Access is denied.", CoreProblem.TunUnavailable },
         { CoreKind.Xray, "Failed to start: main: failed to start server > app/proxyman/inbound: failed to listen TCP on 10808 > transport/internet: failed to listen on address: 127.0.0.1:10808 > listen tcp 127.0.0.1:10808: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.", CoreProblem.PortInUse },
 
         // Подключение к серверу: Xray (Linux и Windows).

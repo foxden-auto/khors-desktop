@@ -4,6 +4,8 @@ using System.Net.Sockets;
 using System.Text;
 using Khors.Ipc;
 using Khors.Service.Ipc;
+using Khors.Service.Tun;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace Khors.Service.Tests;
@@ -13,6 +15,12 @@ public class IpcProtocolTests
     private static readonly ServiceInfo s_info = new("1.2.3", new DateTimeOffset(2026, 10, 5, 12, 0, 0, TimeSpan.Zero));
 
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
+
+    private static TunController Tun() => new(new FakeTunStarter(), NullLogger<TunController>.Instance);
+
+    private static ServiceRequestHandler Handler() => new(s_info, Tun(), _ => { });
+
+    private static Func<Action<IpcPayload>, ServiceRequestHandler> Sessions() => send => new ServiceRequestHandler(s_info, Tun(), send);
 
     [Fact]
     public async Task FrameRoundTrip()
@@ -61,6 +69,33 @@ public class IpcProtocolTests
         Assert.Contains("\"type\":\"hello\"", Encoding.UTF8.GetString(IpcSerializer.Serialize(envelope)), StringComparison.Ordinal);
     }
 
+    public static TheoryData<IpcPayload> AllPayloads => new()
+    {
+        new HelloRequest(1, "0.1.0"),
+        new HelloResponse(1, "1.0.0"),
+        new GetStatusRequest(),
+        new ServiceStatusResponse("1.0.0", DateTimeOffset.UnixEpoch),
+        new ErrorResponse(IpcErrorCode.BadRequest),
+        new ErrorResponse(IpcErrorCode.ProtocolMismatch, 1),
+        new StartTunRequest("{}", "warning"),
+        new TunStartedResponse(IpcCore.Xray, 1, 2),
+        new TunFailedResponse(IpcTunFailure.ExitedDuringStart),
+        new TunFailedResponse(IpcTunFailure.ConfigNotGenerated, IpcCore.SingBox, "transport", "UnsupportedFeature", 1, ["line"], "ServerNotFound"),
+        new StopTunRequest(),
+        new OkResponse(),
+        new TunLogEvent("line"),
+        new TunExitedEvent(1, []),
+    };
+
+    /// <summary>Каждое сообщение протокола проходит сериализацию и разбор, в том числе с пустыми необязательными полями.</summary>
+    [Theory]
+    [MemberData(nameof(AllPayloads))]
+    public void EveryPayloadRoundTrips(IpcPayload payload)
+    {
+        Assert.True(IpcSerializer.TryDeserialize(IpcSerializer.Serialize(new IpcEnvelope(1, payload)), out var parsed, out _, out var error), $"Не разобрано: {error}");
+        Assert.Equivalent(payload, parsed!.Payload, strict: true);
+    }
+
     [Theory]
     [InlineData("""{"id":5,"payload":{"type":"runProcess","path":"C:\\Windows\\System32\\cmd.exe"}}""", 5, IpcErrorCode.UnknownCommand)]
     [InlineData("""{"id":6,"payload":{"protocolVersion":1}}""", 6, IpcErrorCode.UnknownCommand)]
@@ -77,33 +112,33 @@ public class IpcProtocolTests
     }
 
     [Fact]
-    public void CommandsRequireHelloWithSameProtocolVersion()
+    public async Task CommandsRequireHelloWithSameProtocolVersion()
     {
-        var handler = new ServiceRequestHandler(s_info);
+        var handler = Handler();
 
-        Assert.Equal(new ErrorResponse(IpcErrorCode.HelloRequired), handler.Handle(new GetStatusRequest()));
-        Assert.Equal(new ErrorResponse(IpcErrorCode.ProtocolMismatch, IpcProtocol.Version), handler.Handle(new HelloRequest(IpcProtocol.Version + 1, "9.9")));
-        Assert.Equal(new ErrorResponse(IpcErrorCode.HelloRequired), handler.Handle(new GetStatusRequest()));
+        Assert.Equal(new ErrorResponse(IpcErrorCode.HelloRequired), await handler.HandleAsync(new GetStatusRequest(), Ct));
+        Assert.Equal(new ErrorResponse(IpcErrorCode.ProtocolMismatch, IpcProtocol.Version), await handler.HandleAsync(new HelloRequest(IpcProtocol.Version + 1, "9.9"), Ct));
+        Assert.Equal(new ErrorResponse(IpcErrorCode.HelloRequired), await handler.HandleAsync(new GetStatusRequest(), Ct));
 
-        Assert.Equal(new HelloResponse(IpcProtocol.Version, "1.2.3"), handler.Handle(new HelloRequest(IpcProtocol.Version, "0.1.0")));
-        Assert.Equal(new ServiceStatusResponse("1.2.3", s_info.StartedAt), handler.Handle(new GetStatusRequest()));
+        Assert.Equal(new HelloResponse(IpcProtocol.Version, "1.2.3"), await handler.HandleAsync(new HelloRequest(IpcProtocol.Version, "0.1.0"), Ct));
+        Assert.Equal(new ServiceStatusResponse("1.2.3", s_info.StartedAt), await handler.HandleAsync(new GetStatusRequest(), Ct));
     }
 
     [Fact]
-    public void ServiceDoesNotAcceptItsOwnMessagesAsCommands()
+    public async Task ServiceDoesNotAcceptItsOwnMessagesAsCommands()
     {
-        var handler = new ServiceRequestHandler(s_info);
-        handler.Handle(new HelloRequest(IpcProtocol.Version, "0.1.0"));
+        var handler = Handler();
+        await handler.HandleAsync(new HelloRequest(IpcProtocol.Version, "0.1.0"), Ct);
 
-        Assert.Equal(new ErrorResponse(IpcErrorCode.UnknownCommand), handler.Handle(new ServiceStatusResponse("x", DateTimeOffset.UnixEpoch)));
-        Assert.Equal(new ErrorResponse(IpcErrorCode.UnknownCommand), handler.Handle(new ErrorResponse(IpcErrorCode.Internal)));
+        Assert.Equal(new ErrorResponse(IpcErrorCode.UnknownCommand), await handler.HandleAsync(new ServiceStatusResponse("x", DateTimeOffset.UnixEpoch), Ct));
+        Assert.Equal(new ErrorResponse(IpcErrorCode.UnknownCommand), await handler.HandleAsync(new ErrorResponse(IpcErrorCode.Internal), Ct));
     }
 
     [Fact]
     public async Task ClientTalksToServiceSession()
     {
         await using var pair = await SocketPair.CreateAsync(Ct);
-        var session = IpcServer.ServeConnectionAsync(pair.Server, new ServiceRequestHandler(s_info), Ct);
+        var session = IpcServer.ServeConnectionAsync(pair.Server, Sessions(), Ct);
 
         await using (var client = await IpcClient.ConnectAsync(new FixedTransport(pair.Client), "0.1.0", TimeSpan.FromSeconds(5), Ct))
         {
@@ -120,7 +155,7 @@ public class IpcProtocolTests
     public async Task SessionAnswersGarbageAndKeepsWorking()
     {
         await using var pair = await SocketPair.CreateAsync(Ct);
-        var session = IpcServer.ServeConnectionAsync(pair.Server, new ServiceRequestHandler(s_info), Ct);
+        var session = IpcServer.ServeConnectionAsync(pair.Server, Sessions(), Ct);
 
         await IpcFraming.WriteFrameAsync(pair.Client, """{"id":3,"payload":{"type":"exec"}}"""u8.ToArray(), Ct);
         Assert.True(IpcSerializer.TryDeserialize((await IpcFraming.ReadFrameAsync(pair.Client, Ct))!, out var answer, out _, out _));
@@ -138,7 +173,7 @@ public class IpcProtocolTests
     public async Task OversizedFrameEndsSession()
     {
         await using var pair = await SocketPair.CreateAsync(Ct);
-        var session = IpcServer.ServeConnectionAsync(pair.Server, new ServiceRequestHandler(s_info), Ct);
+        var session = IpcServer.ServeConnectionAsync(pair.Server, Sessions(), Ct);
 
         var header = new byte[4];
         BinaryPrimitives.WriteInt32LittleEndian(header, IpcFraming.MaxFrameSize + 1);
@@ -169,7 +204,7 @@ public class IpcProtocolTests
     public async Task PendingRequestFailsWhenServiceDisconnects()
     {
         await using var pair = await SocketPair.CreateAsync(Ct);
-        var session = IpcServer.ServeConnectionAsync(pair.Server, new ServiceRequestHandler(s_info), Ct);
+        var session = IpcServer.ServeConnectionAsync(pair.Server, Sessions(), Ct);
         await using var client = await IpcClient.ConnectAsync(new FixedTransport(pair.Client), "0.1.0", TimeSpan.FromSeconds(5), Ct);
         var disconnected = new TaskCompletionSource();
         client.Disconnected += (_, _) => disconnected.TrySetResult();

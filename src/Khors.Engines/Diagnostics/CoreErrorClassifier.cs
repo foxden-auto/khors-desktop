@@ -9,6 +9,9 @@ public enum CoreProblem
     /// <summary>Локальный порт занят другой программой.</summary>
     PortInUse,
 
+    /// <summary>Адаптер TUN не создан: нет прав или его занял другой VPN в режиме TUN.</summary>
+    TunUnavailable,
+
     /// <summary>Сервер ответил как сайт-маскировка: не принял REALITY-рукопожатие.</summary>
     RealityRejected,
 
@@ -82,6 +85,12 @@ public static class CoreErrorClassifier
         if (Has(line, "address already in use") || Has(line, "only one usage of each socket address"))
         {
             return CoreProblem.PortInUse;
+        }
+
+        // sing-box: «start inbound/tun[tun-in]: configure tun interface: …» — до общего «FATAL».
+        if (Has(line, "inbound/tun[") || Has(line, "configure tun interface") || Has(line, "wintun"))
+        {
+            return CoreProblem.TunUnavailable;
         }
 
         if (line.StartsWith("Failed to start:", StringComparison.Ordinal) || line.StartsWith("FATAL[", StringComparison.Ordinal))
