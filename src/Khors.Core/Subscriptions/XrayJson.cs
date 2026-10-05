@@ -11,7 +11,7 @@ namespace Khors.Core.Subscriptions;
 /// </summary>
 internal static class XrayJson
 {
-    private static readonly HashSet<string> s_proxies = new(StringComparer.Ordinal) { "vless", "vmess", "trojan", "shadowsocks" };
+    private static readonly HashSet<string> s_proxies = new(StringComparer.Ordinal) { "vless", "vmess", "trojan", "shadowsocks", "wireguard" };
 
     public static bool IsXray(JsonNode root) => root switch
     {
@@ -60,6 +60,10 @@ internal static class XrayJson
 
         var tag = outbound.String("tag");
         var settings = outbound.Object("settings") ?? throw new LinkFormatException(LinkParseErrorCode.MissingHost, "settings");
+        if (protocolName == "wireguard")
+        {
+            return WireGuard(outbound, settings, remarks ?? tag);
+        }
 
         // vnext[0] / servers[0] — классическая запись; иначе плоская (address, port, id прямо в settings).
         var server = settings.FirstOf("vnext") ?? settings.FirstOf("servers") ?? settings;
@@ -106,6 +110,35 @@ internal static class XrayJson
             Mux = outbound.Object("mux") is { } mux && mux.Bool("enabled") == true
                 ? new MuxSettings { Enabled = true, Concurrency = mux.Int("concurrency") }
                 : null,
+            UnknownParams = new EquatableArray<UnknownParam>(outbound.Remaining()),
+        };
+    }
+
+    /// <summary>Выход WireGuard Xray: secretKey, address[], peers[0].endpoint «хост:порт», mtu, reserved.</summary>
+    private static Profile WireGuard(JsonFields outbound, JsonFields settings, string? name)
+    {
+        var peer = settings.FirstOf("peers") ?? throw new LinkFormatException(LinkParseErrorCode.MissingHost, "peers");
+        var endpoint = peer.String("endpoint") ?? throw new LinkFormatException(LinkParseErrorCode.MissingHost, "endpoint");
+        var (host, port) = LinkUrl.ParseHostPort(endpoint);
+        peer.Ignore("allowedIPs", "keepAlive");
+        settings.Ignore("workers", "domainStrategy", "noKernelTun", "kernelMode");
+
+        var protocol = new WireGuardSettings
+        {
+            PrivateKey = new Secret(settings.String("secretKey") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "secretKey")),
+            PeerPublicKey = new Secret(peer.String("publicKey") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "publicKey")),
+            PreSharedKey = peer.String("preSharedKey") is { } psk ? new Secret(psk) : null,
+            LocalAddresses = new EquatableArray<string>(settings.Strings("address")),
+            Reserved = new EquatableArray<int>(settings.Strings("reserved").Select(b => int.TryParse(b, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var value) ? value : -1)),
+            Mtu = settings.Int("mtu"),
+        };
+
+        return new Profile
+        {
+            Id = Guid.Empty,
+            Name = string.IsNullOrWhiteSpace(name) ? LinkUrl.NameOrAddress(null, host, port) : name.Trim(),
+            Server = new ServerEndpoint(host, port),
+            Protocol = protocol,
             UnknownParams = new EquatableArray<UnknownParam>(outbound.Remaining()),
         };
     }

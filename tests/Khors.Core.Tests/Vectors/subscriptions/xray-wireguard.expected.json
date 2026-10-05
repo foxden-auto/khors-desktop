@@ -1,0 +1,28 @@
+{
+  "description": "Ожидаемый профиль xray-wireguard.json: выход wireguard Xray (endpoint в peers[0])",
+  "profiles": [
+    {
+      "name": "WARP",
+      "server": {
+        "host": "wg.example.net",
+        "port": 2408
+      },
+      "protocol": {
+        "type": "wireguard",
+        "privateKey": "RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14=",
+        "peerPublicKey": "S2BGSyYNxTf1wij4Qk/8nbbFhbbGfzsDwb4shXmfImw=",
+        "localAddresses": [
+          "172.16.0.2/32",
+          "fd01::2/128"
+        ],
+        "reserved": [
+          1,
+          2,
+          3
+        ],
+        "mtu": 1280
+      }
+    }
+  ],
+  "errors": []
+}

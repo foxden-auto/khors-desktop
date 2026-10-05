@@ -1,4 +1,5 @@
 using Khors.Core.Profiles;
+using Khors.Core.Subscriptions;
 using Khors.Core.Text;
 
 namespace Khors.Core.Import;
@@ -14,7 +15,7 @@ public sealed record ImportLineError(int Line, LinkParseError Error);
 
 /// <summary>
 /// Импорт одной или нескольких ссылок (каждая с новой строки или через пробел) — например, из буфера обмена.
-/// Понимает и содержимое подписки в base64, скопированное целиком.
+/// Понимает и содержимое подписки в base64, и конфиг целиком (Clash/mihomo YAML, sing-box или Xray JSON).
 /// Чистая функция: Id и время передаются снаружи.
 /// </summary>
 public static class ProfileImporter
@@ -34,7 +35,12 @@ public static class ProfileImporter
         var known = existing.Select(Identity).ToHashSet();
         var added = new List<Profile>();
         var duplicates = 0;
-        var (parsed, errors) = LinkText.Parse(text);
+
+        // Конфиг целиком (Clash/mihomo YAML, sing-box или Xray JSON) — разбирается как содержимое подписки.
+        var content = SubscriptionContent.Parse(text);
+        var (parsed, errors) = content.Format is SubscriptionFormat.ClashYaml or SubscriptionFormat.SingBoxJson or SubscriptionFormat.XrayJson
+            ? ([.. content.Profiles], [.. content.Errors])
+            : LinkText.Parse(text);
         foreach (var profile in parsed)
         {
             if (!known.Add(Identity(profile)))

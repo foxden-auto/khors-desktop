@@ -1,0 +1,71 @@
+{
+  "outbounds": [
+    {
+      "type": "tuic",
+      "tag": "TUIC",
+      "server": "tuic.example.com",
+      "server_port": 17230,
+      "uuid": "8d2e6f10-4b3a-4c5d-9e8f-0a1b2c3d4e5f",
+      "password": "TuicPa55",
+      "congestion_control": "bbr",
+      "udp_relay_mode": "quic",
+      "zero_rtt_handshake": true,
+      "tls": {
+        "enabled": true,
+        "server_name": "tuic.example.com",
+        "alpn": [
+          "h3"
+        ]
+      }
+    },
+    {
+      "type": "hysteria2",
+      "tag": "Hysteria2",
+      "server": "hy.example.com",
+      "server_ports": [
+        "20000:30000"
+      ],
+      "hop_interval": "30s",
+      "password": "Hy2Pa55",
+      "obfs": {
+        "type": "salamander",
+        "password": "0bfsPa55w0rd"
+      },
+      "tls": {
+        "enabled": true,
+        "server_name": "hy.example.com"
+      }
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ],
+  "endpoints": [
+    {
+      "type": "wireguard",
+      "tag": "WireGuard",
+      "address": [
+        "10.0.0.2/32"
+      ],
+      "private_key": "RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14=",
+      "mtu": 1280,
+      "peers": [
+        {
+          "address": "wg.example.net",
+          "port": 51820,
+          "public_key": "S2BGSyYNxTf1wij4Qk/8nbbFhbbGfzsDwb4shXmfImw=",
+          "pre_shared_key": "yZFSXD5CEPmcBaINbhEO0qJt7hLnqy6WwX/DiPcRLbs=",
+          "allowed_ips": [
+            "0.0.0.0/0"
+          ],
+          "reserved": [
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ]
+}

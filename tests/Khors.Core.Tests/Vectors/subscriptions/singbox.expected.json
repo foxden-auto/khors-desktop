@@ -1,37 +1,116 @@
 {
-  "description": "Ожидаемые профили singbox.json (без id); ошибки — выход 6 (hysteria2 до ROADMAP 2.3) и 7 (транспорт http/h2)",
+  "description": "Ожидаемые профили singbox.json (без id); ошибка — выход 7 (транспорт http/h2)",
   "format": "SingBoxJson",
   "profiles": [
     {
       "name": "Германия",
-      "server": { "host": "vpn.example.com", "port": 443 },
-      "protocol": { "type": "vless", "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b", "flow": "xtls-rprx-vision" },
-      "security": { "type": "reality", "sni": "www.example.org", "fingerprint": "chrome", "publicKey": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM", "shortId": "6ba85179e30d4fc2" }
+      "server": {
+        "host": "vpn.example.com",
+        "port": 443
+      },
+      "protocol": {
+        "type": "vless",
+        "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+        "flow": "xtls-rprx-vision"
+      },
+      "security": {
+        "type": "reality",
+        "sni": "www.example.org",
+        "fingerprint": "chrome",
+        "publicKey": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM",
+        "shortId": "6ba85179e30d4fc2"
+      }
     },
     {
       "name": "VMess WS",
-      "server": { "host": "cdn.example.net", "port": 443 },
-      "protocol": { "type": "vmess", "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b", "cipher": "auto" },
-      "transport": { "type": "ws", "path": "/vm?ed=2048", "host": "cdn.example.net" },
-      "security": { "type": "tls", "sni": "cdn.example.net" }
+      "server": {
+        "host": "cdn.example.net",
+        "port": 443
+      },
+      "protocol": {
+        "type": "vmess",
+        "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+        "cipher": "auto"
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/vm?ed=2048",
+        "host": "cdn.example.net"
+      },
+      "security": {
+        "type": "tls",
+        "sni": "cdn.example.net"
+      }
     },
     {
       "name": "Trojan gRPC",
-      "server": { "host": "198.51.100.7", "port": 8443 },
-      "protocol": { "type": "trojan", "password": "Fictional-Pa55" },
-      "transport": { "type": "grpc", "serviceName": "tun" },
-      "security": { "type": "tls", "sni": "grpc.example.net", "alpn": ["h2"], "allowInsecure": true },
-      "mux": { "enabled": true, "concurrency": 4 }
+      "server": {
+        "host": "198.51.100.7",
+        "port": 8443
+      },
+      "protocol": {
+        "type": "trojan",
+        "password": "Fictional-Pa55"
+      },
+      "transport": {
+        "type": "grpc",
+        "serviceName": "tun"
+      },
+      "security": {
+        "type": "tls",
+        "sni": "grpc.example.net",
+        "alpn": [
+          "h2"
+        ],
+        "allowInsecure": true
+      },
+      "mux": {
+        "enabled": true,
+        "concurrency": 4
+      }
     },
     {
       "name": "SS 2022",
-      "server": { "host": "2001:db8::20", "port": 8388 },
-      "protocol": { "type": "shadowsocks", "method": "2022-blake3-aes-128-gcm", "password": "Aq3+Zt/9Kp1Lm0Xy7Wq2Bw==" },
-      "unknownParams": [ { "key": "domain_strategy", "value": "prefer_ipv4" } ]
+      "server": {
+        "host": "2001:db8::20",
+        "port": 8388
+      },
+      "protocol": {
+        "type": "shadowsocks",
+        "method": "2022-blake3-aes-128-gcm",
+        "password": "Aq3+Zt/9Kp1Lm0Xy7Wq2Bw=="
+      },
+      "unknownParams": [
+        {
+          "key": "domain_strategy",
+          "value": "prefer_ipv4"
+        }
+      ]
+    },
+    {
+      "name": "Hysteria2",
+      "server": {
+        "host": "hy.example.com",
+        "port": 443
+      },
+      "protocol": {
+        "type": "hysteria2",
+        "password": "Hy2Pa55"
+      },
+      "security": {
+        "type": "tls",
+        "sni": "hy.example.com",
+        "alpn": [
+          "h3"
+        ]
+      }
     }
   ],
   "errors": [
-    { "line": 6, "code": "UnsupportedScheme", "field": "type" },
-    { "line": 7, "code": "UnsupportedTransport", "field": "transport.type" }
+    {
+      "line": 7,
+      "code": "UnsupportedTransport",
+      "field": "transport.type"
+    }
   ]
 }

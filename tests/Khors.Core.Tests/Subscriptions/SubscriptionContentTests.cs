@@ -29,6 +29,9 @@ public class SubscriptionContentTests
     [InlineData("clash.yaml", "clash.expected.json", SubscriptionFormat.ClashYaml)]
     [InlineData("singbox.json", "singbox.expected.json", SubscriptionFormat.SingBoxJson)]
     [InlineData("xray.json", "xray.expected.json", SubscriptionFormat.XrayJson)]
+    [InlineData("clash-udp.yaml", "clash-udp.expected.json", SubscriptionFormat.ClashYaml)]
+    [InlineData("singbox-udp.json", "singbox-udp.expected.json", SubscriptionFormat.SingBoxJson)]
+    [InlineData("xray-wireguard.json", "xray-wireguard.expected.json", SubscriptionFormat.XrayJson)]
     public void ConfigFormatsAreParsedIntoProfiles(string vector, string expectedVector, SubscriptionFormat format)
     {
         var expected = System.Text.Json.Nodes.JsonNode.Parse(Vector(expectedVector))!;
@@ -75,6 +78,16 @@ public class SubscriptionContentTests
 
         Assert.Equal(SubscriptionFormat.Unknown, result.Format);
         Assert.Empty(result.Profiles);
+    }
+
+    /// <summary>Экспорт инбаунда из панели в виде YAML Clash вставляется из буфера как профиль, а не как «16 ссылок».</summary>
+    [Fact]
+    public void PastedClashConfigIsImportedAsProfiles()
+    {
+        var result = ProfileImporter.Import(Vector("clash-udp.yaml"), [], Guid.NewGuid, DateTimeOffset.UnixEpoch);
+
+        Assert.Equal(["Test TUIC - test", "Hysteria2 hopping", "WireGuard"], result.Added.Select(p => p.Name));
+        Assert.Equal([4], result.Errors.Select(e => e.Line));
     }
 
     [Fact]

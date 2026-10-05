@@ -32,7 +32,7 @@
       "method": "2022-blake3-aes-128-gcm", "password": "Aq3+Zt/9Kp1Lm0Xy7Wq2Bw==",
       "domain_strategy": "prefer_ipv4"
     },
-    { "type": "hysteria2", "tag": "Hysteria2", "server": "hy.example.com", "server_port": 443, "password": "Hy2Pa55" },
+    { "type": "hysteria2", "tag": "Hysteria2", "server": "hy.example.com", "server_port": 443, "password": "Hy2Pa55", "tls": { "enabled": true, "server_name": "hy.example.com", "alpn": ["h3"] } },
     { "type": "vless", "tag": "H2", "server": "h2.example.com", "server_port": 443, "uuid": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b", "transport": { "type": "http" } },
     { "type": "direct", "tag": "direct" },
     { "type": "block", "tag": "block" }

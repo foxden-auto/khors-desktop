@@ -1,0 +1,44 @@
+# Вымышленные данные. TUIC — в форме экспорта панели 3x-ui (Clash / Mihomo / Clash Verge).
+proxies:
+  - name: "Test TUIC - test"
+    type: tuic
+    server: tuic.example.com
+    port: 17230
+    uuid: 8d2e6f10-4b3a-4c5d-9e8f-0a1b2c3d4e5f
+    password: "TuicPa55"
+    alpn:
+      - h3
+      - spdy/3.1
+    sni: tuic.example.com
+    congestion-controller: bbr
+    udp-relay-mode: native
+    reduce-rtt: true
+  - name: Hysteria2 hopping
+    type: hysteria2
+    server: hy.example.com
+    port: 443
+    ports: 443,20000-30000
+    password: Hy2Pa55
+    up: "50 Mbps"
+    down: "200 Mbps"
+    obfs: salamander
+    obfs-password: 0bfsPa55w0rd
+    sni: hy.example.com
+    fingerprint: 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+  - name: WireGuard
+    type: wireguard
+    server: 198.51.100.9
+    port: 51820
+    ip: 10.0.0.2
+    ipv6: fd00::2
+    private-key: RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14=
+    public-key: S2BGSyYNxTf1wij4Qk/8nbbFhbbGfzsDwb4shXmfImw=
+    pre-shared-key: yZFSXD5CEPmcBaINbhEO0qJt7hLnqy6WwX/DiPcRLbs=
+    reserved: [1, 2, 3]
+    mtu: 1280
+    udp: true
+  - name: TUIC v4
+    type: tuic
+    server: tuic.example.com
+    port: 443
+    token: fictional-v4-token

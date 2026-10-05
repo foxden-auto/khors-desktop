@@ -87,11 +87,20 @@ internal static class ClashYaml
                 Password = new Secret(fields.String("password") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "password")),
             },
             "ss" => Shadowsocks(fields),
+            "hysteria2" => Hysteria2(fields),
+            "tuic" => Tuic(fields),
+            "wireguard" => WireGuard(fields),
             _ => throw new LinkFormatException(LinkParseErrorCode.UnsupportedScheme, "type"),
         };
 
-        var transport = protocol is ShadowsocksSettings ? new TcpTransport() : Transport(fields);
-        var security = protocol is ShadowsocksSettings ? new NoSecurity() : Security(fields, defaultTls: protocol is TrojanSettings);
+        // Hysteria2 и TUIC — QUIC (TLS всегда, транспорт свой), WireGuard — без TLS, Shadowsocks — без транспорта.
+        var transport = protocol is ShadowsocksSettings || protocol.HasOwnTransport ? new TcpTransport() : Transport(fields);
+        SecuritySettings security = protocol switch
+        {
+            ShadowsocksSettings or WireGuardSettings => new NoSecurity(),
+            Hysteria2Settings or TuicSettings => QuicTls(fields),
+            _ => Security(fields, defaultTls: protocol is TrojanSettings),
+        };
 
         return new Profile
         {
@@ -129,6 +138,71 @@ internal static class ClashYaml
             Plugin = plugin == "obfs" ? "obfs-local" : plugin,
             PluginOptions = string.Join(';', sip003) is { Length: > 0 } joined ? joined : null,
         };
+    }
+
+    private static Hysteria2Settings Hysteria2(Fields fields) => new()
+    {
+        Password = new Secret(fields.String("password") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "password")),
+        Obfs = fields.String("obfs"),
+        ObfsPassword = fields.String("obfs-password") is { } obfsPassword ? new Secret(obfsPassword) : null,
+        Ports = fields.String("ports"),
+        HopIntervalSeconds = fields.Int("hop-interval"),
+        UpMbps = Mbps(fields.String("up")),
+        DownMbps = Mbps(fields.String("down")),
+    };
+
+    /// <summary>TUIC v5 (uuid + password); v4 (token) не поддерживается.</summary>
+    private static TuicSettings Tuic(Fields fields) => new()
+    {
+        Uuid = new Secret(fields.String("uuid") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "uuid")),
+        Password = new Secret(fields.String("password") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "password")),
+        CongestionControl = fields.String("congestion-controller") ?? "cubic",
+        UdpRelayMode = fields.String("udp-relay-mode") ?? "native",
+        ZeroRttHandshake = fields.Bool("reduce-rtt") ?? false,
+    };
+
+    private static WireGuardSettings WireGuard(Fields fields)
+    {
+        var addresses = new List<string>();
+        if (fields.String("ip") is { } ipv4)
+        {
+            addresses.Add(ipv4.Contains('/', StringComparison.Ordinal) ? ipv4 : ipv4 + "/32");
+        }
+
+        if (fields.String("ipv6") is { } ipv6)
+        {
+            addresses.Add(ipv6.Contains('/', StringComparison.Ordinal) ? ipv6 : ipv6 + "/128");
+        }
+
+        return new WireGuardSettings
+        {
+            PrivateKey = new Secret(fields.String("private-key") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "private-key")),
+            PeerPublicKey = new Secret(fields.String("public-key") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "public-key")),
+            PreSharedKey = fields.String("pre-shared-key") is { } psk ? new Secret(psk) : null,
+            LocalAddresses = new EquatableArray<string>(addresses),
+            Reserved = new EquatableArray<int>(fields.Strings("reserved").Select(b => int.TryParse(b, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? value : -1)),
+            Mtu = fields.Int("mtu"),
+        };
+    }
+
+    /// <summary>TLS для QUIC: sni, alpn, skip-cert-verify; fingerprint mihomo — SHA-256 сертификата (закрепление).</summary>
+    private static TlsSecurity QuicTls(Fields fields)
+    {
+        fields.Take("disable-sni");
+        return new TlsSecurity
+        {
+            Sni = fields.String("sni") ?? fields.String("servername"),
+            Alpn = new EquatableArray<string>(fields.Strings("alpn")),
+            AllowInsecure = fields.Bool("skip-cert-verify") ?? false,
+            PinnedPeerCertSha256 = new EquatableArray<string>(fields.Strings("fingerprint")),
+        };
+    }
+
+    /// <summary>«100», «100 Mbps» → 100.</summary>
+    private static int? Mbps(string? value)
+    {
+        var digits = new string((value ?? string.Empty).Trim().TakeWhile(char.IsAsciiDigit).ToArray());
+        return int.TryParse(digits, NumberStyles.None, CultureInfo.InvariantCulture, out var number) ? number : null;
     }
 
     private static TransportSettings Transport(Fields fields)

@@ -1,0 +1,37 @@
+{
+  "remarks": "WARP",
+  "outbounds": [
+    {
+      "tag": "proxy",
+      "protocol": "wireguard",
+      "settings": {
+        "secretKey": "RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14=",
+        "address": [
+          "172.16.0.2/32",
+          "fd01::2/128"
+        ],
+        "mtu": 1280,
+        "reserved": [
+          1,
+          2,
+          3
+        ],
+        "noKernelTun": true,
+        "peers": [
+          {
+            "publicKey": "S2BGSyYNxTf1wij4Qk/8nbbFhbbGfzsDwb4shXmfImw=",
+            "endpoint": "wg.example.net:2408",
+            "allowedIPs": [
+              "0.0.0.0/0",
+              "::/0"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    }
+  ]
+}
