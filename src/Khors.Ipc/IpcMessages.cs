@@ -3,10 +3,10 @@ using System.Text.Json.Serialization;
 
 namespace Khors.Ipc;
 
-/// <summary>Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений.</summary>
+/// <summary>Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений (2 — команды TUN).</summary>
 public static class IpcProtocol
 {
-    public const int Version = 1;
+    public const int Version = 2;
 }
 
 /// <summary>
