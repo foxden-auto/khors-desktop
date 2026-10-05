@@ -38,6 +38,9 @@ STRINGS = {
     "ProfileUnknownParamsFormat": ("Параметры ссылки, которые KHORS пока не понимает: {0}", "Link parameters KHORS does not understand yet: {0}"),
     # Выбор ядра (контекстное меню профиля); названия ядер не переводятся
     "MenuCore": ("Ядро", "Core"),
+    "MenuCopyLink": ("Копировать ссылку", "Copy link"),
+    "LinkCopiedFormat": ("Ссылка «{0}» скопирована. В ней ключи доступа — передавайте её только тем, кому доверяете.",
+                         "The link for “{0}” was copied. It contains access keys — share it only with people you trust."),
     "CoreAutoFormat": ("Автоматически (сейчас {0})", "Automatic (now {0})"),
     "CoreChoiceRejectedFormat": ("Ядро {0} не запустит этот профиль: {1}. Выбор ядра не изменён.",
                                  "The {0} core cannot run this profile: {1}. The core choice was not changed."),

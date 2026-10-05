@@ -8,8 +8,8 @@ using Khors.Engines.Latency;
 namespace Khors.App.ViewModels;
 
 /// <summary>Профиль в списке: имя, краткое описание подключения, ядро и предупреждение, если есть.</summary>
-/// <param name="setCore">Смена ядра из контекстного меню (меню живёт во всплывающем окне и не видит модель окна).</param>
-public sealed partial class ProfileItemViewModel(Profile profile, Func<ProfileItemViewModel, CorePreference, Task>? setCore = null) : ObservableObject
+/// <param name="actions">Команды контекстного меню (меню живёт во всплывающем окне и не видит модель окна).</param>
+public sealed partial class ProfileItemViewModel(Profile profile, IProfileActions? actions = null) : ObservableObject
 {
     public Profile Profile { get; } = profile;
 
@@ -75,7 +75,10 @@ public sealed partial class ProfileItemViewModel(Profile profile, Func<ProfileIt
     }
 
     [RelayCommand]
-    private Task SetCoreAsync(CorePreference core) => setCore?.Invoke(this, core) ?? Task.CompletedTask;
+    private Task SetCoreAsync(CorePreference core) => actions?.SetCoreAsync(this, core) ?? Task.CompletedTask;
+
+    [RelayCommand]
+    private Task CopyLinkAsync() => actions?.CopyLinkAsync(this) ?? Task.CompletedTask;
 
     private static string? DescribeCore(Profile profile) => CoreSelection.Select(profile) is { Unsupported: { } field } choice
         ? Localizer.Format("Failure_UnsupportedByCore", Localizer.CoreName(choice.Core), Localizer.DescribeUnsupported(field))
@@ -114,4 +117,12 @@ public sealed partial class ProfileItemViewModel(Profile profile, Func<ProfileIt
         XhttpTransport => "XHTTP",
         _ => string.Empty,
     };
+}
+
+/// <summary>Действия над профилем из контекстного меню.</summary>
+public interface IProfileActions
+{
+    Task SetCoreAsync(ProfileItemViewModel item, CorePreference core);
+
+    Task CopyLinkAsync(ProfileItemViewModel item);
 }

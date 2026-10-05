@@ -88,6 +88,7 @@
             <Grid ColumnDefinitions="Auto,*,Auto,Auto" Background="Transparent">
               <Grid.ContextMenu>
                 <ContextMenu>
+                  <MenuItem Header="{x:Static res:Strings.MenuCopyLink}" Command="{Binding CopyLinkCommand}" />
                   <MenuItem Header="{x:Static res:Strings.MenuCore}">
                     <MenuItem Header="{Binding CoreAutoText}" ToggleType="Radio" IsChecked="{Binding IsCoreAuto, Mode=OneWay}"
                               Command="{Binding SetCoreCommand}" CommandParameter="{x:Static profiles:CorePreference.Auto}" />

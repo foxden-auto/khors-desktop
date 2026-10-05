@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Khors.App.Services;
+using Khors.Core.Import;
 using Khors.Core.Profiles;
 using Khors.Core.Storage;
 using Khors.Engines.Connection;
@@ -14,7 +15,7 @@ using Khors.Engines.Subscriptions;
 namespace Khors.App.ViewModels;
 
 /// <summary>Главное окно: статус и кнопка подключения, список профилей, импорт из буфера.</summary>
-public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
+public sealed partial class MainWindowViewModel : ObservableObject, IProfileActions, IDisposable
 {
     private readonly ProfileRepository _profiles;
     private readonly SettingsStore _settings;
@@ -355,7 +356,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
     /// Ручной выбор ядра (docs/SPEC.md, 3.4). Ядро, которое не запустит профиль, не сохраняется — вместо этого
     /// объяснение. Если профиль подключён, он переподключается на новом ядре.
     /// </summary>
-    private async Task SetCoreAsync(ProfileItemViewModel item, CorePreference core)
+    public async Task SetCoreAsync(ProfileItemViewModel item, CorePreference core)
     {
         if (_profiles.IsReadOnly || item.Profile.Core == core)
         {
@@ -380,6 +381,13 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
             var settings = _settings.Current;
             await _connection.ConnectAsync(updated, new CoreStartPreferences(settings.SocksPort, settings.HttpPort, settings.CoreLogLevel)).ConfigureAwait(true);
         }
+    }
+
+    /// <summary>Ссылка профиля — в буфер обмена. В ней ключи доступа: предупреждаем, в лог не пишем.</summary>
+    public async Task CopyLinkAsync(ProfileItemViewModel item)
+    {
+        await _clipboard.SetTextAsync(ShareLinkExporter.Export(item.Profile)).ConfigureAwait(true);
+        Message = Localizer.Format("LinkCopiedFormat", item.Name);
     }
 
     partial void OnSelectedProfileChanged(ProfileItemViewModel? value)
@@ -410,7 +418,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         Profiles.Clear();
         foreach (var profile in _profiles.Profiles)
         {
-            var item = new ProfileItemViewModel(profile, SetCoreAsync);
+            var item = new ProfileItemViewModel(profile, this);
             if (_latency.TryGetValue(profile.Id, out var latency))
             {
                 item.SetLatency(latency);

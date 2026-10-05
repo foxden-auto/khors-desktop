@@ -69,6 +69,7 @@
   <data name="Latency_Ok" xml:space="preserve"><value>{0} мс</value></data>
   <data name="Latency_Timeout" xml:space="preserve"><value>тайм-аут</value></data>
   <data name="Latency_Unsupported" xml:space="preserve"><value>не поддерживается</value></data>
+  <data name="LinkCopiedFormat" xml:space="preserve"><value>Ссылка «{0}» скопирована. В ней ключи доступа — передавайте её только тем, кому доверяете.</value></data>
   <data name="LinkError_Empty" xml:space="preserve"><value>пустая строка</value></data>
   <data name="LinkError_InvalidBase64" xml:space="preserve"><value>повреждённые данные base64</value></data>
   <data name="LinkError_InvalidJson" xml:space="preserve"><value>повреждённые данные JSON</value></data>
@@ -80,6 +81,7 @@
   <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>тип шифрования не поддерживается</value></data>
   <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>транспорт пока не поддерживается</value></data>
   <data name="LocalProxyFormat" xml:space="preserve"><value>Ядро {2}. Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
+  <data name="MenuCopyLink" xml:space="preserve"><value>Копировать ссылку</value></data>
   <data name="MenuCore" xml:space="preserve"><value>Ядро</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Выберите профиль в списке</value></data>

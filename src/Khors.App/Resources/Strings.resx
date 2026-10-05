@@ -69,6 +69,7 @@
   <data name="Latency_Ok" xml:space="preserve"><value>{0} ms</value></data>
   <data name="Latency_Timeout" xml:space="preserve"><value>timeout</value></data>
   <data name="Latency_Unsupported" xml:space="preserve"><value>not supported</value></data>
+  <data name="LinkCopiedFormat" xml:space="preserve"><value>The link for “{0}” was copied. It contains access keys — share it only with people you trust.</value></data>
   <data name="LinkError_Empty" xml:space="preserve"><value>empty line</value></data>
   <data name="LinkError_InvalidBase64" xml:space="preserve"><value>damaged base64 data</value></data>
   <data name="LinkError_InvalidJson" xml:space="preserve"><value>damaged JSON data</value></data>
@@ -80,6 +81,7 @@
   <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>security type is not supported</value></data>
   <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>transport is not supported yet</value></data>
   <data name="LocalProxyFormat" xml:space="preserve"><value>Core: {2}. Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
+  <data name="MenuCopyLink" xml:space="preserve"><value>Copy link</value></data>
   <data name="MenuCore" xml:space="preserve"><value>Core</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Mode: system proxy</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Select a profile below</value></data>
