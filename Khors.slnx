@@ -14,6 +14,7 @@
     <Project Path="tests/Khors.Core.Tests/Khors.Core.Tests.csproj" />
     <Project Path="tests/Khors.Engines.Tests/Khors.Engines.Tests.csproj" />
     <Project Path="tests/Khors.Platform.Windows.Tests/Khors.Platform.Windows.Tests.csproj" />
+    <Project Path="tests/Khors.Service.Tests/Khors.Service.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/Khors.DevCli/Khors.DevCli.csproj" />
