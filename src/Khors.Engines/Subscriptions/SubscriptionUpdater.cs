@@ -12,14 +12,16 @@ public sealed record SubscriptionUpdateOutcome(SubscriptionUpdateError? Error, i
 /// <summary>
 /// Обновление подписки: загрузка (напрямую, при сетевой ошибке и подключённом KHORS — через его прокси),
 /// разбор, слияние с имеющимися профилями. Пустой или непонятный ответ не стирает профили подписки.
+/// Обновления выполняются по одному — ручное и автоматическое не пересекаются.
 /// </summary>
-public sealed class SubscriptionUpdater
+public sealed class SubscriptionUpdater : IDisposable
 {
     public delegate Task<SubscriptionFetchResult> SubscriptionFetch(Uri url, string userAgent, IWebProxy? proxy, TimeSpan timeout, CancellationToken cancellationToken);
 
     private readonly ProfileRepository _repository;
     private readonly Func<int?> _localProxyPort;
     private readonly SubscriptionFetch _fetch;
+    private readonly SemaphoreSlim _gate = new(1, 1);
 
     /// <param name="localProxyPort">HTTP-порт подключённого KHORS или <c>null</c>, если не подключён.</param>
     public SubscriptionUpdater(ProfileRepository repository, Func<int?> localProxyPort, SubscriptionFetch? fetch = null)
@@ -31,7 +33,22 @@ public sealed class SubscriptionUpdater
         _fetch = fetch ?? SubscriptionFetcher.FetchAsync;
     }
 
+    public void Dispose() => _gate.Dispose();
+
     public async Task<SubscriptionUpdateOutcome> UpdateAsync(Guid subscriptionId, CancellationToken cancellationToken = default)
+    {
+        await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            return await UpdateCoreAsync(subscriptionId, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    private async Task<SubscriptionUpdateOutcome> UpdateCoreAsync(Guid subscriptionId, CancellationToken cancellationToken)
     {
         var subscription = _repository.FindSubscription(subscriptionId)
             ?? throw new KeyNotFoundException($"Subscription {subscriptionId} not found.");

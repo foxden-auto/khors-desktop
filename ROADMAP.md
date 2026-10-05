@@ -67,7 +67,9 @@
   - Сделано (2.1б): Clash/mihomo YAML — раздел `proxies` (vless, vmess, trojan, ss; tcp, http-маскировка, ws с early data и `v2ray-http-upgrade`, grpc, xhttp; tls, reality с `support-x25519mlkem768`; плагины ss → SIP003). YAML читается деревом узлов (YamlDotNet 18.1.0, MIT, в NOTICE; разрешён для Core в архитектурном тесте), неизвестные поля — в `unknownParams` с путём через точку. Hysteria2/TUIC/WireGuard — ошибка до 2.3. Вектор `Vectors/subscriptions/clash.yaml` с ожидаемыми профилями.
   - Сделано (2.1в): sing-box JSON (прокси-выходы `outbounds`: vless, vmess, trojan, shadowsocks; ws с early data, httpupgrade, grpc; tls с utls, reality; multiplex) и Xray JSON (один конфиг или массив конфигов с `remarks`, как у JSON-подписок v2rayN/3x-ui; vnext/servers и плоская запись settings; raw/tcp с HTTP-маскировкой, ws, httpupgrade, grpc, xhttp/splithttp с `extra`; tls с `pcs`/`vcn`, reality с `publicKey`/`password`; mux). Служебные выходы пропускаются, неизвестные поля — в `unknownParams` с путём. Векторы `singbox.json`, `xray.json` с ожидаемыми профилями.
   - Отложено: hysteria2/tuic/wireguard и транспорты h2/quic/mKCP из конфигов — 2.3 и далее.
-- [ ] 2.2 Автообновление подписок
+- [x] 2.2 Автообновление подписок
+  - Сделано: `SubscriptionSchedule` (Core) — следующее обновление по интервалу подписки (`profile-update-interval`) или настройке (`subscriptionUpdateIntervalHours`, 12 ч; 1…8760), никогда не обновлявшаяся — сразу, после ошибки — через 30 мин (не реже интервала); у подписки — время последней попытки. `SubscriptionScheduler` (Engines) — проверка раз в минуту, первая через 10 с после запуска; после сна просроченные обновляются на первой проверке; выключатель `subscriptionAutoUpdate`. Обновления выполняются по одному (ручное и автоматическое не пересекаются). Тесты на подменных часах.
+  - Отложено: настройки в окне (интервал, выключатель) — вместе с окном настроек.
 - [ ] 2.3 Парсеры `hysteria2://`, `tuic://`, `wireguard://`
 - [ ] 2.4 Генератор конфига sing-box, управление процессом sing-box
 - [ ] 2.5 Автовыбор ядра + ручное переопределение, ошибки несовместимости

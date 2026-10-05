@@ -15,7 +15,11 @@ public sealed record Subscription
     /// <summary>Свой User-Agent для этой подписки; <c>null</c> — по умолчанию KHORS.</summary>
     public string? UserAgent { get; init; }
 
+    /// <summary>Последнее успешное обновление.</summary>
     public DateTimeOffset? UpdatedAt { get; init; }
+
+    /// <summary>Последняя попытка обновления (успешная или нет) — для повтора после ошибки.</summary>
+    public DateTimeOffset? LastAttemptAt { get; init; }
 
     /// <summary>Трафик и срок из заголовка <c>subscription-userinfo</c>.</summary>
     public SubscriptionUserInfo? UserInfo { get; init; }

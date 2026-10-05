@@ -23,6 +23,8 @@ public sealed record ProfileDocument
 /// <param name="CoreLogLevel">Уровень лога ядра.</param>
 /// <param name="Language">Язык интерфейса (ru, en); <c>null</c> — как в системе.</param>
 /// <param name="LatencyTestUrl">Адрес теста задержки: запрос через прокси, ожидается ответ 204 или 200.</param>
+/// <param name="SubscriptionAutoUpdate">Обновлять подписки автоматически (ROADMAP 2.2).</param>
+/// <param name="SubscriptionUpdateIntervalHours">Интервал, если подписка не сообщила свой (<c>profile-update-interval</c>).</param>
 public sealed record AppSettings(
     int SchemaVersion = AppSettings.CurrentSchemaVersion,
     Guid? SelectedProfileId = null,
@@ -30,7 +32,9 @@ public sealed record AppSettings(
     int HttpPort = 10809,
     string CoreLogLevel = "warning",
     string? Language = null,
-    string LatencyTestUrl = "https://cp.cloudflare.com/generate_204")
+    string LatencyTestUrl = "https://cp.cloudflare.com/generate_204",
+    bool SubscriptionAutoUpdate = true,
+    int SubscriptionUpdateIntervalHours = 12)
 {
     public const int CurrentSchemaVersion = 1;
 }

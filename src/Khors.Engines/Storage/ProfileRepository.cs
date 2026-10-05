@@ -190,6 +190,7 @@ public sealed class ProfileRepository
             {
                 Name = string.IsNullOrWhiteSpace(title) ? _subscriptions[index].Name : title,
                 UpdatedAt = now,
+                LastAttemptAt = now,
                 UserInfo = userInfo,
                 UpdateIntervalHours = updateIntervalHours,
                 LastError = null,
@@ -220,7 +221,7 @@ public sealed class ProfileRepository
                 return;
             }
 
-            _subscriptions[index] = _subscriptions[index] with { LastError = error };
+            _subscriptions[index] = _subscriptions[index] with { LastError = error, LastAttemptAt = _time.GetUtcNow() };
             Save();
         }
 

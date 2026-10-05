@@ -66,6 +66,9 @@ public partial class App : Application, IDisposable
             SingleInstance.ActivationRequested += (_, _) => Dispatcher.UIThread.Post(ShowWindow);
         }
 
+        // Автообновление подписок (ROADMAP 2.2): первая проверка через несколько секунд после запуска.
+        _services.GetRequiredService<SubscriptionScheduler>().Start();
+
         // Завершение сеанса Windows и т.п.: сначала отключаемся и возвращаем прокси.
         desktop.ShutdownRequested += (_, e) =>
         {
@@ -96,6 +99,10 @@ public partial class App : Application, IDisposable
                 sp.GetRequiredService<ProfileRepository>(),
                 () => connection.Status is { State: ConnectionState.Connected, HttpPort: { } port } ? port : null);
         });
+        services.AddSingleton(sp => new SubscriptionScheduler(
+            sp.GetRequiredService<ProfileRepository>(),
+            sp.GetRequiredService<SubscriptionUpdater>(),
+            () => sp.GetRequiredService<SettingsStore>().Current));
         services.AddSingleton<MainWindowViewModel>();
         return services.BuildServiceProvider();
     }
@@ -143,6 +150,8 @@ public partial class App : Application, IDisposable
 
         if (_services is not null)
         {
+            await _services.GetRequiredService<SubscriptionScheduler>().DisposeAsync().ConfigureAwait(true);
+
             // Отключение возвращает системный прокси и останавливает ядро.
             await _services.GetRequiredService<ConnectionManager>().DisposeAsync().ConfigureAwait(true);
             _services.GetRequiredService<MainWindowViewModel>().Dispose();
