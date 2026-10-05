@@ -70,6 +70,11 @@ public static class SingBoxConfigGenerator
         // WireGuard в sing-box 1.11+ — endpoint, остальные протоколы — outbound.
         if (profile.Protocol is WireGuardSettings wireGuard)
         {
+            // Через WireGuard идут IP-пакеты: имена сайтов разрешаются на клиенте. Системный резолвер
+            // недоступен через туннель (сервер обычно режет частные адреса), поэтому DNS — публичный, через туннель.
+            var dns = config["dns"]!.AsObject();
+            dns["servers"]!.AsArray().Add(new JsonObject { ["type"] = "udp", ["tag"] = TunnelDnsTag, ["server"] = TunnelDnsServer, ["detour"] = ProxyTag });
+            dns["final"] = TunnelDnsTag;
             config["endpoints"] = new JsonArray(WireGuardEndpoint(profile, wireGuard));
             config["outbounds"] = new JsonArray(new JsonObject { ["type"] = "direct", ["tag"] = DirectTag });
         }
@@ -92,6 +97,9 @@ public static class SingBoxConfigGenerator
     }
 
     /// <summary>Возможности профиля, которых нет в sing-box 1.14 (такие профили — через Xray, ROADMAP 2.5).</summary>
+    private const string TunnelDnsTag = "tunnel-dns";
+    private const string TunnelDnsServer = "1.1.1.1";
+
     private static string? FindUnsupported(Profile profile)
     {
         switch (profile.Protocol)
@@ -406,6 +414,8 @@ public static class SingBoxConfigGenerator
             ["address"] = new JsonArray([.. wireGuard.LocalAddresses.Select(a => (JsonNode)JsonValue.Create(a))]),
             ["private_key"] = wireGuard.PrivateKey.Value,
             ["peers"] = new JsonArray(peer),
+            // Адрес сервера — системным резолвером, не DNS через ещё не поднятый туннель.
+            ["domain_resolver"] = "local",
         };
         if (wireGuard.Mtu is { } mtu)
         {

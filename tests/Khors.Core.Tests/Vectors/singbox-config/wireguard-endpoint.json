@@ -15,8 +15,15 @@
         {
           "type": "local",
           "tag": "local"
+        },
+        {
+          "type": "udp",
+          "tag": "tunnel-dns",
+          "server": "1.1.1.1",
+          "detour": "proxy"
         }
-      ]
+      ],
+      "final": "tunnel-dns"
     },
     "inbounds": [
       {
@@ -58,6 +65,7 @@
             ]
           }
         ],
+        "domain_resolver": "local",
         "mtu": 1280
       }
     ],
