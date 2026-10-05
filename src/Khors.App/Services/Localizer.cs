@@ -3,6 +3,7 @@ using Khors.App.Resources;
 using Khors.Core.Generators;
 using Khors.Core.Import;
 using Khors.Core.Profiles;
+using Khors.Core.Subscriptions;
 using Khors.Engines.Connection;
 using Khors.Engines.Latency;
 
@@ -25,6 +26,13 @@ public static class Localizer
     }
 
     public static string Describe(ProfileIssueCode code) => Get($"Issue_{code}");
+
+    public static string Describe(SubscriptionUpdateError error) => Get($"SubscriptionError_{error}");
+
+    /// <summary>Объём трафика: МБ до 1 ГБ, дальше ГБ.</summary>
+    public static string Bytes(long bytes) => bytes >= 1L << 30
+        ? Format("BytesGbFormat", bytes / (double)(1L << 30))
+        : Format("BytesMbFormat", bytes / (double)(1L << 20));
 
     public static string Describe(LatencyResult result)
     {

@@ -8,6 +8,7 @@ using Khors.Core.Storage;
 using Khors.Engines.Connection;
 using Khors.Engines.Latency;
 using Khors.Engines.Storage;
+using Khors.Engines.Subscriptions;
 
 namespace Khors.App.ViewModels;
 
@@ -19,11 +20,19 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly ConnectionManager _connection;
     private readonly IClipboardText _clipboard;
     private readonly ICoreLauncher _launcher;
+    private readonly SubscriptionUpdater _subscriptionUpdater;
     private readonly DispatcherTimer _sessionTimer;
     private readonly Dictionary<Guid, LatencyResult> _latency = [];
 
-    public MainWindowViewModel(ProfileRepository profiles, SettingsStore settings, ConnectionManager connection, IClipboardText clipboard, ICoreLauncher launcher)
+    public MainWindowViewModel(
+        ProfileRepository profiles,
+        SettingsStore settings,
+        ConnectionManager connection,
+        IClipboardText clipboard,
+        ICoreLauncher launcher,
+        SubscriptionUpdater subscriptionUpdater)
     {
+        _subscriptionUpdater = subscriptionUpdater;
         _profiles = profiles;
         _settings = settings;
         _connection = connection;
@@ -40,6 +49,12 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
     }
 
     public ObservableCollection<ProfileItemViewModel> Profiles { get; } = [];
+
+    public ObservableCollection<SubscriptionItemViewModel> Subscriptions { get; } = [];
+
+    public bool HasSubscriptions => Subscriptions.Count > 0;
+
+    public string SubscriptionsHeader => Localizer.Format("SubscriptionsHeaderFormat", Subscriptions.Count);
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ToggleConnectionCommand))]
@@ -167,6 +182,14 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
             return;
         }
 
+        // Адрес подписки: добавить и сразу загрузить.
+        if (Uri.TryCreate(text.Trim(), UriKind.Absolute, out var subscriptionUrl) && subscriptionUrl.Scheme is "http" or "https")
+        {
+            var subscription = _profiles.AddSubscription(subscriptionUrl);
+            await UpdateSubscriptionCoreAsync(subscription.Id, added: true).ConfigureAwait(true);
+            return;
+        }
+
         var result = _profiles.Import(text);
         var lines = new List<string> { Localizer.Format("ImportResultFormat", result.Added.Count, result.Duplicates, result.Errors.Count) };
         lines.AddRange(result.Errors.Take(5).Select(e => Localizer.Format("ImportLineErrorFormat", e.Line, Localizer.Describe(e.Error))));
@@ -250,6 +273,53 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    private Task UpdateSubscriptionAsync(SubscriptionItemViewModel? item) =>
+        item is null ? Task.CompletedTask : UpdateSubscriptionCoreAsync(item.Id, added: false);
+
+    [RelayCommand]
+    private async Task RemoveSubscriptionAsync(SubscriptionItemViewModel? item)
+    {
+        if (item is null || _profiles.IsReadOnly)
+        {
+            return;
+        }
+
+        if (_connection.Status.Profile?.SubscriptionId == item.Id && State is ConnectionState.Connected or ConnectionState.Connecting)
+        {
+            await _connection.DisconnectAsync().ConfigureAwait(true);
+        }
+
+        _profiles.RemoveSubscription(item.Id);
+    }
+
+    private async Task UpdateSubscriptionCoreAsync(Guid id, bool added)
+    {
+        var item = Subscriptions.FirstOrDefault(s => s.Id == id);
+        if (item is not null)
+        {
+            item.IsUpdating = true;
+        }
+
+        var outcome = await _subscriptionUpdater.UpdateAsync(id).ConfigureAwait(true);
+        var name = _profiles.FindSubscription(id)?.Name ?? string.Empty;
+        var lines = new List<string>
+        {
+            outcome switch
+            {
+                { Error: { } error } => Localizer.Format("SubscriptionUpdateFailedFormat", name, Localizer.Describe(error)),
+                _ when added => Localizer.Format("SubscriptionAddedFormat", name, outcome.Total),
+                _ => Localizer.Format("SubscriptionUpdatedFormat", name, outcome.Total, outcome.Added, outcome.Removed),
+            },
+        };
+        if (outcome.ViaProxy && outcome.Error is null)
+        {
+            lines.Add(Localizer.Get("SubscriptionViaProxy"));
+        }
+
+        Message = string.Join(Environment.NewLine, lines);
+    }
+
+    [RelayCommand]
     private async Task DeleteProfileAsync(ProfileItemViewModel? item)
     {
         if (item is null || _profiles.IsReadOnly)
@@ -305,6 +375,16 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         SelectedProfile = Profiles.FirstOrDefault(p => p.Id == selectedId) ?? Profiles.FirstOrDefault();
         MarkActiveProfile();
         OnPropertyChanged(nameof(HasNoProfiles));
+
+        Subscriptions.Clear();
+        var now = DateTimeOffset.UtcNow;
+        foreach (var subscription in _profiles.Subscriptions)
+        {
+            Subscriptions.Add(new SubscriptionItemViewModel(subscription, now));
+        }
+
+        OnPropertyChanged(nameof(HasSubscriptions));
+        OnPropertyChanged(nameof(SubscriptionsHeader));
     }
 
     private void ApplyStatus(ConnectionStatus status)

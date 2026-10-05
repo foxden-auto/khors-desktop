@@ -67,6 +67,17 @@ public class ProfileImporterTests
         Assert.DoesNotContain(TestProfiles.Uuid, result.ToString(), StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void RawSpacesInNameStayInName()
+    {
+        var text = $"{Trojan.Replace("#Два", "#Germany 1 fast", StringComparison.Ordinal)} {Vless}\nhysteria9://x@y:1 tail";
+
+        var result = ProfileImporter.Import(text, [], Sequence(), s_now);
+
+        Assert.Equal(["Germany 1 fast", "Один"], result.Added.Select(p => p.Name));
+        Assert.Equal([3], result.Errors.Select(e => e.Line));
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("   \r\n\t ")]

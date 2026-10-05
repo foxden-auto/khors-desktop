@@ -14,8 +14,8 @@ public sealed partial class ProfileItemViewModel(Profile profile) : ObservableOb
 
     public string Name => Profile.Name;
 
-    /// <summary>Например, «VLESS · REALITY · TCP». Названия протоколов не переводятся.</summary>
-    public string Summary => string.Join(" · ", new[] { ProtocolName(Profile.Protocol), SecurityName(Profile.Security), TransportName(Profile.Transport) }.Where(s => s.Length > 0));
+    /// <summary>Например, «Подписка · VLESS · REALITY · TCP». Названия протоколов не переводятся.</summary>
+    public string Summary => string.Join(" · ", new[] { Profile.Group ?? string.Empty, ProtocolName(Profile.Protocol), SecurityName(Profile.Security), TransportName(Profile.Transport) }.Where(s => s.Length > 0));
 
     public string? Warning { get; } = ProfileValidator.Validate(profile)
         .Where(i => i.Severity == ProfileIssueSeverity.Warning)

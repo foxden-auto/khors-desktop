@@ -11,6 +11,9 @@
   <data name="ButtonDisconnect" xml:space="preserve"><value>Отключить</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Вставить из буфера</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Задержка</value></data>
+  <data name="ButtonUpdate" xml:space="preserve"><value>Обновить</value></data>
+  <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} ГБ</value></data>
+  <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} МБ</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>В буфере обмена нет текста.</value></data>
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Задержка: {0}</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку vless://, vmess://, trojan:// или ss:// и нажмите «Вставить из буфера».</value></data>
@@ -79,6 +82,22 @@
   <data name="StorageCorrupt" xml:space="preserve"><value>Файл профилей повреждён и отложен рядом; начат новый список.</value></data>
   <data name="StorageReadOnly" xml:space="preserve"><value>Профили сохранены более новой версией KHORS — изменения не записываются.</value></data>
   <data name="StorageRestoredFromBackup" xml:space="preserve"><value>Файл профилей был повреждён — профили восстановлены из резервной копии.</value></data>
+  <data name="SubscriptionAddedFormat" xml:space="preserve"><value>Подписка «{0}» добавлена: профилей {1}.</value></data>
+  <data name="SubscriptionError_HttpError" xml:space="preserve"><value>сервер подписки вернул ошибку</value></data>
+  <data name="SubscriptionError_Network" xml:space="preserve"><value>сервер подписки недоступен</value></data>
+  <data name="SubscriptionError_NoProfiles" xml:space="preserve"><value>в ответе нет профилей известного формата</value></data>
+  <data name="SubscriptionError_Timeout" xml:space="preserve"><value>сервер подписки не ответил вовремя</value></data>
+  <data name="SubscriptionError_TooLarge" xml:space="preserve"><value>ответ сервера слишком большой</value></data>
+  <data name="SubscriptionExpired" xml:space="preserve"><value>срок истёк</value></data>
+  <data name="SubscriptionExpiresFormat" xml:space="preserve"><value>до {0:d}</value></data>
+  <data name="SubscriptionNeverUpdated" xml:space="preserve"><value>ещё не обновлялась</value></data>
+  <data name="SubscriptionTrafficFormat" xml:space="preserve"><value>трафик: {0} из {1}</value></data>
+  <data name="SubscriptionTrafficUsedFormat" xml:space="preserve"><value>трафик: {0}</value></data>
+  <data name="SubscriptionUpdateFailedFormat" xml:space="preserve"><value>«{0}» не обновилась: {1}.</value></data>
+  <data name="SubscriptionUpdatedAtFormat" xml:space="preserve"><value>обновлена {0:g}</value></data>
+  <data name="SubscriptionUpdatedFormat" xml:space="preserve"><value>«{0}» обновлена: профилей {1}, новых {2}, удалено {3}.</value></data>
+  <data name="SubscriptionViaProxy" xml:space="preserve"><value>загружено через KHORS — напрямую сервер подписки недоступен</value></data>
+  <data name="SubscriptionsHeaderFormat" xml:space="preserve"><value>Подписки ({0})</value></data>
   <data name="TestLatencyTooltip" xml:space="preserve"><value>Проверить задержку всех профилей</value></data>
   <data name="TrayExit" xml:space="preserve"><value>Выход</value></data>
   <data name="TrayShow" xml:space="preserve"><value>Показать окно</value></data>

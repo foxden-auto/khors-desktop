@@ -11,6 +11,9 @@
   <data name="ButtonDisconnect" xml:space="preserve"><value>Disconnect</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Paste from clipboard</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Latency</value></data>
+  <data name="ButtonUpdate" xml:space="preserve"><value>Update</value></data>
+  <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} GB</value></data>
+  <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} MB</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>The clipboard contains no text.</value></data>
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Latency: {0}</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a vless://, vmess://, trojan:// or ss:// link and press “Paste from clipboard”.</value></data>
@@ -79,6 +82,22 @@
   <data name="StorageCorrupt" xml:space="preserve"><value>The profiles file is damaged and was set aside; starting a new list.</value></data>
   <data name="StorageReadOnly" xml:space="preserve"><value>Profiles were saved by a newer KHORS version — changes are not saved.</value></data>
   <data name="StorageRestoredFromBackup" xml:space="preserve"><value>The profiles file was damaged — profiles restored from the backup.</value></data>
+  <data name="SubscriptionAddedFormat" xml:space="preserve"><value>Subscription “{0}” added: {1} profiles.</value></data>
+  <data name="SubscriptionError_HttpError" xml:space="preserve"><value>the subscription server returned an error</value></data>
+  <data name="SubscriptionError_Network" xml:space="preserve"><value>the subscription server is unreachable</value></data>
+  <data name="SubscriptionError_NoProfiles" xml:space="preserve"><value>the response contains no profiles in a known format</value></data>
+  <data name="SubscriptionError_Timeout" xml:space="preserve"><value>the subscription server did not respond in time</value></data>
+  <data name="SubscriptionError_TooLarge" xml:space="preserve"><value>the server response is too large</value></data>
+  <data name="SubscriptionExpired" xml:space="preserve"><value>expired</value></data>
+  <data name="SubscriptionExpiresFormat" xml:space="preserve"><value>until {0:d}</value></data>
+  <data name="SubscriptionNeverUpdated" xml:space="preserve"><value>not updated yet</value></data>
+  <data name="SubscriptionTrafficFormat" xml:space="preserve"><value>traffic: {0} of {1}</value></data>
+  <data name="SubscriptionTrafficUsedFormat" xml:space="preserve"><value>traffic: {0}</value></data>
+  <data name="SubscriptionUpdateFailedFormat" xml:space="preserve"><value>“{0}” was not updated: {1}.</value></data>
+  <data name="SubscriptionUpdatedAtFormat" xml:space="preserve"><value>updated {0:g}</value></data>
+  <data name="SubscriptionUpdatedFormat" xml:space="preserve"><value>“{0}” updated: {1} profiles, {2} new, {3} removed.</value></data>
+  <data name="SubscriptionViaProxy" xml:space="preserve"><value>downloaded through KHORS — the subscription server is unreachable directly</value></data>
+  <data name="SubscriptionsHeaderFormat" xml:space="preserve"><value>Subscriptions ({0})</value></data>
   <data name="TestLatencyTooltip" xml:space="preserve"><value>Test latency of all profiles</value></data>
   <data name="TrayExit" xml:space="preserve"><value>Exit</value></data>
   <data name="TrayShow" xml:space="preserve"><value>Show window</value></data>

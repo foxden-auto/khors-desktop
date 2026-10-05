@@ -12,6 +12,7 @@ using Khors.Core.Diagnostics;
 using Khors.Engines;
 using Khors.Engines.Connection;
 using Khors.Engines.Storage;
+using Khors.Engines.Subscriptions;
 using Khors.Platform;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -87,6 +88,14 @@ public partial class App : Application, IDisposable
         services.AddSingleton<ICoreLauncher>(sp => new XrayCoreLauncher(sp.GetRequiredService<SecretMasker>(), sp.GetService<IChildProcessGuard>()));
         services.AddSingleton(sp => new ConnectionManager(sp.GetRequiredService<ICoreLauncher>(), sp.GetService<ISystemProxy>(), SystemProxyWatchdog.EnsureStarted));
         services.AddSingleton<IClipboardText>(_ => new WindowClipboardText(() => _window));
+        services.AddSingleton(sp =>
+        {
+            var connection = sp.GetRequiredService<ConnectionManager>();
+            // При сетевой ошибке подписка повторно загружается через подключённый KHORS.
+            return new SubscriptionUpdater(
+                sp.GetRequiredService<ProfileRepository>(),
+                () => connection.Status is { State: ConnectionState.Connected, HttpPort: { } port } ? port : null);
+        });
         services.AddSingleton<MainWindowViewModel>();
         return services.BuildServiceProvider();
     }

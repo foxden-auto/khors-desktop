@@ -14,8 +14,8 @@ internal static class LinkText
     {
         var profiles = new List<Profile>();
         var errors = new List<ImportLineError>();
-        var links = text.Split(s_separators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        for (var i = 0; i < links.Length; i++)
+        var links = Split(text);
+        for (var i = 0; i < links.Count; i++)
         {
             var result = ShareLinkParser.Parse(links[i]);
             if (result.IsSuccess)
@@ -29,5 +29,33 @@ internal static class LinkText
         }
 
         return (profiles, errors);
+    }
+
+    /// <summary>
+    /// Ссылки по строкам; внутри строки новая ссылка начинается только со «схема://». Слово без «://»
+    /// продолжает имя предыдущей ссылки: некоторые клиенты копируют имя (<c>#Germany 1</c>) с пробелом.
+    /// </summary>
+    internal static List<string> Split(string text)
+    {
+        var links = new List<string>();
+        foreach (var line in text.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            var startOfLine = true;
+            foreach (var word in line.Split(s_separators, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (!startOfLine && !word.Contains("://", StringComparison.Ordinal))
+                {
+                    links[^1] += " " + word;
+                }
+                else
+                {
+                    links.Add(word);
+                }
+
+                startOfLine = false;
+            }
+        }
+
+        return links;
     }
 }

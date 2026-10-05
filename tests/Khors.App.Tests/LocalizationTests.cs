@@ -44,6 +44,11 @@ public class LocalizationTests
                 keys.Add($"Latency_{status}");
             }
 
+            foreach (var error in Enum.GetNames<Khors.Core.Subscriptions.SubscriptionUpdateError>())
+            {
+                keys.Add($"SubscriptionError_{error}");
+            }
+
             foreach (var state in Enum.GetNames<ConnectionState>())
             {
                 keys.Add($"Status{state}");
