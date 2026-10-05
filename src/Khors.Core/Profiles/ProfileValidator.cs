@@ -213,6 +213,11 @@ public static class ProfileValidator
                     error(ProfileIssueCode.RealityShortIdInvalid, "security.shortId");
                 }
 
+                if (reality.SupportsX25519MlKem768 == true && profile.Core == CorePreference.SingBox)
+                {
+                    error(ProfileIssueCode.RealityPostQuantumRequiresXray, "core");
+                }
+
                 // REALITY в Xray работает поверх RAW(TCP), gRPC и XHTTP.
                 if (profile.Transport is WsTransport or HttpUpgradeTransport)
                 {

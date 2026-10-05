@@ -76,6 +76,7 @@ STRINGS = {
     "Issue_RealityShortIdInvalid": ("REALITY: неверный short id", "REALITY: invalid short id"),
     "Issue_RealityTransportUnsupported": ("REALITY не работает с этим транспортом", "REALITY does not work with this transport"),
     "Issue_RealityMlDsa65VerifyInvalid": ("REALITY: неверный ключ pqv", "REALITY: invalid pqv key"),
+    "Issue_RealityPostQuantumRequiresXray": ("сервер требует X25519MLKEM768 — нужно ядро Xray, sing-box не подключится", "the server requires X25519MLKEM768 — use the Xray core, sing-box cannot connect"),
     "Issue_TlsPinnedCertInvalid": ("неверный отпечаток сертификата (pcs)", "invalid certificate fingerprint (pcs)"),
     "Issue_InsecureTls": ("проверка сертификата отключена (allowInsecure)", "certificate verification is disabled (allowInsecure)"),
     "Issue_UnknownParameters": ("в ссылке есть параметры, которые KHORS пока не понимает", "the link has parameters KHORS does not understand yet"),

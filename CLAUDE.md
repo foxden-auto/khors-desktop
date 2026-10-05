@@ -57,6 +57,7 @@ dotnet run --project tools/Khors.DevCli -- "<ссылка>"   # живая пр�
 ## Предметные знания
 
 - VLESS + REALITY по умолчанию идёт через Xray-core с fingerprint `chrome`. sing-box не отправляет X25519MLKEM768 в ClientHello REALITY и не подключается к серверам Xray-core 26.9.8+ (`reality verification failed`). Не меняй выбор ядра для REALITY на sing-box без проверки на актуальном сервере.
+- Параметр ссылки `support-x25519mlkem768=true` (ссылки серверов KHORS) — сервер ждёт X25519MLKEM768 в ClientHello REALITY: профиль только через Xray (`RealitySecurity.SupportsX25519MlKem768`).
 - В режиме TUN трафик процессов ядер к серверам должен идти мимо туннеля, иначе петля.
 - Xray-core 26: `allowInsecure` удалён (замена — `pinnedPeerCertSha256`/`verifyPeerCertByName`, в ссылках `pcs`/`vcn`); VLESS без шифрования и Trojan без TLS к публичному адресу ядро не запускает; `mldsa65Verify` (`pqv`) — base64url на 1952 байта. Любой сгенерированный конфиг Xray проверяется тестом `xray run -test` на версии из `cores.lock.json`.
 - `reality verification failed` означает, что сервер ответил как сайт-маскировка, то есть не принял клиента: неверный ключ/short id/SNI, несовместимый ClientHello или ограничение версии клиента на сервере.

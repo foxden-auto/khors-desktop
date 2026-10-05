@@ -1,0 +1,26 @@
+{
+  "description": "VLESS + REALITY + Vision с признаком support-x25519mlkem768 (сервер Xray 26.9.8+), как в ссылках серверов KHORS",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@vpn.example.com:443?encryption=none&flow=xtls-rprx-vision&fp=chrome&pbk=Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM&security=reality&sid=6ba85179e30d4fc2&sni=www.example.org&spx=%2F5e4d3c2b1a&support-x25519mlkem768=true&type=tcp#PQ%20test",
+  "expected": {
+    "name": "PQ test",
+    "server": {
+      "host": "vpn.example.com",
+      "port": 443
+    },
+    "protocol": {
+      "type": "vless",
+      "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+      "flow": "xtls-rprx-vision",
+      "encryption": "none"
+    },
+    "security": {
+      "type": "reality",
+      "sni": "www.example.org",
+      "fingerprint": "chrome",
+      "publicKey": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM",
+      "shortId": "6ba85179e30d4fc2",
+      "spiderX": "/5e4d3c2b1a",
+      "supportsX25519MlKem768": true
+    }
+  }
+}

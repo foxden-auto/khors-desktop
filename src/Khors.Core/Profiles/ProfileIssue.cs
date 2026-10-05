@@ -36,6 +36,7 @@ public enum ProfileIssueCode
     RealityShortIdInvalid,
     RealityTransportUnsupported,
     RealityMlDsa65VerifyInvalid,
+    RealityPostQuantumRequiresXray,
     TlsPinnedCertInvalid,
     InsecureTls,
     UnknownParameters,

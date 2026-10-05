@@ -37,6 +37,7 @@
   <data name="Issue_PasswordEmpty" xml:space="preserve"><value>password is empty</value></data>
   <data name="Issue_PortOutOfRange" xml:space="preserve"><value>port is outside 1–65535</value></data>
   <data name="Issue_RealityMlDsa65VerifyInvalid" xml:space="preserve"><value>REALITY: invalid pqv key</value></data>
+  <data name="Issue_RealityPostQuantumRequiresXray" xml:space="preserve"><value>the server requires X25519MLKEM768 — use the Xray core, sing-box cannot connect</value></data>
   <data name="Issue_RealityPublicKeyInvalid" xml:space="preserve"><value>REALITY: invalid public key</value></data>
   <data name="Issue_RealityShortIdInvalid" xml:space="preserve"><value>REALITY: invalid short id</value></data>
   <data name="Issue_RealitySniEmpty" xml:space="preserve"><value>REALITY: SNI is empty</value></data>

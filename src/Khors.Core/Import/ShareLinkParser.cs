@@ -154,6 +154,7 @@ public static partial class ShareLinkParser
                 ShortId = query.Take("sid") is { } sid ? new Secret(sid) : null,
                 SpiderX = query.Take("spx"),
                 MlDsa65Verify = query.Take("pqv"),
+                SupportsX25519MlKem768 = query.Take("support-x25519mlkem768") is { } pq ? IsTrue(pq) : null,
             },
             _ => throw new LinkFormatException(LinkParseErrorCode.UnsupportedSecurity, "security"),
         };

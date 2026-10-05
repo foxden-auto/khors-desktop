@@ -39,6 +39,7 @@ public class ProfileValidatorTests
         { "reality-sid-not-hex", ProfileIssueCode.RealityShortIdInvalid, ProfileIssueSeverity.Error },
         { "reality-sid-too-long", ProfileIssueCode.RealityShortIdInvalid, ProfileIssueSeverity.Error },
         { "reality-over-ws", ProfileIssueCode.RealityTransportUnsupported, ProfileIssueSeverity.Error },
+        { "postquantum-on-singbox", ProfileIssueCode.RealityPostQuantumRequiresXray, ProfileIssueSeverity.Error },
         { "tls-insecure", ProfileIssueCode.InsecureTls, ProfileIssueSeverity.Warning },
         { "unknown-params", ProfileIssueCode.UnknownParameters, ProfileIssueSeverity.Warning },
     };
@@ -109,6 +110,7 @@ public class ProfileValidatorTests
             "reality-sid-not-hex" => vless with { Security = Reality() with { ShortId = new Secret("zz") } },
             "reality-sid-too-long" => vless with { Security = Reality() with { ShortId = new Secret("0123456789abcdef01") } },
             "reality-over-ws" => vlessPlain with { Transport = new WsTransport() },
+            "postquantum-on-singbox" => vless with { Core = CorePreference.SingBox, Security = Reality() with { SupportsX25519MlKem768 = true } },
             "tls-insecure" => TestProfiles.TrojanGrpc() with { Security = new TlsSecurity { AllowInsecure = true } },
             "unknown-params" => TestProfiles.VlessReality(),
             _ => throw new ArgumentOutOfRangeException(nameof(scenario), scenario, null),

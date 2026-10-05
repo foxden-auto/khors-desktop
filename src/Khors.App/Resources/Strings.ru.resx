@@ -37,6 +37,7 @@
   <data name="Issue_PasswordEmpty" xml:space="preserve"><value>не задан пароль</value></data>
   <data name="Issue_PortOutOfRange" xml:space="preserve"><value>порт вне диапазона 1–65535</value></data>
   <data name="Issue_RealityMlDsa65VerifyInvalid" xml:space="preserve"><value>REALITY: неверный ключ pqv</value></data>
+  <data name="Issue_RealityPostQuantumRequiresXray" xml:space="preserve"><value>сервер требует X25519MLKEM768 — нужно ядро Xray, sing-box не подключится</value></data>
   <data name="Issue_RealityPublicKeyInvalid" xml:space="preserve"><value>REALITY: неверный публичный ключ</value></data>
   <data name="Issue_RealityShortIdInvalid" xml:space="preserve"><value>REALITY: неверный short id</value></data>
   <data name="Issue_RealitySniEmpty" xml:space="preserve"><value>REALITY: не задан SNI</value></data>

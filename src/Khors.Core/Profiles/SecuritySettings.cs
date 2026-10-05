@@ -54,5 +54,12 @@ public sealed record RealitySecurity : SecuritySettings
     /// <summary>Ключ проверки ML-DSA-65, base64url без паддинга, 1952 байта (параметр ссылки <c>pqv</c>, в Xray — <c>mldsa65Verify</c>).</summary>
     public string? MlDsa65Verify { get; init; }
 
+    /// <summary>
+    /// Сервер поддерживает (и может требовать) X25519MLKEM768 в ClientHello REALITY — параметр ссылки
+    /// <c>support-x25519mlkem768</c>; <c>null</c> — не указано. Такой профиль запускается только через Xray:
+    /// sing-box этот ключ не отправляет, и серверы Xray-core 26.9.8+ его не принимают (docs/SPEC.md, 3.4).
+    /// </summary>
+    public bool? SupportsX25519MlKem768 { get; init; }
+
     public override string ToString() => $"RealitySecurity {{ Fingerprint = {Fingerprint} }}";
 }
