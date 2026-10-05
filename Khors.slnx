@@ -9,6 +9,7 @@
     <Project Path="src/Khors.App/Khors.App.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Khors.App.Tests/Khors.App.Tests.csproj" />
     <Project Path="tests/Khors.Architecture.Tests/Khors.Architecture.Tests.csproj" />
     <Project Path="tests/Khors.Core.Tests/Khors.Core.Tests.csproj" />
     <Project Path="tests/Khors.Engines.Tests/Khors.Engines.Tests.csproj" />

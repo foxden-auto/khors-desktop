@@ -1,4 +1,6 @@
+using Khors.Platform;
 using Khors.Platform.Windows;
+using Khors.Platform.Windows.Proxy;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Khors.App;
@@ -15,4 +17,13 @@ internal static class PlatformComposition
 
         throw new PlatformNotSupportedException("KHORS Desktop supports only Windows for now.");
     }
+
+    /// <summary>Для роли сторожа: без контейнера зависимостей.</summary>
+    public static ISystemProxy? CreateSystemProxy() =>
+        OperatingSystem.IsWindows() ? new WindowsSystemProxy(WindowsPlatform.StateDirectory) : null;
+
+    public static ISingleInstance CreateSingleInstance() =>
+        OperatingSystem.IsWindows()
+            ? new WindowsSingleInstance()
+            : throw new PlatformNotSupportedException("KHORS Desktop supports only Windows for now.");
 }

@@ -18,6 +18,7 @@ public sealed class ConnectionManager : IAsyncDisposable
     private readonly SemaphoreSlim _gate = new(1, 1);
     private ICoreSession? _session;
     private ConnectionStatus _status = ConnectionStatus.Disconnected;
+    private int _disposed;
 
     /// <param name="systemProxy"><c>null</c> — платформа без системного прокси (ядро запускается, прокси не меняется).</param>
     /// <param name="ensureWatchdog">Запуск сторожа перед включением прокси (<see cref="SystemProxyWatchdog.EnsureStarted"/>).</param>
@@ -122,8 +123,14 @@ public sealed class ConnectionManager : IAsyncDisposable
         }
     }
 
+    /// <summary>Отключает и освобождает ресурсы. Повторный вызов ничего не делает.</summary>
     public async ValueTask DisposeAsync()
     {
+        if (Interlocked.Exchange(ref _disposed, 1) == 1)
+        {
+            return;
+        }
+
         await DisconnectAsync().ConfigureAwait(false);
         _gate.Dispose();
     }

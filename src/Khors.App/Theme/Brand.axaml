@@ -1,0 +1,44 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!--
+    Фирменная палитра KHORS — как на сайте (khors-site, app/globals.css) и в KHORS Android.
+    Единственное место с цветами: в разметке и коде — только эти токены (CLAUDE.md, соглашения).
+  -->
+  <Color x:Key="KhorsBackgroundColor">#0D1012</Color>
+  <Color x:Key="KhorsForegroundColor">#F4F3ED</Color>
+  <Color x:Key="KhorsCardColor">#15191B</Color>
+  <Color x:Key="KhorsPrimaryColor">#E5BD70</Color>
+  <Color x:Key="KhorsPrimaryForegroundColor">#16140F</Color>
+  <Color x:Key="KhorsSecondaryColor">#202527</Color>
+  <Color x:Key="KhorsMutedColor">#1B2022</Color>
+  <Color x:Key="KhorsMutedForegroundColor">#A8ACAE</Color>
+  <Color x:Key="KhorsAccentColor">#242A2C</Color>
+  <Color x:Key="KhorsDestructiveColor">#FF9999</Color>
+  <Color x:Key="KhorsBorderColor">#2D3335</Color>
+  <Color x:Key="KhorsInputColor">#656969</Color>
+  <!-- Фон логотипа (favicon.svg). -->
+  <Color x:Key="KhorsLogoBackgroundColor">#101416</Color>
+
+  <SolidColorBrush x:Key="KhorsBackgroundBrush" Color="{StaticResource KhorsBackgroundColor}" />
+  <SolidColorBrush x:Key="KhorsForegroundBrush" Color="{StaticResource KhorsForegroundColor}" />
+  <SolidColorBrush x:Key="KhorsCardBrush" Color="{StaticResource KhorsCardColor}" />
+  <SolidColorBrush x:Key="KhorsPrimaryBrush" Color="{StaticResource KhorsPrimaryColor}" />
+  <SolidColorBrush x:Key="KhorsPrimaryForegroundBrush" Color="{StaticResource KhorsPrimaryForegroundColor}" />
+  <SolidColorBrush x:Key="KhorsSecondaryBrush" Color="{StaticResource KhorsSecondaryColor}" />
+  <SolidColorBrush x:Key="KhorsMutedBrush" Color="{StaticResource KhorsMutedColor}" />
+  <SolidColorBrush x:Key="KhorsMutedForegroundBrush" Color="{StaticResource KhorsMutedForegroundColor}" />
+  <SolidColorBrush x:Key="KhorsAccentBrush" Color="{StaticResource KhorsAccentColor}" />
+  <SolidColorBrush x:Key="KhorsDestructiveBrush" Color="{StaticResource KhorsDestructiveColor}" />
+  <SolidColorBrush x:Key="KhorsBorderBrush" Color="{StaticResource KhorsBorderColor}" />
+  <SolidColorBrush x:Key="KhorsInputBrush" Color="{StaticResource KhorsInputColor}" />
+  <SolidColorBrush x:Key="KhorsLogoBackgroundBrush" Color="{StaticResource KhorsLogoBackgroundColor}" />
+
+  <!-- Акцент Fluent — фирменный золотой вместо системного цвета Windows. -->
+  <Color x:Key="SystemAccentColor">#E5BD70</Color>
+  <Color x:Key="SystemAccentColorDark1">#E5BD70</Color>
+  <Color x:Key="SystemAccentColorDark2">#E5BD70</Color>
+  <Color x:Key="SystemAccentColorDark3">#E5BD70</Color>
+  <Color x:Key="SystemAccentColorLight1">#E5BD70</Color>
+  <Color x:Key="SystemAccentColorLight2">#E5BD70</Color>
+  <Color x:Key="SystemAccentColorLight3">#E5BD70</Color>
+</ResourceDictionary>

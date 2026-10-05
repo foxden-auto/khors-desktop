@@ -1,9 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Сгенерировано tools/i18n/strings.py — правьте таблицу там. -->
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
+  <data name="ButtonConnect" xml:space="preserve"><value>Connect</value></data>
+  <data name="ButtonDelete" xml:space="preserve"><value>Delete</value></data>
+  <data name="ButtonDisconnect" xml:space="preserve"><value>Disconnect</value></data>
+  <data name="ButtonImportClipboard" xml:space="preserve"><value>Paste from clipboard</value></data>
+  <data name="ClipboardEmpty" xml:space="preserve"><value>The clipboard contains no text.</value></data>
+  <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a vless://, vmess://, trojan:// or ss:// link and press “Paste from clipboard”.</value></data>
+  <data name="FailureDetails" xml:space="preserve"><value>Core log</value></data>
+  <data name="Failure_CoreCrashed" xml:space="preserve"><value>Xray exited unexpectedly (code {0}). System proxy restored.</value></data>
+  <data name="Failure_CoreNotFound" xml:space="preserve"><value>The Xray executable was not found. Reinstall KHORS.</value></data>
+  <data name="Failure_CoreStartFailed" xml:space="preserve"><value>Xray failed to start (code {0}). See the log below.</value></data>
+  <data name="Failure_ProfileInvalid" xml:space="preserve"><value>The profile has an error: {0}.</value></data>
+  <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Could not enable the Windows system proxy.</value></data>
+  <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>Xray does not support this profile: {0}.</value></data>
+  <data name="ImportLineErrorFormat" xml:space="preserve"><value>Link {0}: {1}</value></data>
+  <data name="ImportResultFormat" xml:space="preserve"><value>Added: {0}. Already present: {1}. Not recognized: {2}.</value></data>
+  <data name="Issue_AlterIdNegative" xml:space="preserve"><value>alterId is negative</value></data>
+  <data name="Issue_FlowRequiresTcp" xml:space="preserve"><value>flow requires TCP</value></data>
+  <data name="Issue_FlowRequiresTlsOrReality" xml:space="preserve"><value>flow requires TLS or REALITY</value></data>
+  <data name="Issue_FlowUnknown" xml:space="preserve"><value>unknown flow</value></data>
+  <data name="Issue_HostEmpty" xml:space="preserve"><value>server address is empty</value></data>
+  <data name="Issue_HostInvalid" xml:space="preserve"><value>invalid server address</value></data>
+  <data name="Issue_IdEmpty" xml:space="preserve"><value>UUID is empty</value></data>
+  <data name="Issue_IdInvalid" xml:space="preserve"><value>invalid UUID</value></data>
+  <data name="Issue_InsecureTls" xml:space="preserve"><value>certificate verification is disabled (allowInsecure)</value></data>
+  <data name="Issue_MethodEmpty" xml:space="preserve"><value>cipher is empty</value></data>
+  <data name="Issue_MuxConcurrencyOutOfRange" xml:space="preserve"><value>invalid mux concurrency</value></data>
+  <data name="Issue_MuxIncompatibleWithFlow" xml:space="preserve"><value>mux cannot be used with flow</value></data>
+  <data name="Issue_NameEmpty" xml:space="preserve"><value>name is empty</value></data>
+  <data name="Issue_PasswordEmpty" xml:space="preserve"><value>password is empty</value></data>
+  <data name="Issue_PortOutOfRange" xml:space="preserve"><value>port is outside 1–65535</value></data>
+  <data name="Issue_RealityMlDsa65VerifyInvalid" xml:space="preserve"><value>REALITY: invalid pqv key</value></data>
+  <data name="Issue_RealityPublicKeyInvalid" xml:space="preserve"><value>REALITY: invalid public key</value></data>
+  <data name="Issue_RealityShortIdInvalid" xml:space="preserve"><value>REALITY: invalid short id</value></data>
+  <data name="Issue_RealitySniEmpty" xml:space="preserve"><value>REALITY: SNI is empty</value></data>
+  <data name="Issue_RealityTransportUnsupported" xml:space="preserve"><value>REALITY does not work with this transport</value></data>
+  <data name="Issue_TlsPinnedCertInvalid" xml:space="preserve"><value>invalid certificate fingerprint (pcs)</value></data>
+  <data name="Issue_TransportModeUnknown" xml:space="preserve"><value>unknown transport mode</value></data>
+  <data name="Issue_UnknownParameters" xml:space="preserve"><value>the link has parameters KHORS does not understand yet</value></data>
+  <data name="Issue_XhttpExtraInvalid" xml:space="preserve"><value>XHTTP extra is not a JSON object</value></data>
+  <data name="LinkError_Empty" xml:space="preserve"><value>empty line</value></data>
+  <data name="LinkError_InvalidBase64" xml:space="preserve"><value>damaged base64 data</value></data>
+  <data name="LinkError_InvalidJson" xml:space="preserve"><value>damaged JSON data</value></data>
+  <data name="LinkError_InvalidPort" xml:space="preserve"><value>invalid port</value></data>
+  <data name="LinkError_Malformed" xml:space="preserve"><value>the link is malformed</value></data>
+  <data name="LinkError_MissingCredentials" xml:space="preserve"><value>missing UUID, password or cipher</value></data>
+  <data name="LinkError_MissingHost" xml:space="preserve"><value>missing server address</value></data>
+  <data name="LinkError_UnsupportedScheme" xml:space="preserve"><value>unsupported link type</value></data>
+  <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>security type is not supported</value></data>
+  <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>transport is not supported yet</value></data>
+  <data name="LocalProxyFormat" xml:space="preserve"><value>Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
+  <data name="ModeSystemProxy" xml:space="preserve"><value>Mode: system proxy</value></data>
+  <data name="NoProfileSelected" xml:space="preserve"><value>Select a profile below</value></data>
+  <data name="ProfileWarningsFormat" xml:space="preserve"><value>Warning: {0}</value></data>
+  <data name="ProfilesHeader" xml:space="preserve"><value>Profiles</value></data>
+  <data name="ProxyRecoveredAfterCrash" xml:space="preserve"><value>System proxy restored after KHORS terminated unexpectedly.</value></data>
+  <data name="SessionTimeFormat" xml:space="preserve"><value>Session time: {0}</value></data>
+  <data name="StatusConnected" xml:space="preserve"><value>Connected</value></data>
+  <data name="StatusConnecting" xml:space="preserve"><value>Connecting…</value></data>
   <data name="StatusDisconnected" xml:space="preserve"><value>Disconnected</value></data>
+  <data name="StatusDisconnecting" xml:space="preserve"><value>Disconnecting…</value></data>
+  <data name="StatusFailed" xml:space="preserve"><value>Connection failed</value></data>
+  <data name="StorageCorrupt" xml:space="preserve"><value>The profiles file is damaged and was set aside; starting a new list.</value></data>
+  <data name="StorageReadOnly" xml:space="preserve"><value>Profiles were saved by a newer KHORS version — changes are not saved.</value></data>
+  <data name="StorageRestoredFromBackup" xml:space="preserve"><value>The profiles file was damaged — profiles restored from the backup.</value></data>
+  <data name="TrayExit" xml:space="preserve"><value>Exit</value></data>
+  <data name="TrayShow" xml:space="preserve"><value>Show window</value></data>
+  <data name="TrayTooltipFormat" xml:space="preserve"><value>KHORS — {0}</value></data>
+  <data name="Unsupported_Other" xml:space="preserve"><value>an unsupported feature</value></data>
+  <data name="Unsupported_core" xml:space="preserve"><value>the profile is assigned to sing-box</value></data>
+  <data name="Unsupported_protocol_alterId" xml:space="preserve"><value>legacy VMess (alterId greater than 0)</value></data>
+  <data name="Unsupported_protocol_plugin" xml:space="preserve"><value>Shadowsocks plugins</value></data>
+  <data name="Unsupported_security" xml:space="preserve"><value>VLESS/Trojan without TLS to a public address</value></data>
+  <data name="Unsupported_security_allowInsecure" xml:space="preserve"><value>disabled certificate verification (allowInsecure) was removed in Xray 26</value></data>
 </root>

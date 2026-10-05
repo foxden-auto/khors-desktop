@@ -3,6 +3,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\khors.ico</ApplicationIcon>
+    <AssemblyName>khors-desktop</AssemblyName>
+    <RootNamespace>Khors.App</RootNamespace>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <NeutralLanguage>en</NeutralLanguage>
@@ -23,6 +26,9 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
   <ItemGroup>
+    <AvaloniaResource Include="Assets\khors.ico" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
       <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
       <StronglyTypedNamespace>Khors.App.Resources</StronglyTypedNamespace>
@@ -31,4 +37,11 @@
       <PublicClass>true</PublicClass>
     </EmbeddedResource>
   </ItemGroup>
+  <!-- Отладочные .pdb нативных библиотек (SkiaSharp, HarfBuzz) в публикуемый пакет не нужны. -->
+  <Target Name="RemovePublishedPdbs" AfterTargets="Publish">
+    <ItemGroup>
+      <PublishedPdb Include="$(PublishDir)*.pdb" />
+    </ItemGroup>
+    <Delete Files="@(PublishedPdb)" />
+  </Target>
 </Project>

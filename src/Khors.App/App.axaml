@@ -1,9 +1,131 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Khors.App.App"
-             RequestedThemeVariant="Default">
-  <!-- Брендовая палитра KHORS Android ещё не получена: пока стандартная тема Fluent (ROADMAP, «Известные проблемы»). -->
+             RequestedThemeVariant="Dark">
+  <!-- Палитра сайта KHORS — тёмная; светлая тема появится вместе с её палитрой (ROADMAP, «Известные проблемы»). -->
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Theme/Brand.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
   <Application.Styles>
     <FluentTheme />
+
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{DynamicResource KhorsBackgroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.title">
+      <Setter Property="FontSize" Value="22" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.section">
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.status">
+      <Setter Property="FontSize" Value="18" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.status.failed">
+      <Setter Property="Foreground" Value="{DynamicResource KhorsDestructiveBrush}" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="{DynamicResource KhorsMutedForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.small">
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="TextBlock.warning">
+      <Setter Property="Foreground" Value="{DynamicResource KhorsPrimaryBrush}" />
+    </Style>
+    <Style Selector="SelectableTextBlock.log">
+      <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, monospace" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsMutedForegroundBrush}" />
+    </Style>
+
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{DynamicResource KhorsCardBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource KhorsBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="20" />
+    </Style>
+    <Style Selector="Border.message">
+      <Setter Property="Background" Value="{DynamicResource KhorsSecondaryBrush}" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="12" />
+    </Style>
+
+    <!-- Большая круглая кнопка подключения: золотой контур, при подключении — золотая заливка. -->
+    <Style Selector="Button.connect">
+      <Setter Property="Width" Value="168" />
+      <Setter Property="Height" Value="168" />
+      <Setter Property="CornerRadius" Value="84" />
+      <Setter Property="FontSize" Value="18" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Background" Value="{DynamicResource KhorsAccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsPrimaryBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource KhorsPrimaryBrush}" />
+      <Setter Property="BorderThickness" Value="3" />
+    </Style>
+    <Style Selector="Button.connect:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource KhorsSecondaryBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsPrimaryBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource KhorsPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.connect.connected">
+      <Setter Property="Background" Value="{DynamicResource KhorsPrimaryBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsPrimaryForegroundBrush}" />
+    </Style>
+    <Style Selector="Button.connect.connected:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource KhorsPrimaryBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsPrimaryForegroundBrush}" />
+    </Style>
+
+    <Style Selector="Button.secondary">
+      <Setter Property="Background" Value="{DynamicResource KhorsSecondaryBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsForegroundBrush}" />
+      <Setter Property="CornerRadius" Value="8" />
+    </Style>
+    <Style Selector="Button.ghost">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource KhorsMutedForegroundBrush}" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <Style Selector="ListBox.profiles">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ListBox.profiles ListBoxItem">
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="12,8" />
+      <Setter Property="Margin" Value="0,2" />
+    </Style>
+    <!-- Выделение: тёмная карточка с золотой рамкой вместо заливки акцентом — текст остаётся читаемым. -->
+    <Style Selector="ListBox.profiles ListBoxItem /template/ ContentPresenter">
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="ListBox.profiles ListBoxItem:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource KhorsMutedBrush}" />
+    </Style>
+    <Style Selector="ListBox.profiles ListBoxItem:selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource KhorsCardBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource KhorsPrimaryBrush}" />
+    </Style>
+    <Style Selector="ListBox.profiles ListBoxItem:selected:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource KhorsAccentBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource KhorsPrimaryBrush}" />
+    </Style>
+    <Style Selector="Ellipse.active-marker">
+      <Setter Property="Fill" Value="{DynamicResource KhorsPrimaryBrush}" />
+    </Style>
   </Application.Styles>
 </Application>

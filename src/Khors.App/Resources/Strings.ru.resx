@@ -1,9 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Сгенерировано tools/i18n/strings.py — правьте таблицу там. -->
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
-  <data name="StatusDisconnected" xml:space="preserve"><value>Не подключено</value></data>
+  <data name="ButtonConnect" xml:space="preserve"><value>Подключить</value></data>
+  <data name="ButtonDelete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="ButtonDisconnect" xml:space="preserve"><value>Отключить</value></data>
+  <data name="ButtonImportClipboard" xml:space="preserve"><value>Вставить из буфера</value></data>
+  <data name="ClipboardEmpty" xml:space="preserve"><value>В буфере обмена нет текста.</value></data>
+  <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку vless://, vmess://, trojan:// или ss:// и нажмите «Вставить из буфера».</value></data>
+  <data name="FailureDetails" xml:space="preserve"><value>Лог ядра</value></data>
+  <data name="Failure_CoreCrashed" xml:space="preserve"><value>Xray неожиданно завершился (код {0}). Системный прокси возвращён.</value></data>
+  <data name="Failure_CoreNotFound" xml:space="preserve"><value>Не найден исполняемый файл Xray. Переустановите KHORS.</value></data>
+  <data name="Failure_CoreStartFailed" xml:space="preserve"><value>Xray не запустился (код {0}). Подробности — в логе ниже.</value></data>
+  <data name="Failure_ProfileInvalid" xml:space="preserve"><value>В профиле ошибка: {0}.</value></data>
+  <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Не удалось включить системный прокси Windows.</value></data>
+  <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>Xray не поддерживает этот профиль: {0}.</value></data>
+  <data name="ImportLineErrorFormat" xml:space="preserve"><value>Ссылка {0}: {1}</value></data>
+  <data name="ImportResultFormat" xml:space="preserve"><value>Добавлено: {0}. Уже были: {1}. Не распознано: {2}.</value></data>
+  <data name="Issue_AlterIdNegative" xml:space="preserve"><value>alterId меньше нуля</value></data>
+  <data name="Issue_FlowRequiresTcp" xml:space="preserve"><value>flow работает только с TCP</value></data>
+  <data name="Issue_FlowRequiresTlsOrReality" xml:space="preserve"><value>flow требует TLS или REALITY</value></data>
+  <data name="Issue_FlowUnknown" xml:space="preserve"><value>неизвестный flow</value></data>
+  <data name="Issue_HostEmpty" xml:space="preserve"><value>не задан адрес сервера</value></data>
+  <data name="Issue_HostInvalid" xml:space="preserve"><value>неверный адрес сервера</value></data>
+  <data name="Issue_IdEmpty" xml:space="preserve"><value>не задан UUID</value></data>
+  <data name="Issue_IdInvalid" xml:space="preserve"><value>неверный UUID</value></data>
+  <data name="Issue_InsecureTls" xml:space="preserve"><value>проверка сертификата отключена (allowInsecure)</value></data>
+  <data name="Issue_MethodEmpty" xml:space="preserve"><value>не задан метод шифрования</value></data>
+  <data name="Issue_MuxConcurrencyOutOfRange" xml:space="preserve"><value>неверное число соединений mux</value></data>
+  <data name="Issue_MuxIncompatibleWithFlow" xml:space="preserve"><value>mux несовместим с flow</value></data>
+  <data name="Issue_NameEmpty" xml:space="preserve"><value>не задано имя</value></data>
+  <data name="Issue_PasswordEmpty" xml:space="preserve"><value>не задан пароль</value></data>
+  <data name="Issue_PortOutOfRange" xml:space="preserve"><value>порт вне диапазона 1–65535</value></data>
+  <data name="Issue_RealityMlDsa65VerifyInvalid" xml:space="preserve"><value>REALITY: неверный ключ pqv</value></data>
+  <data name="Issue_RealityPublicKeyInvalid" xml:space="preserve"><value>REALITY: неверный публичный ключ</value></data>
+  <data name="Issue_RealityShortIdInvalid" xml:space="preserve"><value>REALITY: неверный short id</value></data>
+  <data name="Issue_RealitySniEmpty" xml:space="preserve"><value>REALITY: не задан SNI</value></data>
+  <data name="Issue_RealityTransportUnsupported" xml:space="preserve"><value>REALITY не работает с этим транспортом</value></data>
+  <data name="Issue_TlsPinnedCertInvalid" xml:space="preserve"><value>неверный отпечаток сертификата (pcs)</value></data>
+  <data name="Issue_TransportModeUnknown" xml:space="preserve"><value>неизвестный режим транспорта</value></data>
+  <data name="Issue_UnknownParameters" xml:space="preserve"><value>в ссылке есть параметры, которые KHORS пока не понимает</value></data>
+  <data name="Issue_XhttpExtraInvalid" xml:space="preserve"><value>параметр extra XHTTP — не JSON-объект</value></data>
+  <data name="LinkError_Empty" xml:space="preserve"><value>пустая строка</value></data>
+  <data name="LinkError_InvalidBase64" xml:space="preserve"><value>повреждённые данные base64</value></data>
+  <data name="LinkError_InvalidJson" xml:space="preserve"><value>повреждённые данные JSON</value></data>
+  <data name="LinkError_InvalidPort" xml:space="preserve"><value>неверный порт</value></data>
+  <data name="LinkError_Malformed" xml:space="preserve"><value>ссылка повреждена</value></data>
+  <data name="LinkError_MissingCredentials" xml:space="preserve"><value>нет UUID, пароля или метода шифрования</value></data>
+  <data name="LinkError_MissingHost" xml:space="preserve"><value>нет адреса сервера</value></data>
+  <data name="LinkError_UnsupportedScheme" xml:space="preserve"><value>неподдерживаемый тип ссылки</value></data>
+  <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>тип шифрования не поддерживается</value></data>
+  <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>транспорт пока не поддерживается</value></data>
+  <data name="LocalProxyFormat" xml:space="preserve"><value>Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
+  <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
+  <data name="NoProfileSelected" xml:space="preserve"><value>Выберите профиль в списке</value></data>
+  <data name="ProfileWarningsFormat" xml:space="preserve"><value>Предупреждение: {0}</value></data>
+  <data name="ProfilesHeader" xml:space="preserve"><value>Профили</value></data>
+  <data name="ProxyRecoveredAfterCrash" xml:space="preserve"><value>Системный прокси восстановлен после аварийного завершения KHORS.</value></data>
+  <data name="SessionTimeFormat" xml:space="preserve"><value>Время сессии: {0}</value></data>
+  <data name="StatusConnected" xml:space="preserve"><value>Подключено</value></data>
+  <data name="StatusConnecting" xml:space="preserve"><value>Подключение…</value></data>
+  <data name="StatusDisconnected" xml:space="preserve"><value>Отключено</value></data>
+  <data name="StatusDisconnecting" xml:space="preserve"><value>Отключение…</value></data>
+  <data name="StatusFailed" xml:space="preserve"><value>Ошибка подключения</value></data>
+  <data name="StorageCorrupt" xml:space="preserve"><value>Файл профилей повреждён и отложен рядом; начат новый список.</value></data>
+  <data name="StorageReadOnly" xml:space="preserve"><value>Профили сохранены более новой версией KHORS — изменения не записываются.</value></data>
+  <data name="StorageRestoredFromBackup" xml:space="preserve"><value>Файл профилей был повреждён — профили восстановлены из резервной копии.</value></data>
+  <data name="TrayExit" xml:space="preserve"><value>Выход</value></data>
+  <data name="TrayShow" xml:space="preserve"><value>Показать окно</value></data>
+  <data name="TrayTooltipFormat" xml:space="preserve"><value>KHORS — {0}</value></data>
+  <data name="Unsupported_Other" xml:space="preserve"><value>неподдерживаемая возможность</value></data>
+  <data name="Unsupported_core" xml:space="preserve"><value>профилю назначено ядро sing-box</value></data>
+  <data name="Unsupported_protocol_alterId" xml:space="preserve"><value>устаревший VMess (alterId больше 0)</value></data>
+  <data name="Unsupported_protocol_plugin" xml:space="preserve"><value>плагины Shadowsocks</value></data>
+  <data name="Unsupported_security" xml:space="preserve"><value>VLESS/Trojan без TLS к публичному адресу</value></data>
+  <data name="Unsupported_security_allowInsecure" xml:space="preserve"><value>отключённая проверка сертификата (allowInsecure) удалена в Xray 26</value></data>
 </root>

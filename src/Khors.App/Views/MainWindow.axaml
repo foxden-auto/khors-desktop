@@ -5,9 +5,75 @@
         x:Class="Khors.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="{x:Static res:Strings.AppTitle}"
-        Width="420" Height="640"
-        MinWidth="360" MinHeight="480">
-  <TextBlock Text="{Binding Status}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" />
+        Icon="/Assets/khors.ico"
+        Width="420" Height="720"
+        MinWidth="380" MinHeight="560"
+        WindowStartupLocation="CenterScreen">
+  <DockPanel Margin="20">
+
+    <!-- Логотип: та же геометрия, что в Assets/logo.svg (viewBox 40×40). -->
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12">
+      <Viewbox Width="36" Height="36">
+        <Canvas Width="40" Height="40">
+          <Rectangle Width="40" Height="40" RadiusX="10" RadiusY="10" Fill="{DynamicResource KhorsLogoBackgroundBrush}" />
+          <Ellipse Canvas.Left="6" Canvas.Top="6" Width="28" Height="28" Stroke="{DynamicResource KhorsPrimaryBrush}" StrokeThickness="2" />
+          <Path Data="M14,12 L14,28 M26,12 L15,20 L26,28" Stroke="{DynamicResource KhorsPrimaryBrush}" StrokeThickness="3" />
+        </Canvas>
+      </Viewbox>
+      <TextBlock Text="{x:Static res:Strings.AppTitle}" Classes="title" VerticalAlignment="Center" />
+    </StackPanel>
+
+    <!-- Статус и кнопка подключения. -->
+    <Border DockPanel.Dock="Top" Classes="card" Margin="0,20,0,0">
+      <StackPanel Spacing="10">
+        <Button Classes="connect" Classes.connected="{Binding IsConnected}"
+                HorizontalAlignment="Center"
+                Command="{Binding ToggleConnectionCommand}"
+                Content="{Binding ConnectButtonText}" />
+        <TextBlock Text="{Binding StatusText}" Classes="status" Classes.failed="{Binding IsFailed}" HorizontalAlignment="Center" />
+        <TextBlock Text="{Binding ActiveProfileName}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"
+                   IsVisible="{Binding ActiveProfileName, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        <TextBlock Text="{Binding StatusDetail}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
+                   IsVisible="{Binding StatusDetail, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        <TextBlock Text="{Binding SessionTime}" Classes="muted" HorizontalAlignment="Center" IsVisible="{Binding IsConnected}" />
+        <TextBlock Text="{Binding ModeText}" Classes="muted" HorizontalAlignment="Center" />
+        <Expander Header="{x:Static res:Strings.FailureDetails}" IsVisible="{Binding HasLogTail}" HorizontalAlignment="Stretch">
+          <SelectableTextBlock Text="{Binding LogTail}" Classes="log" TextWrapping="Wrap" />
+        </Expander>
+      </StackPanel>
+    </Border>
+
+    <!-- Сообщения: итог импорта, восстановление после сбоя. -->
+    <Border DockPanel.Dock="Bottom" Classes="message" IsVisible="{Binding HasMessage}" Margin="0,12,0,0">
+      <SelectableTextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+    </Border>
+
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,20,0,8">
+      <TextBlock Text="{x:Static res:Strings.ProfilesHeader}" Classes="section" VerticalAlignment="Center" />
+      <Button Grid.Column="1" Classes="secondary" Command="{Binding ImportFromClipboardCommand}" Content="{x:Static res:Strings.ButtonImportClipboard}" />
+    </Grid>
+
+    <Panel>
+      <ListBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Classes="profiles">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:ProfileItemViewModel">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <Ellipse Width="8" Height="8" Margin="0,0,10,0" Classes="active-marker" IsVisible="{Binding IsActive}" VerticalAlignment="Center" />
+              <StackPanel Grid.Column="1" Spacing="2">
+                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{Binding Summary}" Classes="muted small" />
+                <TextBlock Text="{Binding Warning}" Classes="warning small" TextWrapping="Wrap" IsVisible="{Binding HasWarning}" />
+              </StackPanel>
+              <Button Grid.Column="2" Classes="ghost" VerticalAlignment="Center"
+                      Content="{x:Static res:Strings.ButtonDelete}"
+                      Command="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).DeleteProfileCommand}"
+                      CommandParameter="{Binding}" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <TextBlock Text="{x:Static res:Strings.EmptyProfilesHint}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
+                 VerticalAlignment="Center" Margin="24" IsVisible="{Binding HasNoProfiles}" />
+    </Panel>
+  </DockPanel>
 </Window>
