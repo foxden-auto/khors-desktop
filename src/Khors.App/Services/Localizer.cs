@@ -66,10 +66,14 @@ public static class Localizer
         _ => string.Empty,
     };
 
+    /// <summary>Что не поддерживает ядро — по полю профиля (<see cref="CoreConfigError.Field"/>).</summary>
+    public static string DescribeUnsupported(string field) =>
+        TryGet("Unsupported_" + field.Replace('.', '_')) ?? Get("Unsupported_Other");
+
     private static string DescribeUnsupported(CoreConfigError? error) => error switch
     {
         { Code: CoreConfigErrorCode.WrongCore } => Get("Unsupported_core"),
-        { Field: { } field } => TryGet("Unsupported_" + field.Replace('.', '_')) ?? Get("Unsupported_Other"),
+        { Field: { } field } => DescribeUnsupported(field),
         _ => Get("Unsupported_Other"),
     };
 }

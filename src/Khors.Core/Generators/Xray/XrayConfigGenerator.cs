@@ -88,10 +88,13 @@ public static class XrayConfigGenerator
     }
 
     /// <summary>
-    /// Возможности профиля, которые Xray-core 26 не принимает. Такие профили запускаются через sing-box (ROADMAP 2.5).
+    /// Возможность профиля, которую Xray-core 26 не принимает: поле профиля или <c>null</c>, если Xray его запустит
+    /// (без учёта ошибок профиля и выбора ядра). Такие профили автовыбор отдаёт sing-box.
     /// </summary>
-    private static string? FindUnsupported(Profile profile)
+    public static string? FindUnsupported(Profile profile)
     {
+        ArgumentNullException.ThrowIfNull(profile);
+
         // Hysteria2, TUIC и WireGuard запускаются через sing-box (docs/SPEC.md, 3.4).
         if (profile.Protocol.HasOwnTransport)
         {

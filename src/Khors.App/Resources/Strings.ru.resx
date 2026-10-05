@@ -17,6 +17,8 @@
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} МБ</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>В буфере обмена нет текста.</value></data>
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Задержка: {0}</value></data>
+  <data name="CoreAutoFormat" xml:space="preserve"><value>Автоматически (сейчас {0})</value></data>
+  <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>Ядро {0} не запустит этот профиль: {1}. Выбор ядра не изменён.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Лог ядра скопирован в буфер обмена: строк {0}. Адреса и ключи в нём замаскированы.</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку vless://, vmess://, trojan:// или ss:// и нажмите «Вставить из буфера».</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Лог ядра</value></data>
@@ -78,6 +80,7 @@
   <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>тип шифрования не поддерживается</value></data>
   <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>транспорт пока не поддерживается</value></data>
   <data name="LocalProxyFormat" xml:space="preserve"><value>Ядро {2}. Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
+  <data name="MenuCore" xml:space="preserve"><value>Ядро</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Выберите профиль в списке</value></data>
   <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Параметры ссылки, которые KHORS пока не понимает: {0}</value></data>

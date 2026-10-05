@@ -9,7 +9,7 @@ public sealed record SubscriptionMergeResult(EquatableArray<Profile> Profiles, i
 
 /// <summary>
 /// Обновление профилей подписки. То же подключение (совпадает всё, кроме имени и служебных полей)
-/// сохраняет свой Id — выбор пользователя и замеры не теряются. Чистая функция.
+/// сохраняет свой Id и выбранное пользователем ядро — выбор пользователя и замеры не теряются. Чистая функция.
 /// </summary>
 public static class SubscriptionMerge
 {
@@ -47,7 +47,7 @@ public static class SubscriptionMerge
             {
                 var changed = existing.Name != profile.Name || existing.Group != subscription.Name;
                 renamed += existing.Name != profile.Name ? 1 : 0;
-                result.Add(fromSubscription with { Id = existing.Id, UpdatedAt = changed ? now : existing.UpdatedAt });
+                result.Add(fromSubscription with { Id = existing.Id, Core = existing.Core, UpdatedAt = changed ? now : existing.UpdatedAt });
                 kept.Add(existing.Id);
             }
             else

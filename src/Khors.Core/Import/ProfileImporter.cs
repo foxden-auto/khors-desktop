@@ -56,11 +56,11 @@ public static class ProfileImporter
     }
 
     /// <summary>
-    /// Что делает профиль «тем же самым» подключением: всё, кроме имени, группы и служебных полей.
+    /// Что делает профиль «тем же самым» подключением: всё, кроме имени, группы, выбора ядра и служебных полей.
     /// </summary>
     public static Profile Identity(Profile profile)
     {
         ArgumentNullException.ThrowIfNull(profile);
-        return profile with { Id = Guid.Empty, Name = string.Empty, Group = null, SubscriptionId = null, UpdatedAt = default };
+        return profile with { Id = Guid.Empty, Name = string.Empty, Group = null, SubscriptionId = null, UpdatedAt = default, Core = CorePreference.Auto };
     }
 }

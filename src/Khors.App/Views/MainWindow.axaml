@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Khors.App.ViewModels"
         xmlns:res="using:Khors.App.Resources"
+        xmlns:profiles="using:Khors.Core.Profiles"
         x:Class="Khors.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="{x:Static res:Strings.AppTitle}"
@@ -84,7 +85,19 @@
       <ListBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Classes="profiles">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:ProfileItemViewModel">
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" Background="Transparent">
+              <Grid.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="{x:Static res:Strings.MenuCore}">
+                    <MenuItem Header="{Binding CoreAutoText}" ToggleType="Radio" IsChecked="{Binding IsCoreAuto, Mode=OneWay}"
+                              Command="{Binding SetCoreCommand}" CommandParameter="{x:Static profiles:CorePreference.Auto}" />
+                    <MenuItem Header="Xray" ToggleType="Radio" IsChecked="{Binding IsCoreXray, Mode=OneWay}"
+                              Command="{Binding SetCoreCommand}" CommandParameter="{x:Static profiles:CorePreference.Xray}" />
+                    <MenuItem Header="sing-box" ToggleType="Radio" IsChecked="{Binding IsCoreSingBox, Mode=OneWay}"
+                              Command="{Binding SetCoreCommand}" CommandParameter="{x:Static profiles:CorePreference.SingBox}" />
+                  </MenuItem>
+                </ContextMenu>
+              </Grid.ContextMenu>
               <Ellipse Width="8" Height="8" Margin="0,0,10,0" Classes="active-marker" IsVisible="{Binding IsActive}" VerticalAlignment="Center" />
               <StackPanel Grid.Column="1" Spacing="2">
                 <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />

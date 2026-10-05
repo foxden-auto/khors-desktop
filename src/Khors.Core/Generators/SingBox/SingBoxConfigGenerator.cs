@@ -96,12 +96,17 @@ public static class SingBoxConfigGenerator
         return CoreConfigResult.Success(config.ToJsonString(s_jsonOptions));
     }
 
-    /// <summary>Возможности профиля, которых нет в sing-box 1.14 (такие профили — через Xray, ROADMAP 2.5).</summary>
     private const string TunnelDnsTag = "tunnel-dns";
     private const string TunnelDnsServer = "1.1.1.1";
 
-    private static string? FindUnsupported(Profile profile)
+    /// <summary>
+    /// Возможность профиля, которой нет в sing-box 1.14: поле профиля или <c>null</c>, если sing-box его запустит
+    /// (без учёта ошибок профиля и выбора ядра).
+    /// </summary>
+    public static string? FindUnsupported(Profile profile)
     {
+        ArgumentNullException.ThrowIfNull(profile);
+
         switch (profile.Protocol)
         {
             case VlessSettings { Encryption: not "none" }:

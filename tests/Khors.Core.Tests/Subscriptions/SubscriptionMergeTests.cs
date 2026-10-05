@@ -38,6 +38,18 @@ public class SubscriptionMergeTests
     }
 
     [Fact]
+    public void ManualCoreChoiceSurvivesUpdate()
+    {
+        var chosen = Existing(TestProfiles.VlessReality(), "Германия") with { Core = CorePreference.SingBox };
+
+        var result = SubscriptionMerge.Merge([chosen], [Incoming(TestProfiles.VlessReality(), "Германия")], s_subscription, Guid.NewGuid, s_now);
+
+        Assert.Equal(chosen.Id, Assert.Single(result.Profiles).Id);
+        Assert.Equal(CorePreference.SingBox, result.Profiles[0].Core);
+        Assert.Equal(0, result.Added);
+    }
+
+    [Fact]
     public void SameConnectionsKeepIdsRenamesAreTrackedAndMissingAreRemoved()
     {
         var keep = Existing(TestProfiles.VlessReality(), "Германия");

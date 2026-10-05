@@ -1,14 +1,19 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Khors.App.Services;
 using Khors.Core.Profiles;
+using Khors.Engines.Connection;
 using Khors.Engines.Latency;
 
 namespace Khors.App.ViewModels;
 
-/// <summary>Профиль в списке: имя, краткое описание подключения и предупреждение, если есть.</summary>
-public sealed partial class ProfileItemViewModel(Profile profile) : ObservableObject
+/// <summary>Профиль в списке: имя, краткое описание подключения, ядро и предупреждение, если есть.</summary>
+/// <param name="setCore">Смена ядра из контекстного меню (меню живёт во всплывающем окне и не видит модель окна).</param>
+public sealed partial class ProfileItemViewModel(Profile profile, Func<ProfileItemViewModel, CorePreference, Task>? setCore = null) : ObservableObject
 {
     public Profile Profile { get; } = profile;
+
+    public CoreChoice Core { get; } = CoreSelection.Select(profile);
 
     public Guid Id => Profile.Id;
 
@@ -22,12 +27,23 @@ public sealed partial class ProfileItemViewModel(Profile profile) : ObservableOb
         // У Hysteria2/TUIC TLS встроен в QUIC, у WireGuard — свой транспорт: показываем UDP.
         Profile.Protocol.HasOwnTransport ? string.Empty : SecurityName(Profile.Security),
         Profile.Protocol.HasOwnTransport ? "UDP" : TransportName(Profile.Transport),
+        Localizer.CoreName(Core.Core),
     }.Where(s => s.Length > 0));
 
-    public string? Warning { get; } = ProfileValidator.Validate(profile)
+    /// <summary>Сначала — что выбранное ядро не запустит профиль, затем предупреждения валидатора.</summary>
+    public string? Warning { get; } = DescribeCore(profile) ?? ProfileValidator.Validate(profile)
         .Where(i => i.Severity == ProfileIssueSeverity.Warning)
         .Select(i => DescribeWarning(profile, i.Code))
         .FirstOrDefault();
+
+    public bool IsCoreAuto => Profile.Core == CorePreference.Auto;
+
+    public bool IsCoreXray => Profile.Core == CorePreference.Xray;
+
+    public bool IsCoreSingBox => Profile.Core == CorePreference.SingBox;
+
+    /// <summary>«Автоматически (сейчас Xray)» — какое ядро выберет автовыбор.</summary>
+    public string CoreAutoText => Localizer.Format("CoreAutoFormat", Localizer.CoreName(CoreSelection.For(Profile with { Core = CorePreference.Auto })));
 
     public bool HasWarning => Warning is not null;
 
@@ -57,6 +73,13 @@ public sealed partial class ProfileItemViewModel(Profile profile) : ObservableOb
             ? Localizer.Format("LatencyTooltipFormat", (int)Math.Round(first.TotalMilliseconds))
             : null;
     }
+
+    [RelayCommand]
+    private Task SetCoreAsync(CorePreference core) => setCore?.Invoke(this, core) ?? Task.CompletedTask;
+
+    private static string? DescribeCore(Profile profile) => CoreSelection.Select(profile) is { Unsupported: { } field } choice
+        ? Localizer.Format("Failure_UnsupportedByCore", Localizer.CoreName(choice.Core), Localizer.DescribeUnsupported(field))
+        : null;
 
     // Имена неизвестных параметров не секретны (секретны значения) — показываем их, чтобы было ясно, что не поддержано.
     private static string DescribeWarning(Profile profile, ProfileIssueCode code) => code == ProfileIssueCode.UnknownParameters

@@ -1,0 +1,62 @@
+{
+  "description": "Trojan без TLS к публичному адресу: Xray запрещает — через sing-box",
+  "link": "trojan://Fictional-Pa55@trojan.example.com:443?security=none&peer=trojan.example.com#tr",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809,
+    "logLevel": "none"
+  },
+  "expected": {
+    "log": {
+      "disabled": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "trojan",
+        "tag": "proxy",
+        "server": "trojan.example.com",
+        "server_port": 443,
+        "password": "Fictional-Pa55"
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}

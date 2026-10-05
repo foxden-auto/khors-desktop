@@ -1,27 +1,61 @@
 using Khors.Core.Diagnostics;
+using Khors.Core.Generators.SingBox;
+using Khors.Core.Generators.Xray;
 using Khors.Core.Profiles;
 using Khors.Engines.Processes;
 using Khors.Platform;
 
 namespace Khors.Engines.Connection;
 
-/// <summary>Какое ядро запускает профиль (минимальный выбор ROADMAP 2.4; полный автовыбор — 2.5).</summary>
+/// <summary>Выбранное ядро профиля.</summary>
+/// <param name="Automatic">Ядро выбрано автоматически (<see cref="CorePreference.Auto"/>), а не пользователем.</param>
+/// <param name="Unsupported">
+/// Поле профиля, которое выбранное ядро не поддерживает (запуск закончится ошибкой с объяснением);
+/// <c>null</c> — ядро может запустить профиль.
+/// </param>
+public sealed record CoreChoice(CoreKind Core, bool Automatic, string? Unsupported)
+{
+    public bool IsSupported => Unsupported is null;
+}
+
+/// <summary>Какое ядро запускает профиль (docs/SPEC.md, 3.4).</summary>
 public static class CoreSelection
 {
     /// <summary>
-    /// Явный выбор пользователя; иначе Hysteria2, TUIC и WireGuard — sing-box (docs/SPEC.md, 3.4), остальное — Xray
-    /// (в том числе REALITY: sing-box не отправляет X25519MLKEM768).
+    /// Явный выбор пользователя — как есть, даже если ядро не поддерживает профиль (тогда <see cref="CoreChoice.Unsupported"/>).
+    /// Автовыбор: Xray, если он запускает профиль (VLESS, REALITY, XHTTP и др.; sing-box не отправляет X25519MLKEM768),
+    /// иначе sing-box (Hysteria2, TUIC, WireGuard, а также то, что Xray 26 убрал: allowInsecure, VMess с alterId,
+    /// плагины Shadowsocks, VLESS/Trojan без TLS). Если не может ни одно — ядро по умолчанию для протокола и его причина.
     /// </summary>
-    public static CoreKind For(Profile profile)
+    public static CoreChoice Select(Profile profile)
     {
         ArgumentNullException.ThrowIfNull(profile);
-        return profile.Core switch
+        switch (profile.Core)
         {
-            CorePreference.Xray => CoreKind.Xray,
-            CorePreference.SingBox => CoreKind.SingBox,
-            _ => profile.Protocol.HasOwnTransport ? CoreKind.SingBox : CoreKind.Xray,
-        };
+            case CorePreference.Xray:
+                return new CoreChoice(CoreKind.Xray, Automatic: false, XrayConfigGenerator.FindUnsupported(profile));
+            case CorePreference.SingBox:
+                return new CoreChoice(CoreKind.SingBox, Automatic: false, SingBoxConfigGenerator.FindUnsupported(profile));
+        }
+
+        var xray = XrayConfigGenerator.FindUnsupported(profile);
+        if (xray is null)
+        {
+            return new CoreChoice(CoreKind.Xray, Automatic: true, null);
+        }
+
+        var singBox = SingBoxConfigGenerator.FindUnsupported(profile);
+        if (singBox is null)
+        {
+            return new CoreChoice(CoreKind.SingBox, Automatic: true, null);
+        }
+
+        return profile.Protocol.HasOwnTransport
+            ? new CoreChoice(CoreKind.SingBox, Automatic: true, singBox)
+            : new CoreChoice(CoreKind.Xray, Automatic: true, xray);
     }
+
+    public static CoreKind For(Profile profile) => Select(profile).Core;
 }
 
 /// <summary>Запуск ядра заданного вида.</summary>

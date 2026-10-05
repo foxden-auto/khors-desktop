@@ -1,0 +1,85 @@
+{
+  "description": "allowInsecure без pcs: Xray 26 не запускает — автовыбор отдаёт sing-box (insecure)",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@cdn.example.net:443?type=ws&path=%2Fws%3Fed%3D2048&host=cdn.example.net&security=tls&sni=cdn.example.net&alpn=h2%2Chttp%2F1.1&fp=firefox&allowInsecure=1#ws",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809,
+    "logLevel": "none"
+  },
+  "expected": {
+    "log": {
+      "disabled": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "vless",
+        "tag": "proxy",
+        "server": "cdn.example.net",
+        "server_port": 443,
+        "uuid": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+        "packet_encoding": "xudp",
+        "tls": {
+          "enabled": true,
+          "server_name": "cdn.example.net",
+          "insecure": true,
+          "alpn": [
+            "h2",
+            "http/1.1"
+          ],
+          "utls": {
+            "enabled": true,
+            "fingerprint": "firefox"
+          }
+        },
+        "transport": {
+          "type": "ws",
+          "path": "/ws",
+          "headers": {
+            "Host": "cdn.example.net"
+          },
+          "max_early_data": 2048,
+          "early_data_header_name": "Sec-WebSocket-Protocol"
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}

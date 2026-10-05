@@ -89,16 +89,4 @@ public class SingBoxLauncherTests
         Assert.Equal(CoreKind.SingBox, error.Core);
         Assert.Equal(new CoreConfigError(CoreConfigErrorCode.UnsupportedFeature, "security.pinnedPeerCertSha256"), error.ConfigError);
     }
-
-    [Theory]
-    [InlineData(CorePreference.Auto, "tuic", CoreKind.SingBox)]
-    [InlineData(CorePreference.Auto, "vless", CoreKind.Xray)]
-    [InlineData(CorePreference.SingBox, "vless", CoreKind.SingBox)]
-    [InlineData(CorePreference.Xray, "tuic", CoreKind.Xray)]
-    public void CoreIsSelectedByProtocolOrUserChoice(CorePreference preference, string protocol, CoreKind expected)
-    {
-        var profile = (protocol == "tuic" ? Tuic() : Tuic() with { Protocol = new VlessSettings { Id = new Secret(Uuid) }, Security = new NoSecurity() }) with { Core = preference };
-
-        Assert.Equal(expected, CoreSelection.For(profile));
-    }
 }

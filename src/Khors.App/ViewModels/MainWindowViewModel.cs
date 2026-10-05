@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Khors.App.Services;
+using Khors.Core.Profiles;
 using Khors.Core.Storage;
 using Khors.Engines.Connection;
 using Khors.Engines.Latency;
@@ -350,6 +351,37 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         _profiles.Remove(item.Id);
     }
 
+    /// <summary>
+    /// Ручной выбор ядра (docs/SPEC.md, 3.4). Ядро, которое не запустит профиль, не сохраняется — вместо этого
+    /// объяснение. Если профиль подключён, он переподключается на новом ядре.
+    /// </summary>
+    private async Task SetCoreAsync(ProfileItemViewModel item, CorePreference core)
+    {
+        if (_profiles.IsReadOnly || item.Profile.Core == core)
+        {
+            ReloadProfiles();
+            return;
+        }
+
+        var updated = item.Profile with { Core = core };
+        if (core != CorePreference.Auto && CoreSelection.Select(updated) is { Unsupported: { } field } choice)
+        {
+            Message = Localizer.Format("CoreChoiceRejectedFormat", Localizer.CoreName(choice.Core), Localizer.DescribeUnsupported(field));
+            // Пункт меню уже отмечен — вернуть отметку на сохранённый выбор.
+            ReloadProfiles();
+            return;
+        }
+
+        Message = null;
+        var reconnect = _connection.Status.Profile?.Id == item.Id && State is ConnectionState.Connected or ConnectionState.Connecting;
+        _profiles.Update(updated);
+        if (reconnect)
+        {
+            var settings = _settings.Current;
+            await _connection.ConnectAsync(updated, new CoreStartPreferences(settings.SocksPort, settings.HttpPort, settings.CoreLogLevel)).ConfigureAwait(true);
+        }
+    }
+
     partial void OnSelectedProfileChanged(ProfileItemViewModel? value)
     {
         if (value is not null && value.Id != _settings.Current.SelectedProfileId)
@@ -378,7 +410,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         Profiles.Clear();
         foreach (var profile in _profiles.Profiles)
         {
-            var item = new ProfileItemViewModel(profile);
+            var item = new ProfileItemViewModel(profile, SetCoreAsync);
             if (_latency.TryGetValue(profile.Id, out var latency))
             {
                 item.SetLatency(latency);

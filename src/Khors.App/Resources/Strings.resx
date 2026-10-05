@@ -17,6 +17,8 @@
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} MB</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>The clipboard contains no text.</value></data>
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Latency: {0}</value></data>
+  <data name="CoreAutoFormat" xml:space="preserve"><value>Automatic (now {0})</value></data>
+  <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>The {0} core cannot run this profile: {1}. The core choice was not changed.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Core log copied to the clipboard: {0} lines. Addresses and keys are masked.</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a vless://, vmess://, trojan:// or ss:// link and press “Paste from clipboard”.</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Core log</value></data>
@@ -78,6 +80,7 @@
   <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>security type is not supported</value></data>
   <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>transport is not supported yet</value></data>
   <data name="LocalProxyFormat" xml:space="preserve"><value>Core: {2}. Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
+  <data name="MenuCore" xml:space="preserve"><value>Core</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Mode: system proxy</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Select a profile below</value></data>
   <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Link parameters KHORS does not understand yet: {0}</value></data>

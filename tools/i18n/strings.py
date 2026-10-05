@@ -36,6 +36,11 @@ STRINGS = {
     "ClipboardEmpty": ("В буфере обмена нет текста.", "The clipboard contains no text."),
     "ProfileWarningsFormat": ("Предупреждение: {0}", "Warning: {0}"),
     "ProfileUnknownParamsFormat": ("Параметры ссылки, которые KHORS пока не понимает: {0}", "Link parameters KHORS does not understand yet: {0}"),
+    # Выбор ядра (контекстное меню профиля); названия ядер не переводятся
+    "MenuCore": ("Ядро", "Core"),
+    "CoreAutoFormat": ("Автоматически (сейчас {0})", "Automatic (now {0})"),
+    "CoreChoiceRejectedFormat": ("Ядро {0} не запустит этот профиль: {1}. Выбор ядра не изменён.",
+                                 "The {0} core cannot run this profile: {1}. The core choice was not changed."),
     # Тест задержки (LatencyStatus)
     "ButtonTestLatency": ("Задержка", "Latency"),
     "TestLatencyTooltip": ("Проверить задержку всех профилей", "Test latency of all profiles"),

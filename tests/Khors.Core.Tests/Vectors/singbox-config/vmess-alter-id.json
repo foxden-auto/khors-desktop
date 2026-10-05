@@ -1,0 +1,68 @@
+{
+  "description": "VMess с alterId > 0: в Xray только AEAD — через sing-box",
+  "link": "vmess://eyJ2IjoiMiIsInBzIjoibGVnYWN5IiwiYWRkIjoidm0uZXhhbXBsZS5jb20iLCJwb3J0IjoiNDQzIiwiaWQiOiIzZjFjMmE5ZS03YjRkLTRlOGEtOWMyMS01ZDZlN2Y4MDlhMWIiLCJhaWQiOiI2NCIsInNjeSI6ImF1dG8iLCJuZXQiOiJ0Y3AiLCJ0eXBlIjoibm9uZSIsInRscyI6InRscyIsInNuaSI6InZtLmV4YW1wbGUuY29tIn0=",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809,
+    "logLevel": "none"
+  },
+  "expected": {
+    "log": {
+      "disabled": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "vmess",
+        "tag": "proxy",
+        "server": "vm.example.com",
+        "server_port": 443,
+        "uuid": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+        "security": "auto",
+        "alter_id": 64,
+        "tls": {
+          "enabled": true,
+          "server_name": "vm.example.com"
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}
