@@ -4,4 +4,7 @@
     <ProjectReference Include="..\Khors.Core\Khors.Core.csproj" />
     <ProjectReference Include="..\Khors.Platform.Abstractions\Khors.Platform.Abstractions.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Khors.Engines.Tests" />
+  </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 # Сквозная проверка сторожа системного прокси (только CI: меняет системный прокси).
-# Запускает khors-devcli с --system-proxy, жёстко завершает его (TerminateProcess) и проверяет,
-# что сторож вернул прежние настройки прокси за ≤ 5 с.
+# Запускает khors-devcli с --system-proxy; завершает сторожа и проверяет, что он перезапущен;
+# затем жёстко завершает утилиту (TerminateProcess) и проверяет, что сторож вернул прокси за ≤ 5 с.
 param([string]$DevCli = "artifacts/devcli-win-x64/khors-devcli.exe")
 
 $ErrorActionPreference = "Stop"
@@ -10,6 +10,10 @@ $output = Join-Path ([IO.Path]::GetTempPath()) "khors-devcli-watchdog.txt"
 function Get-ProxyState {
     $p = Get-ItemProperty $key
     [pscustomobject]@{ Enable = [int]$p.ProxyEnable; Server = [string]$p.ProxyServer }
+}
+
+function Get-WatchdogIds {
+    @(Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*--khors-system-proxy-watchdog*" } | ForEach-Object { $_.ProcessId })
 }
 
 function Wait-Until([scriptblock]$Condition, [int]$Seconds) {
@@ -30,6 +34,14 @@ $process = Start-Process $DevCli -ArgumentList $link, "--system-proxy", "--socks
 try {
     $enabled = Wait-Until { $s = Get-ProxyState; $s.Enable -eq 1 -and $s.Server -like "127.0.0.1:*" } 30
     if (-not $enabled) { throw "Системный прокси не включился: $(Get-ProxyState | ConvertTo-Json -Compress)" }
+
+    # Сторожа «по ошибке» сняли в Диспетчере задач — должен появиться новый.
+    $watchdogs = Get-WatchdogIds
+    if ($watchdogs.Count -ne 1) { throw "Ожидался один сторож, найдено: $($watchdogs.Count)" }
+    Stop-Process -Id $watchdogs[0] -Force
+    $restarted = Wait-Until { $ids = Get-WatchdogIds; $ids.Count -eq 1 -and $ids[0] -ne $watchdogs[0] } 5
+    if (-not $restarted) { throw "Сторож не перезапущен после завершения" }
+    Write-Host "OK: сторож перезапущен после завершения."
 
     Stop-Process -Id $process.Id -Force
 

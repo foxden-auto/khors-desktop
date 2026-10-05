@@ -10,46 +10,40 @@ namespace Khors.Engines;
 /// который ждёт завершения KHORS и, если тот не успел откатить прокси (kill, TerminateProcess),
 /// вызывает <see cref="ISystemProxy.RecoverAfterCrash"/>. При штатном выходе KHORS сам удаляет журнал,
 /// и сторож завершается, ничего не меняя (CLAUDE.md, правило 9).
+/// Если сторожа завершили, пока KHORS работает, он запускается заново (<see cref="WatchdogKeeper"/>).
 /// </summary>
 public static class SystemProxyWatchdog
 {
     public const string Argument = "--khors-system-proxy-watchdog";
 
-    private static readonly Lock s_lock = new();
-    private static Process? s_watchdog;
+    private static readonly WatchdogKeeper s_keeper = new(CreateStartInfo);
 
-    /// <summary>Запускает сторожа для текущего процесса, если он ещё не запущен. Вызывать перед включением прокси.</summary>
-    public static void EnsureStarted()
+    /// <summary>
+    /// Запускает сторожа для текущего процесса, если он ещё не запущен, и дальше держит его запущенным.
+    /// Вызывать перед включением прокси.
+    /// </summary>
+    public static void EnsureStarted() => s_keeper.EnsureStarted();
+
+    private static ProcessStartInfo CreateStartInfo()
     {
-        lock (s_lock)
+        using var current = Process.GetCurrentProcess();
+        var startInfo = new ProcessStartInfo(Environment.ProcessPath ?? throw new InvalidOperationException("Process path is unknown."))
         {
-            if (s_watchdog is { HasExited: false })
-            {
-                return;
-            }
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
 
-            s_watchdog?.Dispose();
-
-            using var current = Process.GetCurrentProcess();
-            var startInfo = new ProcessStartInfo(Environment.ProcessPath ?? throw new InvalidOperationException("Process path is unknown."))
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
-
-            // Запуск через «dotnet app.dll»: первым аргументом нужна сборка приложения.
-            if (Path.GetFileNameWithoutExtension(startInfo.FileName).Equals("dotnet", StringComparison.OrdinalIgnoreCase)
-                && Assembly.GetEntryAssembly()?.Location is { Length: > 0 } entryAssembly)
-            {
-                startInfo.ArgumentList.Add(entryAssembly);
-            }
-
-            startInfo.ArgumentList.Add(Argument);
-            startInfo.ArgumentList.Add(current.Id.ToString(CultureInfo.InvariantCulture));
-            startInfo.ArgumentList.Add(current.StartTime.ToUniversalTime().Ticks.ToString(CultureInfo.InvariantCulture));
-
-            s_watchdog = Process.Start(startInfo);
+        // Запуск через «dotnet app.dll»: первым аргументом нужна сборка приложения.
+        if (Path.GetFileNameWithoutExtension(startInfo.FileName).Equals("dotnet", StringComparison.OrdinalIgnoreCase)
+            && Assembly.GetEntryAssembly()?.Location is { Length: > 0 } entryAssembly)
+        {
+            startInfo.ArgumentList.Add(entryAssembly);
         }
+
+        startInfo.ArgumentList.Add(Argument);
+        startInfo.ArgumentList.Add(current.Id.ToString(CultureInfo.InvariantCulture));
+        startInfo.ArgumentList.Add(current.StartTime.ToUniversalTime().Ticks.ToString(CultureInfo.InvariantCulture));
+        return startInfo;
     }
 
     /// <summary>
