@@ -10,7 +10,9 @@
   <data name="ButtonDelete" xml:space="preserve"><value>Delete</value></data>
   <data name="ButtonDisconnect" xml:space="preserve"><value>Disconnect</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Paste from clipboard</value></data>
+  <data name="ButtonTestLatency" xml:space="preserve"><value>Latency</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>The clipboard contains no text.</value></data>
+  <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Latency: {0}</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a vless://, vmess://, trojan:// or ss:// link and press “Paste from clipboard”.</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Core log</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>Xray exited unexpectedly (code {0}). System proxy restored.</value></data>
@@ -46,6 +48,11 @@
   <data name="Issue_TransportModeUnknown" xml:space="preserve"><value>unknown transport mode</value></data>
   <data name="Issue_UnknownParameters" xml:space="preserve"><value>the link has parameters KHORS does not understand yet</value></data>
   <data name="Issue_XhttpExtraInvalid" xml:space="preserve"><value>XHTTP extra is not a JSON object</value></data>
+  <data name="LatencyTesting" xml:space="preserve"><value>testing…</value></data>
+  <data name="Latency_Failed" xml:space="preserve"><value>no response</value></data>
+  <data name="Latency_Ok" xml:space="preserve"><value>{0} ms</value></data>
+  <data name="Latency_Timeout" xml:space="preserve"><value>timeout</value></data>
+  <data name="Latency_Unsupported" xml:space="preserve"><value>not supported</value></data>
   <data name="LinkError_Empty" xml:space="preserve"><value>empty line</value></data>
   <data name="LinkError_InvalidBase64" xml:space="preserve"><value>damaged base64 data</value></data>
   <data name="LinkError_InvalidJson" xml:space="preserve"><value>damaged JSON data</value></data>
@@ -72,6 +79,7 @@
   <data name="StorageCorrupt" xml:space="preserve"><value>The profiles file is damaged and was set aside; starting a new list.</value></data>
   <data name="StorageReadOnly" xml:space="preserve"><value>Profiles were saved by a newer KHORS version — changes are not saved.</value></data>
   <data name="StorageRestoredFromBackup" xml:space="preserve"><value>The profiles file was damaged — profiles restored from the backup.</value></data>
+  <data name="TestLatencyTooltip" xml:space="preserve"><value>Test latency of all profiles</value></data>
   <data name="TrayExit" xml:space="preserve"><value>Exit</value></data>
   <data name="TrayShow" xml:space="preserve"><value>Show window</value></data>
   <data name="TrayTooltipFormat" xml:space="preserve"><value>KHORS — {0}</value></data>

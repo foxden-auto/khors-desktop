@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Khors.App.Services;
 using Khors.Core.Profiles;
+using Khors.Engines.Latency;
 
 namespace Khors.App.ViewModels;
 
@@ -25,6 +26,23 @@ public sealed partial class ProfileItemViewModel(Profile profile) : ObservableOb
 
     [ObservableProperty]
     public partial bool IsActive { get; set; }
+
+    /// <summary>Итог теста задержки: «123 мс», «тайм-аут», «проверка…»; <c>null</c> — не проверялся.</summary>
+    [ObservableProperty]
+    public partial string? LatencyText { get; set; }
+
+    [ObservableProperty]
+    public partial bool LatencyOk { get; set; }
+
+    [ObservableProperty]
+    public partial bool LatencyBad { get; set; }
+
+    public void SetLatency(LatencyResult? result)
+    {
+        LatencyText = result is null ? Localizer.Get("LatencyTesting") : Localizer.Describe(result);
+        LatencyOk = result?.Status == LatencyStatus.Ok;
+        LatencyBad = result is not null && result.Status != LatencyStatus.Ok;
+    }
 
     // Имена неизвестных параметров не секретны (секретны значения) — показываем их, чтобы было ясно, что не поддержано.
     private static string DescribeWarning(Profile profile, ProfileIssueCode code) => code == ProfileIssueCode.UnknownParameters

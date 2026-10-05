@@ -10,7 +10,9 @@
   <data name="ButtonDelete" xml:space="preserve"><value>Удалить</value></data>
   <data name="ButtonDisconnect" xml:space="preserve"><value>Отключить</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Вставить из буфера</value></data>
+  <data name="ButtonTestLatency" xml:space="preserve"><value>Задержка</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>В буфере обмена нет текста.</value></data>
+  <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Задержка: {0}</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку vless://, vmess://, trojan:// или ss:// и нажмите «Вставить из буфера».</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Лог ядра</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>Xray неожиданно завершился (код {0}). Системный прокси возвращён.</value></data>
@@ -46,6 +48,11 @@
   <data name="Issue_TransportModeUnknown" xml:space="preserve"><value>неизвестный режим транспорта</value></data>
   <data name="Issue_UnknownParameters" xml:space="preserve"><value>в ссылке есть параметры, которые KHORS пока не понимает</value></data>
   <data name="Issue_XhttpExtraInvalid" xml:space="preserve"><value>параметр extra XHTTP — не JSON-объект</value></data>
+  <data name="LatencyTesting" xml:space="preserve"><value>проверка…</value></data>
+  <data name="Latency_Failed" xml:space="preserve"><value>нет ответа</value></data>
+  <data name="Latency_Ok" xml:space="preserve"><value>{0} мс</value></data>
+  <data name="Latency_Timeout" xml:space="preserve"><value>тайм-аут</value></data>
+  <data name="Latency_Unsupported" xml:space="preserve"><value>не поддерживается</value></data>
   <data name="LinkError_Empty" xml:space="preserve"><value>пустая строка</value></data>
   <data name="LinkError_InvalidBase64" xml:space="preserve"><value>повреждённые данные base64</value></data>
   <data name="LinkError_InvalidJson" xml:space="preserve"><value>повреждённые данные JSON</value></data>
@@ -72,6 +79,7 @@
   <data name="StorageCorrupt" xml:space="preserve"><value>Файл профилей повреждён и отложен рядом; начат новый список.</value></data>
   <data name="StorageReadOnly" xml:space="preserve"><value>Профили сохранены более новой версией KHORS — изменения не записываются.</value></data>
   <data name="StorageRestoredFromBackup" xml:space="preserve"><value>Файл профилей был повреждён — профили восстановлены из резервной копии.</value></data>
+  <data name="TestLatencyTooltip" xml:space="preserve"><value>Проверить задержку всех профилей</value></data>
   <data name="TrayExit" xml:space="preserve"><value>Выход</value></data>
   <data name="TrayShow" xml:space="preserve"><value>Показать окно</value></data>
   <data name="TrayTooltipFormat" xml:space="preserve"><value>KHORS — {0}</value></data>

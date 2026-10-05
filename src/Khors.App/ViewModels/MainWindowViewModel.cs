@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using Khors.App.Services;
 using Khors.Core.Storage;
 using Khors.Engines.Connection;
+using Khors.Engines.Latency;
 using Khors.Engines.Storage;
 
 namespace Khors.App.ViewModels;
@@ -17,14 +18,17 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly SettingsStore _settings;
     private readonly ConnectionManager _connection;
     private readonly IClipboardText _clipboard;
+    private readonly ICoreLauncher _launcher;
     private readonly DispatcherTimer _sessionTimer;
+    private readonly Dictionary<Guid, LatencyResult> _latency = [];
 
-    public MainWindowViewModel(ProfileRepository profiles, SettingsStore settings, ConnectionManager connection, IClipboardText clipboard)
+    public MainWindowViewModel(ProfileRepository profiles, SettingsStore settings, ConnectionManager connection, IClipboardText clipboard, ICoreLauncher launcher)
     {
         _profiles = profiles;
         _settings = settings;
         _connection = connection;
         _clipboard = clipboard;
+        _launcher = launcher;
         _sessionTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => UpdateSessionTime());
 
         ReloadProfiles();
@@ -65,6 +69,14 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial string? LogTail { get; set; }
+
+    /// <summary>Задержка текущего подключения («Задержка: 123 мс»).</summary>
+    [ObservableProperty]
+    public partial string? ConnectionLatency { get; set; }
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(TestLatencyCommand))]
+    public partial bool IsTestingLatency { get; set; }
 
     public bool IsConnected => State == ConnectionState.Connected;
 
@@ -167,6 +179,76 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>Тест задержки всех профилей: подключённый — через текущее ядро, остальные — через временное (не больше 3 одновременно).</summary>
+    [RelayCommand(CanExecute = nameof(CanTestLatency))]
+    private async Task TestLatencyAsync()
+    {
+        IsTestingLatency = true;
+        try
+        {
+            var items = Profiles.ToList();
+            foreach (var item in items)
+            {
+                item.SetLatency(null);
+            }
+
+            using var parallel = new SemaphoreSlim(3);
+            await Task.WhenAll(items.Select(async item =>
+            {
+                await parallel.WaitAsync().ConfigureAwait(true);
+                try
+                {
+                    var result = await MeasureAsync(item).ConfigureAwait(true);
+                    _latency[item.Id] = result;
+                    item.SetLatency(result);
+                }
+                finally
+                {
+                    parallel.Release();
+                }
+            })).ConfigureAwait(true);
+        }
+        finally
+        {
+            IsTestingLatency = false;
+        }
+    }
+
+    private bool CanTestLatency() => !IsTestingLatency;
+
+    private Task<LatencyResult> MeasureAsync(ProfileItemViewModel item)
+    {
+        var url = LatencyUrl();
+        return _connection.Status is { State: ConnectionState.Connected, HttpPort: { } port, Profile: { } active } && active.Id == item.Id
+            ? LatencyTester.MeasureThroughProxyAsync(port, url, LatencyTester.DefaultTimeout)
+            : LatencyTester.MeasureProfileAsync(item.Profile, _launcher, url, LatencyTester.DefaultTimeout);
+    }
+
+    private Uri LatencyUrl() =>
+        Uri.TryCreate(_settings.Current.LatencyTestUrl, UriKind.Absolute, out var url) && url.Scheme is "http" or "https"
+            ? url
+            : LatencyTester.DefaultTestUrl;
+
+    /// <summary>После подключения — один замер через текущее ядро.</summary>
+    private async Task MeasureConnectionAsync(ConnectionStatus status)
+    {
+        if (status is not { HttpPort: { } port, Profile: { } profile })
+        {
+            return;
+        }
+
+        ConnectionLatency = Localizer.Format("ConnectionLatencyFormat", Localizer.Get("LatencyTesting"));
+        var result = await LatencyTester.MeasureThroughProxyAsync(port, LatencyUrl(), LatencyTester.DefaultTimeout).ConfigureAwait(true);
+
+        // Пока шёл замер, могли отключиться или переключиться.
+        if (_connection.Status is { State: ConnectionState.Connected, Profile: { } current } && current.Id == profile.Id)
+        {
+            ConnectionLatency = Localizer.Format("ConnectionLatencyFormat", Localizer.Describe(result));
+            _latency[profile.Id] = result;
+            Profiles.FirstOrDefault(p => p.Id == profile.Id)?.SetLatency(result);
+        }
+    }
+
     [RelayCommand]
     private async Task DeleteProfileAsync(ProfileItemViewModel? item)
     {
@@ -211,7 +293,13 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         Profiles.Clear();
         foreach (var profile in _profiles.Profiles)
         {
-            Profiles.Add(new ProfileItemViewModel(profile));
+            var item = new ProfileItemViewModel(profile);
+            if (_latency.TryGetValue(profile.Id, out var latency))
+            {
+                item.SetLatency(latency);
+            }
+
+            Profiles.Add(item);
         }
 
         SelectedProfile = Profiles.FirstOrDefault(p => p.Id == selectedId) ?? Profiles.FirstOrDefault();
@@ -221,6 +309,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
 
     private void ApplyStatus(ConnectionStatus status)
     {
+        var justConnected = status.State == ConnectionState.Connected && State != ConnectionState.Connected;
         State = status.State;
         ActiveProfileName = status.Profile?.Name;
         StatusText = Localizer.Get($"Status{status.State}");
@@ -248,6 +337,15 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
 
         UpdateSessionTime();
         MarkActiveProfile();
+
+        if (status.State != ConnectionState.Connected)
+        {
+            ConnectionLatency = null;
+        }
+        else if (justConnected)
+        {
+            _ = MeasureConnectionAsync(status);
+        }
     }
 
     private void UpdateSessionTime()

@@ -39,6 +39,11 @@ public class LocalizationTests
                 keys.Add($"Failure_{kind}");
             }
 
+            foreach (var status in Enum.GetNames<Khors.Engines.Latency.LatencyStatus>())
+            {
+                keys.Add($"Latency_{status}");
+            }
+
             foreach (var state in Enum.GetNames<ConnectionState>())
             {
                 keys.Add($"Status{state}");

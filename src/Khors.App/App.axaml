@@ -124,6 +124,15 @@
       <Setter Property="Background" Value="{DynamicResource KhorsAccentBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource KhorsPrimaryBrush}" />
     </Style>
+    <Style Selector="TextBlock.latency">
+      <Setter Property="Foreground" Value="{DynamicResource KhorsMutedForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.latency.ok">
+      <Setter Property="Foreground" Value="{DynamicResource KhorsPrimaryBrush}" />
+    </Style>
+    <Style Selector="TextBlock.latency.bad">
+      <Setter Property="Foreground" Value="{DynamicResource KhorsDestructiveBrush}" />
+    </Style>
     <Style Selector="Ellipse.active-marker">
       <Setter Property="Fill" Value="{DynamicResource KhorsPrimaryBrush}" />
     </Style>

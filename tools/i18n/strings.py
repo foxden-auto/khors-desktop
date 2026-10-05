@@ -34,6 +34,15 @@ STRINGS = {
     "ClipboardEmpty": ("В буфере обмена нет текста.", "The clipboard contains no text."),
     "ProfileWarningsFormat": ("Предупреждение: {0}", "Warning: {0}"),
     "ProfileUnknownParamsFormat": ("Параметры ссылки, которые KHORS пока не понимает: {0}", "Link parameters KHORS does not understand yet: {0}"),
+    # Тест задержки (LatencyStatus)
+    "ButtonTestLatency": ("Задержка", "Latency"),
+    "TestLatencyTooltip": ("Проверить задержку всех профилей", "Test latency of all profiles"),
+    "LatencyTesting": ("проверка…", "testing…"),
+    "ConnectionLatencyFormat": ("Задержка: {0}", "Latency: {0}"),
+    "Latency_Ok": ("{0} мс", "{0} ms"),
+    "Latency_Timeout": ("тайм-аут", "timeout"),
+    "Latency_Failed": ("нет ответа", "no response"),
+    "Latency_Unsupported": ("не поддерживается", "not supported"),
     # Хранилище и восстановление
     "ProxyRecoveredAfterCrash": ("Системный прокси восстановлен после аварийного завершения KHORS.", "System proxy restored after KHORS terminated unexpectedly."),
     "StorageRestoredFromBackup": ("Файл профилей был повреждён — профили восстановлены из резервной копии.", "The profiles file was damaged — profiles restored from the backup."),

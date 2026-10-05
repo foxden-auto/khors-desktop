@@ -18,13 +18,15 @@ public sealed record ProfileDocument
 /// <param name="HttpPort">Желаемый порт HTTP-входа (на него указывает системный прокси).</param>
 /// <param name="CoreLogLevel">Уровень лога ядра.</param>
 /// <param name="Language">Язык интерфейса (ru, en); <c>null</c> — как в системе.</param>
+/// <param name="LatencyTestUrl">Адрес теста задержки: запрос через прокси, ожидается ответ 204 или 200.</param>
 public sealed record AppSettings(
     int SchemaVersion = AppSettings.CurrentSchemaVersion,
     Guid? SelectedProfileId = null,
     int SocksPort = 10808,
     int HttpPort = 10809,
     string CoreLogLevel = "warning",
-    string? Language = null)
+    string? Language = null,
+    string LatencyTestUrl = "https://cp.cloudflare.com/generate_204")
 {
     public const int CurrentSchemaVersion = 1;
 }

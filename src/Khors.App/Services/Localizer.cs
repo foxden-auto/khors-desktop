@@ -4,6 +4,7 @@ using Khors.Core.Generators;
 using Khors.Core.Import;
 using Khors.Core.Profiles;
 using Khors.Engines.Connection;
+using Khors.Engines.Latency;
 
 namespace Khors.App.Services;
 
@@ -24,6 +25,14 @@ public static class Localizer
     }
 
     public static string Describe(ProfileIssueCode code) => Get($"Issue_{code}");
+
+    public static string Describe(LatencyResult result)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        return result is { Status: LatencyStatus.Ok, Delay: { } delay }
+            ? Format("Latency_Ok", (int)Math.Round(delay.TotalMilliseconds))
+            : Get($"Latency_{result.Status}");
+    }
 
     public static string Describe(ConnectionFailure failure)
     {

@@ -30,6 +30,8 @@
         <TextBlock Text="{Binding StatusDetail}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
                    IsVisible="{Binding StatusDetail, Converter={x:Static ObjectConverters.IsNotNull}}" />
         <TextBlock Text="{Binding SessionTime}" Classes="muted" HorizontalAlignment="Center" IsVisible="{Binding IsConnected}" />
+        <TextBlock Text="{Binding ConnectionLatency}" Classes="muted" HorizontalAlignment="Center"
+                   IsVisible="{Binding ConnectionLatency, Converter={x:Static ObjectConverters.IsNotNull}}" />
         <TextBlock Text="{Binding ModeText}" Classes="muted" HorizontalAlignment="Center" />
         <Expander Header="{x:Static res:Strings.FailureDetails}" IsVisible="{Binding HasLogTail}" HorizontalAlignment="Stretch">
           <SelectableTextBlock Text="{Binding LogTail}" Classes="log" TextWrapping="Wrap" />
@@ -42,23 +44,27 @@
       <SelectableTextBlock Text="{Binding Message}" TextWrapping="Wrap" />
     </Border>
 
-    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,20,0,8">
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,20,0,8">
       <TextBlock Text="{x:Static res:Strings.ProfilesHeader}" Classes="section" VerticalAlignment="Center" />
-      <Button Grid.Column="1" Classes="secondary" Command="{Binding ImportFromClipboardCommand}" Content="{x:Static res:Strings.ButtonImportClipboard}" />
+      <Button Grid.Column="1" Classes="secondary" Margin="0,0,8,0" Command="{Binding TestLatencyCommand}"
+              Content="{x:Static res:Strings.ButtonTestLatency}" ToolTip.Tip="{x:Static res:Strings.TestLatencyTooltip}" />
+      <Button Grid.Column="2" Classes="secondary" Command="{Binding ImportFromClipboardCommand}" Content="{x:Static res:Strings.ButtonImportClipboard}" />
     </Grid>
 
     <Panel>
       <ListBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Classes="profiles">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:ProfileItemViewModel">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
               <Ellipse Width="8" Height="8" Margin="0,0,10,0" Classes="active-marker" IsVisible="{Binding IsActive}" VerticalAlignment="Center" />
               <StackPanel Grid.Column="1" Spacing="2">
                 <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
                 <TextBlock Text="{Binding Summary}" Classes="muted small" />
                 <TextBlock Text="{Binding Warning}" Classes="warning small" TextWrapping="Wrap" IsVisible="{Binding HasWarning}" />
               </StackPanel>
-              <Button Grid.Column="2" Classes="ghost" VerticalAlignment="Center"
+              <TextBlock Grid.Column="2" Text="{Binding LatencyText}" Classes="small latency" VerticalAlignment="Center" Margin="8,0,0,0"
+                         Classes.ok="{Binding LatencyOk}" Classes.bad="{Binding LatencyBad}" />
+              <Button Grid.Column="3" Classes="ghost" VerticalAlignment="Center"
                       Content="{x:Static res:Strings.ButtonDelete}"
                       Command="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).DeleteProfileCommand}"
                       CommandParameter="{Binding}" />
