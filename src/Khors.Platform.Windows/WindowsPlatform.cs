@@ -17,7 +17,10 @@ public static class WindowsPlatform
         return services;
     }
 
+    /// <summary>Данные пользователя: <c>%APPDATA%\KHORS</c> (профили, настройки).</summary>
+    public static string DataDirectory { get; } =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "KHORS");
+
     /// <summary>Состояние для отката изменений системы: <c>%APPDATA%\KHORS\state</c>.</summary>
-    public static string StateDirectory { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "KHORS", "state");
+    public static string StateDirectory { get; } = Path.Combine(DataDirectory, "state");
 }
