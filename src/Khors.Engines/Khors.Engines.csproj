@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Khors.Core\Khors.Core.csproj" />
     <ProjectReference Include="..\Khors.Platform.Abstractions\Khors.Platform.Abstractions.csproj" />
+    <ProjectReference Include="..\Khors.Ipc\Khors.Ipc.csproj" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Khors.Engines.Tests" />

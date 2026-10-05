@@ -106,7 +106,11 @@
   <data name="MenuImportFile" xml:space="preserve"><value>Из файла…</value></data>
   <data name="MenuImportScreen" xml:space="preserve"><value>QR-код с экрана</value></data>
   <data name="MenuShowQr" xml:space="preserve"><value>Показать QR-код</value></data>
-  <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
+  <data name="ModeLabel" xml:space="preserve"><value>Режим:</value></data>
+  <data name="ModeProxyOption" xml:space="preserve"><value>Системный прокси</value></data>
+  <data name="ModeProxyTooltip" xml:space="preserve"><value>Через KHORS идут программы, которые используют системный прокси Windows (браузеры и большинство приложений)</value></data>
+  <data name="ModeTunOption" xml:space="preserve"><value>TUN</value></data>
+  <data name="ModeTunTooltip" xml:space="preserve"><value>Весь трафик компьютера через KHORS — в том числе игры и программы без поддержки прокси. Нужна работающая служба KHORS (внизу окна).</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Выберите профиль в списке</value></data>
   <data name="Problem_AuthenticationFailed" xml:space="preserve"><value>Сервер отклонил пароль. Проверьте пароль в профиле или обновите подписку.</value></data>
   <data name="Problem_CertificateExpired" xml:space="preserve"><value>Сертификат сервера просрочен или ещё не действует. Проверьте дату и время на компьютере.</value></data>
@@ -184,6 +188,7 @@
   <data name="TrayExit" xml:space="preserve"><value>Выход</value></data>
   <data name="TrayShow" xml:space="preserve"><value>Показать окно</value></data>
   <data name="TrayTooltipFormat" xml:space="preserve"><value>KHORS — {0}</value></data>
+  <data name="TunConnectedFormat" xml:space="preserve"><value>Ядро {0}. Весь трафик идёт через адаптер TUN KHORS.</value></data>
   <data name="Unsupported_Other" xml:space="preserve"><value>неподдерживаемая возможность</value></data>
   <data name="Unsupported_core" xml:space="preserve"><value>профилю вручную назначено другое ядро</value></data>
   <data name="Unsupported_protocol" xml:space="preserve"><value>Hysteria2, TUIC и WireGuard работают только через sing-box</value></data>

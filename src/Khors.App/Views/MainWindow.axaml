@@ -35,7 +35,15 @@
         <TextBlock Text="{Binding SessionTime}" Classes="muted" HorizontalAlignment="Center" IsVisible="{Binding IsConnected}" />
         <TextBlock Text="{Binding ConnectionLatency}" Classes="muted" HorizontalAlignment="Center"
                    IsVisible="{Binding ConnectionLatency, Converter={x:Static ObjectConverters.IsNotNull}}" />
-        <TextBlock Text="{Binding ModeText}" Classes="muted" HorizontalAlignment="Center" />
+        <!-- Режим: системный прокси или TUN через службу; меняется без подключения. -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+          <TextBlock Text="{x:Static res:Strings.ModeLabel}" Classes="muted" VerticalAlignment="Center" />
+          <RadioButton GroupName="mode" IsChecked="{Binding IsProxyMode}" IsEnabled="{Binding CanChangeMode}"
+                       Content="{x:Static res:Strings.ModeProxyOption}" ToolTip.Tip="{x:Static res:Strings.ModeProxyTooltip}" />
+          <RadioButton GroupName="mode" IsChecked="{Binding IsTunMode}" IsEnabled="{Binding CanSelectTun}"
+                       Content="{x:Static res:Strings.ModeTunOption}" ToolTip.Tip="{x:Static res:Strings.ModeTunTooltip}"
+                       ToolTip.ShowOnDisabled="True" />
+        </StackPanel>
         <Expander Header="{x:Static res:Strings.FailureDetails}" IsVisible="{Binding HasLogTail}" HorizontalAlignment="Stretch">
           <StackPanel Spacing="8">
             <SelectableTextBlock Text="{Binding LogTail}" Classes="log" TextWrapping="Wrap" />

@@ -2,6 +2,7 @@ using Khors.Core.Diagnostics;
 using Khors.Core.Generators.SingBox;
 using Khors.Core.Generators.Xray;
 using Khors.Core.Profiles;
+using Khors.Core.Storage;
 using Khors.Engines.Processes;
 using Khors.Platform;
 
@@ -94,14 +95,26 @@ public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildP
     }
 }
 
-/// <summary>Запуск ядра, выбранного <see cref="CoreSelection"/>.</summary>
-public sealed class SelectingCoreLauncher(ICoreLauncher xray, ICoreLauncher singBox) : ICoreLauncher
+/// <summary>
+/// Запуск ядра, выбранного <see cref="CoreSelection"/>; в режиме TUN — через службу (<paramref name="tun"/>),
+/// без неё режим TUN недоступен.
+/// </summary>
+public sealed class SelectingCoreLauncher(ICoreLauncher xray, ICoreLauncher singBox, ICoreLauncher? tun = null) : ICoreLauncher
 {
-    public SelectingCoreLauncher(SecretMasker masker, IChildProcessGuard? guard)
-        : this(new CoreKindLauncher(CoreKind.Xray, masker, guard), new CoreKindLauncher(CoreKind.SingBox, masker, guard))
+    public SelectingCoreLauncher(SecretMasker masker, IChildProcessGuard? guard, ICoreLauncher? tun = null)
+        : this(new CoreKindLauncher(CoreKind.Xray, masker, guard), new CoreKindLauncher(CoreKind.SingBox, masker, guard), tun)
     {
     }
 
-    public Task<ICoreSession> StartAsync(Profile profile, CoreStartPreferences preferences, CancellationToken cancellationToken) =>
-        (CoreSelection.For(profile) == CoreKind.SingBox ? singBox : xray).StartAsync(profile, preferences, cancellationToken);
+    public Task<ICoreSession> StartAsync(Profile profile, CoreStartPreferences preferences, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(preferences);
+        if (preferences.Mode == ConnectionMode.Tun)
+        {
+            return tun?.StartAsync(profile, preferences, cancellationToken)
+                ?? throw new CoreStartException(CoreStartFailure.ServiceUnavailable, "TUN mode is not available.") { Core = CoreSelection.For(profile) };
+        }
+
+        return (CoreSelection.For(profile) == CoreKind.SingBox ? singBox : xray).StartAsync(profile, preferences, cancellationToken);
+    }
 }

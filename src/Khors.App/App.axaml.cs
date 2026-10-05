@@ -13,6 +13,7 @@ using Khors.Engines;
 using Khors.Engines.Auto;
 using Khors.Engines.Connection;
 using Khors.Engines.Latency;
+using Khors.Ipc;
 using Khors.Engines.Storage;
 using Khors.Engines.Subscriptions;
 using Khors.Platform;
@@ -24,6 +25,9 @@ public partial class App : Application, IDisposable
 {
     // Замер профиля для «Авто»: короче обычного теста — неответивший сервер не задерживает подбор.
     private static readonly TimeSpan s_autoProbeTimeout = TimeSpan.FromSeconds(6);
+
+    /// <summary>Версия приложения для рукопожатия со службой.</summary>
+    internal static string AppVersion { get; } = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
 
     private ServiceProvider? _services;
     private MainWindow? _window;
@@ -93,7 +97,12 @@ public partial class App : Application, IDisposable
         services.AddSingleton(new SecretMasker());
         services.AddSingleton(sp => ProfileRepository.Open(sp.GetRequiredService<AppPaths>().ProfilesFile));
         services.AddSingleton(sp => SettingsStore.Open(sp.GetRequiredService<AppPaths>().SettingsFile));
-        services.AddSingleton<ICoreLauncher>(sp => new SelectingCoreLauncher(sp.GetRequiredService<SecretMasker>(), sp.GetService<IChildProcessGuard>()));
+        services.AddSingleton<ICoreLauncher>(sp =>
+        {
+            var masker = sp.GetRequiredService<SecretMasker>();
+            var tun = new ServiceTunLauncher(sp.GetRequiredService<IIpcClientTransport>(), AppVersion, masker);
+            return new SelectingCoreLauncher(masker, sp.GetService<IChildProcessGuard>(), tun);
+        });
         services.AddSingleton(sp => new ConnectionManager(sp.GetRequiredService<ICoreLauncher>(), sp.GetService<ISystemProxy>(), SystemProxyWatchdog.EnsureStarted));
         services.AddSingleton<IAppClipboard>(_ => new WindowClipboard(() => _window));
         services.AddSingleton<IDesktopDialogs>(sp => new WindowDialogs(() => _window, sp.GetRequiredService<IAppClipboard>(), sp.GetService<IScreenCapture>()));

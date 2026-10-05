@@ -62,6 +62,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         _launcher = launcher;
         _sessionTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => UpdateSessionTime());
 
+        IsTunMode = settings.Current.ConnectionMode == ConnectionMode.Tun;
+
         // «Авто» — до загрузки списка, чтобы загрузка не выбрала первый профиль поверх сохранённого выбора.
         IsAutoSelected = settings.Current.AutoSelect;
         SortByLatency = settings.Current.SortProfilesByLatency;
@@ -181,7 +183,26 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     public bool HasMessage => !string.IsNullOrEmpty(Message);
 
-    public string ModeText { get; } = Localizer.Get("ModeSystemProxy");
+    /// <summary>Режим TUN (весь трафик через службу) вместо системного прокси. Меняется, пока не подключено.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsProxyMode))]
+    public partial bool IsTunMode { get; set; }
+
+    public bool IsProxyMode
+    {
+        get => !IsTunMode;
+        set => IsTunMode = !value;
+    }
+
+    /// <summary>Служба запущена и ответила на рукопожатие — режим TUN можно выбрать.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanSelectTun))]
+    public partial bool IsServiceRunning { get; set; }
+
+    /// <summary>Режим меняется только без подключения (переключение на лету — ROADMAP 3.7).</summary>
+    public bool CanChangeMode => State is ConnectionState.Disconnected or ConnectionState.Failed && !_auto.IsActive;
+
+    public bool CanSelectTun => CanChangeMode && (IsServiceRunning || IsTunMode);
 
     /// <summary>Сообщения после запуска: восстановление прокси, состояние файла профилей.</summary>
     public void ShowStartupNotices(bool proxyRecovered)
@@ -298,12 +319,14 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         var state = await Task.Run(_service.GetState).ConfigureAwait(true);
         var text = Localizer.Get($"ServiceState_{state}");
         var mismatch = false;
+        string? serviceVersion = null;
         if (state == ServiceState.Running)
         {
             try
             {
                 await using var client = await IpcClient.ConnectAsync(_serviceTransport, AppVersion, TimeSpan.FromSeconds(3)).ConfigureAwait(true);
-                text = Localizer.Format("ServiceRunningFormat", client.Service.ServiceVersion);
+                serviceVersion = client.Service.ServiceVersion;
+                text = Localizer.Format("ServiceRunningFormat", serviceVersion);
             }
             catch (IpcVersionMismatchException)
             {
@@ -321,11 +344,12 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         }
 
         ServiceStatusText = Localizer.Format("ServiceLabelFormat", text);
+        IsServiceRunning = serviceVersion is not null;
         CanInstallService = state == ServiceState.NotInstalled || mismatch;
         CanRemoveService = state is not ServiceState.NotInstalled and not ServiceState.Unknown;
     }
 
-    private static string AppVersion { get; } = typeof(MainWindowViewModel).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
+    private static string AppVersion => App.AppVersion;
 
     private TimeSpan AutoRecheckInterval() => TimeSpan.FromMinutes(Math.Clamp(_settings.Current.AutoRecheckMinutes, 1, 1440));
 
@@ -726,6 +750,17 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         ApplyStatus(_connection.Status);
     }
 
+    partial void OnIsTunModeChanged(bool value)
+    {
+        var mode = value ? ConnectionMode.Tun : ConnectionMode.SystemProxy;
+        if (mode != _settings.Current.ConnectionMode)
+        {
+            _settings.Update(s => s with { ConnectionMode = mode });
+        }
+
+        OnPropertyChanged(nameof(CanSelectTun));
+    }
+
     partial void OnSortByLatencyChanged(bool value)
     {
         if (value != _settings.Current.SortProfilesByLatency)
@@ -741,6 +776,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         UpdateAutoSummary();
         ApplyStatus(_connection.Status);
         ToggleConnectionCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(CanChangeMode));
+        OnPropertyChanged(nameof(CanSelectTun));
         if (status.State == AutoState.Connected && SortByLatency)
         {
             ReloadProfiles();
@@ -773,6 +810,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     {
         OnPropertyChanged(nameof(IsConnected));
         OnPropertyChanged(nameof(IsFailed));
+        OnPropertyChanged(nameof(CanChangeMode));
+        OnPropertyChanged(nameof(CanSelectTun));
     }
 
     partial void OnLogTailChanged(string? value) => OnPropertyChanged(nameof(HasLogTail));
@@ -838,6 +877,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
         StatusDetail = status switch
         {
+            { State: ConnectionState.Connected } when IsTunMode => Localizer.Format("TunConnectedFormat", Localizer.CoreName(status.Core)),
             { State: ConnectionState.Connected, HttpPort: { } http, SocksPort: { } socks } => Localizer.Format("LocalProxyFormat", http, socks, Localizer.CoreName(status.Core)),
             { State: ConnectionState.Failed, Failure: { } failure } => Localizer.Describe(failure),
             { State: ConnectionState.Disconnected } when SelectedProfile is null && !IsAutoSelected => Localizer.Get("NoProfileSelected"),
