@@ -17,12 +17,41 @@ public sealed record SingBoxConfigOptions
 
     /// <summary>Уровень лога в терминах Xray (debug, info, warning, error, none) — переводится в уровни sing-box.</summary>
     public string LogLevel { get; init; } = "warning";
+
+    /// <summary>Режим TUN (весь трафик системы); <c>null</c> — только локальные входы (режим «Системный прокси»).</summary>
+    public SingBoxTunOptions? Tun { get; init; }
+
+    /// <summary>
+    /// Цепочка TUN → SOCKS → Xray (docs/SPEC.md, 3.3): выход — локальный SOCKS-вход Xray на этом порту,
+    /// протокол профиля обрабатывает Xray. <c>null</c> — выход из профиля.
+    /// </summary>
+    public int? UpstreamSocksPort { get; init; }
+}
+
+/// <summary>Адаптер TUN sing-box (wintun на Windows).</summary>
+public sealed record SingBoxTunOptions
+{
+    public string InterfaceName { get; init; } = "KHORS";
+
+    public string Inet4Address { get; init; } = "172.19.0.1/30";
+
+    public string Inet6Address { get; init; } = "fdfe:dcba:9876::1/126";
+
+    public int Mtu { get; init; } = 9000;
+
+    /// <summary>
+    /// Адреса (IP или подсеть), которые идут мимо туннеля: адрес сервера профиля, к которому подключается Xray
+    /// в цепочке, — иначе его трафик снова попадёт в TUN (петля).
+    /// </summary>
+    public IReadOnlyList<string> ExcludeAddresses { get; init; } = [];
 }
 
 /// <summary>
-/// Генерация конфига sing-box из профиля (режим «Системный прокси»): входы SOCKS и HTTP на 127.0.0.1,
-/// выход (или endpoint WireGuard) из профиля, локальные сети напрямую. JSON строится только из модели
-/// (CLAUDE.md, правило 3). Формат — по документации sing-box 1.14.
+/// Генерация конфига sing-box из профиля: входы SOCKS и HTTP на 127.0.0.1, выход (или endpoint WireGuard)
+/// из профиля, локальные сети напрямую. В режиме TUN (<see cref="SingBoxConfigOptions.Tun"/>) — ещё адаптер TUN
+/// с <c>auto_route</c>/<c>strict_route</c>, перехват DNS и выход sing-box мимо туннеля (<c>auto_detect_interface</c>);
+/// в цепочке (<see cref="SingBoxConfigOptions.UpstreamSocksPort"/>) выход — SOCKS-вход Xray. JSON строится только
+/// из модели (CLAUDE.md, правило 3). Формат — по документации sing-box 1.14.
 /// </summary>
 public static class SingBoxConfigGenerator
 {
@@ -40,7 +69,9 @@ public static class SingBoxConfigGenerator
         ArgumentNullException.ThrowIfNull(profile);
         ArgumentNullException.ThrowIfNull(options);
 
-        if (profile.Core == CorePreference.Xray)
+        // В цепочке протокол профиля обрабатывает Xray — возможности sing-box для него не важны.
+        var chained = options.UpstreamSocksPort is not null;
+        if (profile.Core == CorePreference.Xray && !chained)
         {
             return CoreConfigResult.Failure(CoreConfigErrorCode.WrongCore, "core");
         }
@@ -50,7 +81,7 @@ public static class SingBoxConfigGenerator
             return CoreConfigResult.Failure(CoreConfigErrorCode.ProfileInvalid, issue.Field);
         }
 
-        if (FindUnsupported(profile) is { } field)
+        if (!chained && FindUnsupported(profile) is { } field)
         {
             return CoreConfigResult.Failure(CoreConfigErrorCode.UnsupportedFeature, field);
         }
@@ -68,7 +99,13 @@ public static class SingBoxConfigGenerator
         };
 
         // WireGuard в sing-box 1.11+ — endpoint, остальные протоколы — outbound.
-        if (profile.Protocol is WireGuardSettings wireGuard)
+        if (options.UpstreamSocksPort is { } upstream)
+        {
+            config["outbounds"] = new JsonArray(
+                new JsonObject { ["type"] = "socks", ["tag"] = ProxyTag, ["server"] = "127.0.0.1", ["server_port"] = upstream, ["version"] = "5" },
+                new JsonObject { ["type"] = "direct", ["tag"] = DirectTag });
+        }
+        else if (profile.Protocol is WireGuardSettings wireGuard)
         {
             // Через WireGuard идут IP-пакеты: имена сайтов разрешаются на клиенте. Системный резолвер
             // недоступен через туннель (сервер обычно режет частные адреса), поэтому DNS — публичный, через туннель.
@@ -93,8 +130,57 @@ public static class SingBoxConfigGenerator
             ["default_domain_resolver"] = "local",
         };
 
+        if (options.Tun is { } tun)
+        {
+            AddTun(config, tun);
+        }
+
         return CoreConfigResult.Success(config.ToJsonString(s_jsonOptions));
     }
+
+    private const string TunTag = "tun-in";
+    private const string RemoteDnsTag = "remote";
+    private const string RemoteDnsServer = "1.1.1.1";
+
+    /// <summary>
+    /// TUN: весь трафик системы — в sing-box. Сам sing-box выходит в сеть через физический интерфейс
+    /// (<c>auto_detect_interface</c>), иначе его соединения с сервером снова попали бы в TUN. DNS-запросы системы
+    /// перехватываются и уходят через туннель (DoH 1.1.1.1), чтобы провайдер их не видел; пресеты DNS — ROADMAP 3.4.
+    /// </summary>
+    private static void AddTun(JsonObject config, SingBoxTunOptions tun)
+    {
+        var inbound = new JsonObject
+        {
+            ["type"] = "tun",
+            ["tag"] = TunTag,
+            ["interface_name"] = tun.InterfaceName,
+            ["address"] = new JsonArray(tun.Inet4Address, tun.Inet6Address),
+            ["mtu"] = tun.Mtu,
+            ["auto_route"] = true,
+            ["strict_route"] = true,
+        };
+        if (tun.ExcludeAddresses.Count > 0)
+        {
+            inbound["route_exclude_address"] = new JsonArray([.. tun.ExcludeAddresses.Select(a => (JsonNode)JsonValue.Create(ToPrefix(a))!)]);
+        }
+
+        config["inbounds"]!.AsArray().Insert(0, inbound);
+
+        var dns = config["dns"]!.AsObject();
+        if (dns["final"] is null)
+        {
+            dns["servers"]!.AsArray().Add(new JsonObject { ["type"] = "https", ["tag"] = RemoteDnsTag, ["server"] = RemoteDnsServer, ["detour"] = ProxyTag });
+            dns["final"] = RemoteDnsTag;
+        }
+
+        var route = config["route"]!.AsObject();
+        route["rules"]!.AsArray().Insert(1, new JsonObject { ["protocol"] = "dns", ["action"] = "hijack-dns" });
+        route["auto_detect_interface"] = true;
+    }
+
+    /// <summary>Адрес без маски — как подсеть из одного адреса (/32 или /128).</summary>
+    private static string ToPrefix(string address) =>
+        address.Contains('/', StringComparison.Ordinal) ? address : address + (address.Contains(':', StringComparison.Ordinal) ? "/128" : "/32");
 
     private const string TunnelDnsTag = "tunnel-dns";
     private const string TunnelDnsServer = "1.1.1.1";

@@ -12,8 +12,8 @@ using Xunit;
 namespace Khors.Core.Tests.Generators;
 
 /// <summary>
-/// Снапшоты конфигов sing-box: <c>Vectors/singbox-config/*.json</c> — ссылка (+ <c>core</c>), параметры и ожидаемый
-/// конфиг или ошибка. Каждый ожидаемый конфиг проверяется настоящим sing-box (<c>sing-box check</c>), если он скачан.
+/// Снапшоты конфигов sing-box: <c>Vectors/singbox-config/*.json</c> — ссылка (+ <c>core</c>), параметры (порты, уровень лога,
+/// <c>tun</c> с <c>excludeAddresses</c>, <c>upstreamSocksPort</c> для цепочки через Xray) и ожидаемый конфиг или ошибка. Каждый ожидаемый конфиг проверяется настоящим sing-box (<c>sing-box check</c>), если он скачан.
 /// </summary>
 public class SingBoxConfigVectorTests
 {
@@ -94,6 +94,10 @@ public class SingBoxConfigVectorTests
             SocksPort = options["socksPort"]!.GetValue<int>(),
             HttpPort = options["httpPort"]!.GetValue<int>(),
             LogLevel = options["logLevel"]?.GetValue<string>() ?? "warning",
+            UpstreamSocksPort = options["upstreamSocksPort"]?.GetValue<int>(),
+            Tun = options["tun"] is { } tun
+                ? new SingBoxTunOptions { ExcludeAddresses = tun["excludeAddresses"]?.AsArray().Select(a => a!.GetValue<string>()).ToArray() ?? [] }
+                : null,
         });
     }
 

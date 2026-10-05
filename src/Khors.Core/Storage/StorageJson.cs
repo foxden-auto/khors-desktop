@@ -26,6 +26,24 @@ public static class StorageJson
     public static VersionedParseResult<ProfileDocument> ParseProfiles(string json) =>
         VersionedJson.Parse(json, ProfileDocument.CurrentSchemaVersion, StorageJsonContext.Default.ProfileDocument, ProfileMigrations);
 
+    /// <summary>Один профиль — для передачи службе (режим TUN). Тот же формат, что в <c>profiles.json</c>.</summary>
+    public static string SerializeProfile(Profile profile) =>
+        JsonSerializer.Serialize(profile, StorageJsonContext.Default.Profile);
+
+    /// <summary>Профиль из <see cref="SerializeProfile"/>; <c>null</c> — текст не разбирается.</summary>
+    public static Profile? ParseProfile(string json)
+    {
+        ArgumentNullException.ThrowIfNull(json);
+        try
+        {
+            return JsonSerializer.Deserialize(json, StorageJsonContext.Default.Profile);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            return null;
+        }
+    }
+
     public static string SerializeSettings(AppSettings settings) =>
         JsonSerializer.Serialize(settings, StorageJsonContext.Default.AppSettings);
 
@@ -43,6 +61,7 @@ public static class StorageJson
     RespectRequiredConstructorParameters = true)]
 [JsonSerializable(typeof(ProfileDocument))]
 [JsonSerializable(typeof(AppSettings))]
+[JsonSerializable(typeof(Profile))]
 [JsonSerializable(typeof(Profile[]))]
 [JsonSerializable(typeof(Subscription[]))]
 [JsonSerializable(typeof(UnknownParam[]))]

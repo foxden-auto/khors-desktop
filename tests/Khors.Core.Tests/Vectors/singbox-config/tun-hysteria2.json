@@ -1,0 +1,91 @@
+{
+  "description": "TUN: Hysteria2 через sing-box — адаптер KHORS, auto_route/strict_route, перехват DNS (DoH через туннель), выход sing-box мимо туннеля",
+  "link": "hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809,
+    "tun": {}
+  },
+  "expected": {
+    "log": {
+      "level": "warn",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        },
+        {
+          "type": "https",
+          "tag": "remote",
+          "server": "1.1.1.1",
+          "detour": "proxy"
+        }
+      ],
+      "final": "remote"
+    },
+    "inbounds": [
+      {
+        "type": "tun",
+        "tag": "tun-in",
+        "interface_name": "KHORS",
+        "address": [
+          "172.19.0.1/30",
+          "fdfe:dcba:9876::1/126"
+        ],
+        "mtu": 9000,
+        "auto_route": true,
+        "strict_route": true
+      },
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "hysteria2",
+        "tag": "proxy",
+        "server": "hy.example.com",
+        "server_port": 443,
+        "password": "Hy2Pa55",
+        "tls": {
+          "enabled": true,
+          "server_name": "hy.example.com"
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "protocol": "dns",
+          "action": "hijack-dns"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local",
+      "auto_detect_interface": true
+    }
+  }
+}
