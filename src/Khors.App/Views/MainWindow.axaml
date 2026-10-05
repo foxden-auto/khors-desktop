@@ -11,15 +11,9 @@
         WindowStartupLocation="CenterScreen">
   <DockPanel Margin="20">
 
-    <!-- Логотип: та же геометрия, что в Assets/logo.svg (viewBox 40×40). -->
+    <!-- Логотип KHORS (Assets/logo-512.png — тот же, что у KHORS Android). -->
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12">
-      <Viewbox Width="36" Height="36">
-        <Canvas Width="40" Height="40">
-          <Rectangle Width="40" Height="40" RadiusX="10" RadiusY="10" Fill="{DynamicResource KhorsLogoBackgroundBrush}" />
-          <Ellipse Canvas.Left="6" Canvas.Top="6" Width="28" Height="28" Stroke="{DynamicResource KhorsPrimaryBrush}" StrokeThickness="2" />
-          <Path Data="M14,12 L14,28 M26,12 L15,20 L26,28" Stroke="{DynamicResource KhorsPrimaryBrush}" StrokeThickness="3" />
-        </Canvas>
-      </Viewbox>
+      <Image Source="/Assets/logo-512.png" Width="44" Height="44" RenderOptions.BitmapInterpolationMode="HighQuality" />
       <TextBlock Text="{x:Static res:Strings.AppTitle}" Classes="title" VerticalAlignment="Center" />
     </StackPanel>
 

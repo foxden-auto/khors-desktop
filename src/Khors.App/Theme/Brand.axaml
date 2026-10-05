@@ -16,8 +16,6 @@
   <Color x:Key="KhorsDestructiveColor">#FF9999</Color>
   <Color x:Key="KhorsBorderColor">#2D3335</Color>
   <Color x:Key="KhorsInputColor">#656969</Color>
-  <!-- Фон логотипа (favicon.svg). -->
-  <Color x:Key="KhorsLogoBackgroundColor">#101416</Color>
 
   <SolidColorBrush x:Key="KhorsBackgroundBrush" Color="{StaticResource KhorsBackgroundColor}" />
   <SolidColorBrush x:Key="KhorsForegroundBrush" Color="{StaticResource KhorsForegroundColor}" />
@@ -31,7 +29,6 @@
   <SolidColorBrush x:Key="KhorsDestructiveBrush" Color="{StaticResource KhorsDestructiveColor}" />
   <SolidColorBrush x:Key="KhorsBorderBrush" Color="{StaticResource KhorsBorderColor}" />
   <SolidColorBrush x:Key="KhorsInputBrush" Color="{StaticResource KhorsInputColor}" />
-  <SolidColorBrush x:Key="KhorsLogoBackgroundBrush" Color="{StaticResource KhorsLogoBackgroundColor}" />
 
   <!-- Акцент Fluent — фирменный золотой вместо системного цвета Windows. -->
   <Color x:Key="SystemAccentColor">#E5BD70</Color>

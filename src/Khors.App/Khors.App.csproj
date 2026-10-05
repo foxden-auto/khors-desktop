@@ -27,6 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\khors.ico" />
+    <AvaloniaResource Include="Assets\logo-512.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
