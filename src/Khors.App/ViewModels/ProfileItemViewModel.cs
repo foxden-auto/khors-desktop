@@ -57,7 +57,7 @@ public sealed partial class ProfileItemViewModel(Profile profile, IProfileAction
     [ObservableProperty]
     public partial bool LatencyOk { get; set; }
 
-    /// <summary>Подсказка: время первого соединения рядом с задержкой.</summary>
+    /// <summary>Подсказка у задержки: время первого соединения или причина неудачи.</summary>
     [ObservableProperty]
     public partial string? LatencyTooltip { get; set; }
 
@@ -69,9 +69,12 @@ public sealed partial class ProfileItemViewModel(Profile profile, IProfileAction
         LatencyText = result is null ? Localizer.Get("LatencyTesting") : Localizer.Describe(result);
         LatencyOk = result?.Status == LatencyStatus.Ok;
         LatencyBad = result is not null && result.Status != LatencyStatus.Ok;
-        LatencyTooltip = result?.FirstConnection is { } first
-            ? Localizer.Format("LatencyTooltipFormat", (int)Math.Round(first.TotalMilliseconds))
-            : null;
+        LatencyTooltip = result switch
+        {
+            { Problem: { } problem } => Localizer.Describe(problem),
+            { FirstConnection: { } first } => Localizer.Format("LatencyTooltipFormat", (int)Math.Round(first.TotalMilliseconds)),
+            _ => null,
+        };
     }
 
     [RelayCommand]

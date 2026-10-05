@@ -12,6 +12,9 @@ public sealed record CoreLaunch(
     IPEndPoint ReadinessEndpoint,
     TimeSpan ReadyTimeout)
 {
+    /// <summary>Какие строки лога записывать в буфер (до маскировки); <c>null</c> — все.</summary>
+    public Func<string, bool>? KeepLine { get; init; }
+
     // Конфиг содержит секреты — не выводим.
     public override string ToString() => $"CoreLaunch {{ {Path.GetFileName(ExecutablePath)} {string.Join(' ', Arguments)}, Ready = {ReadinessEndpoint} }}";
 }

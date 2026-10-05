@@ -3,6 +3,7 @@ using Khors.Core.Diagnostics;
 using Khors.Core.Generators;
 using Khors.Core.Profiles;
 using Khors.Engines.Connection;
+using Khors.Engines.Diagnostics;
 using Khors.Engines.Processes;
 using Khors.Platform;
 using Xunit;
@@ -85,6 +86,62 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
         Assert.Equal(ConnectionFailureKind.CoreCrashed, status.Failure!.Kind);
         Assert.Equal(1, status.Failure.ExitCode);
         Assert.Contains(status.Failure.LogTail, l => l.Contains("reality verification failed", StringComparison.Ordinal));
+        Assert.Equal(new CoreDiagnosis(CoreProblem.RealityRejected, CoreKind.Xray), status.Failure.Problem);
+    }
+
+    private const string RefusedLine =
+        "2026/10/05 20:41:52.085452 [Info] [407998944] app/proxyman/outbound: app/proxyman/outbound: failed to process outbound traffic > "
+        + "proxy/vless/outbound: failed to find an available destination > common/retry: [dial tcp 192.0.2.10:443: connect: connection refused] > "
+        + "common/retry: all retry attempts failed";
+
+    [Fact]
+    public async Task ServerFailureInLiveLogBecomesProblemOnce()
+    {
+        await _manager.ConnectAsync(ValidProfile(), s_preferences, TestContext.Current.CancellationToken);
+        var statuses = new List<ConnectionStatus>();
+        _manager.StatusChanged += (_, s) => statuses.Add(s);
+
+        _launcher.Last!.Log.Add(CoreLogSource.StandardOutput, "2026/10/05 20:41:50 [Warning] core: Xray 26.9.9 started");
+        _launcher.Last.Log.Add(CoreLogSource.StandardOutput, RefusedLine);
+        _launcher.Last.Log.Add(CoreLogSource.StandardOutput, RefusedLine);
+
+        var status = Assert.Single(statuses);
+        Assert.Equal(ConnectionState.Connected, status.State);
+        Assert.Equal(new CoreDiagnosis(CoreProblem.ConnectionRefused, CoreKind.Xray), status.Problem);
+
+        _manager.ClearProblem();
+
+        Assert.Null(_manager.Status.Problem);
+        Assert.Equal(ConnectionState.Connected, _manager.Status.State);
+    }
+
+    [Fact]
+    public async Task LogOfDisconnectedCoreDoesNotChangeStatus()
+    {
+        await _manager.ConnectAsync(ValidProfile(), s_preferences, TestContext.Current.CancellationToken);
+        var session = _launcher.Last!;
+        await _manager.DisconnectAsync();
+
+        session.Log.Add(CoreLogSource.StandardOutput, RefusedLine);
+
+        Assert.Equal(ConnectionStatus.Disconnected, _manager.Status);
+    }
+
+    [Fact]
+    public async Task StartFailureIsDiagnosedFromLogTail()
+    {
+        _launcher.FailWith = new CoreStartException(
+            CoreStartFailure.ExitedDuringStart,
+            "exited",
+            exitCode: 23,
+            logTail: ["Failed to start: main: failed to load config files: [stdin:] > infra/conf: failed to build outbound config"])
+        {
+            Core = CoreKind.Xray,
+        };
+
+        await _manager.ConnectAsync(ValidProfile(), s_preferences, TestContext.Current.CancellationToken);
+
+        Assert.Equal(new CoreDiagnosis(CoreProblem.ConfigRejected, CoreKind.Xray), _manager.Status.Failure!.Problem);
     }
 
     [Fact]

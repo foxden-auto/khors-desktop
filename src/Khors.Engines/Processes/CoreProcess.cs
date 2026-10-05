@@ -19,12 +19,14 @@ public sealed class CoreProcess : IAsyncDisposable
     private readonly Process _process;
     private readonly Task _outputPump;
     private readonly TaskCompletionSource<CoreExit> _exit = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly Func<string, bool>? _keepLine;
     private int _stopRequested;
 
-    private CoreProcess(Process process, CoreLogBuffer log)
+    private CoreProcess(Process process, CoreLogBuffer log, Func<string, bool>? keepLine)
     {
         _process = process;
         Log = log;
+        _keepLine = keepLine;
         ProcessId = process.Id;
         _outputPump = Task.WhenAll(
             PumpAsync(process.StandardOutput, CoreLogSource.StandardOutput),
@@ -76,7 +78,7 @@ public sealed class CoreProcess : IAsyncDisposable
 
         var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
         process.Start();
-        var core = new CoreProcess(process, log);
+        var core = new CoreProcess(process, log, launch.KeepLine);
 
         try
         {
@@ -184,7 +186,7 @@ public sealed class CoreProcess : IAsyncDisposable
     {
         while (await reader.ReadLineAsync().ConfigureAwait(false) is { } line)
         {
-            if (line.Length > 0)
+            if (line.Length > 0 && (_keepLine is null || _keepLine(line)))
             {
                 Log.Add(source, line);
             }

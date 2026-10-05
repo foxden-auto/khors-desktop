@@ -56,7 +56,8 @@ public static class XrayConfigGenerator
 
         var config = new JsonObject
         {
-            ["log"] = new JsonObject { ["loglevel"] = options.LogLevel },
+            // Журнал доступа (адреса посещаемых сайтов) не нужен ни пользователю, ни классификатору ошибок.
+            ["log"] = new JsonObject { ["loglevel"] = options.LogLevel, ["access"] = "none" },
             ["inbounds"] = BuildInbounds(options),
             ["outbounds"] = new JsonArray(
                 BuildProxyOutbound(profile),

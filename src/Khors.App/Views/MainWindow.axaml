@@ -30,6 +30,8 @@
                    IsVisible="{Binding ActiveProfileName, Converter={x:Static ObjectConverters.IsNotNull}}" />
         <TextBlock Text="{Binding StatusDetail}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
                    IsVisible="{Binding StatusDetail, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        <TextBlock Text="{Binding ProblemHint}" Classes="warning" TextWrapping="Wrap" TextAlignment="Center"
+                   IsVisible="{Binding ProblemHint, Converter={x:Static ObjectConverters.IsNotNull}}" />
         <TextBlock Text="{Binding SessionTime}" Classes="muted" HorizontalAlignment="Center" IsVisible="{Binding IsConnected}" />
         <TextBlock Text="{Binding ConnectionLatency}" Classes="muted" HorizontalAlignment="Center"
                    IsVisible="{Binding ConnectionLatency, Converter={x:Static ObjectConverters.IsNotNull}}" />

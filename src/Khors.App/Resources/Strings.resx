@@ -20,6 +20,7 @@
   <data name="ClipboardEmpty" xml:space="preserve"><value>The clipboard contains neither a link nor a QR code image.</value></data>
   <data name="ClipboardNoQr" xml:space="preserve"><value>No QR code was found in the clipboard image.</value></data>
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Latency: {0}</value></data>
+  <data name="ConnectionProblemFormat" xml:space="preserve"><value>Connections to the server fail. {0}</value></data>
   <data name="CoreAutoFormat" xml:space="preserve"><value>Automatic (now {0})</value></data>
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>The {0} core cannot run this profile: {1}. The core choice was not changed.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Core log copied to the clipboard: {0} lines. Addresses and keys are masked.</value></data>
@@ -97,6 +98,20 @@
   <data name="MenuShowQr" xml:space="preserve"><value>Show QR code</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Mode: system proxy</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Select a profile below</value></data>
+  <data name="Problem_AuthenticationFailed" xml:space="preserve"><value>The server rejected the password. Check the password in the profile or update the subscription.</value></data>
+  <data name="Problem_CertificateExpired" xml:space="preserve"><value>The server certificate has expired or is not yet valid. Check the date and time on this computer.</value></data>
+  <data name="Problem_CertificateNameMismatch" xml:space="preserve"><value>The server certificate was issued for another name. Check the SNI (server name) in the profile.</value></data>
+  <data name="Problem_CertificateUntrusted" xml:space="preserve"><value>The server certificate failed verification: it is self-signed or the connection is intercepted. Ask the server owner for the right settings.</value></data>
+  <data name="Problem_ConfigRejected" xml:space="preserve"><value>The core rejected the configuration. Copy the core log and report it to the KHORS developers.</value></data>
+  <data name="Problem_ConnectionRefused" xml:space="preserve"><value>The server refused the connection: nothing is listening on this port. Check the port in the profile or contact the server owner.</value></data>
+  <data name="Problem_ConnectionReset" xml:space="preserve"><value>The connection to the server was reset. Your ISP may be blocking this protocol — try another profile.</value></data>
+  <data name="Problem_ConnectionTimeout" xml:space="preserve"><value>The server does not respond: it is down, the port is closed by a firewall, or the address is blocked by your ISP.</value></data>
+  <data name="Problem_NetworkUnreachable" xml:space="preserve"><value>No route to the server. Check your internet connection.</value></data>
+  <data name="Problem_PortInUse" xml:space="preserve"><value>A local port is used by another program (for example, another VPN client). Close it and connect again.</value></data>
+  <data name="Problem_RealityRejected" xml:space="preserve"><value>The server did not accept the REALITY handshake. Check the public key, short id and SNI in the profile, or update the subscription.</value></data>
+  <data name="Problem_RealityRejected_SingBox" xml:space="preserve"><value>The server did not accept the REALITY handshake. Check the public key, short id, SNI and fingerprint; if the server runs Xray 26.9.8 or newer, switch the profile to the Xray core (profile menu → Core).</value></data>
+  <data name="Problem_ServerNotFound" xml:space="preserve"><value>The server address was not found. Check the address in the profile and your internet connection.</value></data>
+  <data name="Problem_TlsHandshakeFailed" xml:space="preserve"><value>The TLS handshake with the server failed. Check the SNI, fingerprint and port in the profile.</value></data>
   <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Link parameters KHORS does not understand yet: {0}</value></data>
   <data name="ProfileWarningsFormat" xml:space="preserve"><value>Warning: {0}</value></data>
   <data name="ProfilesHeader" xml:space="preserve"><value>Profiles</value></data>

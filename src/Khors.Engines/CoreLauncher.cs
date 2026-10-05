@@ -5,6 +5,7 @@ using Khors.Core.Generators;
 using Khors.Core.Generators.SingBox;
 using Khors.Core.Generators.Xray;
 using Khors.Core.Profiles;
+using Khors.Engines.Diagnostics;
 using Khors.Engines.Processes;
 using Khors.Platform;
 
@@ -20,7 +21,7 @@ public sealed record CoreStartOptions
     /// <summary>API статистики (только Xray).</summary>
     public bool EnableStatsApi { get; init; }
 
-    /// <summary>Уровень лога в терминах Xray (debug, info, warning, error, none).</summary>
+    /// <summary>Уровень лога в терминах Xray (debug, info, warning, error, none); как он применяется — <see cref="CoreLogLevels.Plan"/>.</summary>
     public string LogLevel { get; init; } = "warning";
 
     /// <summary>Путь к своей сборке ядра (docs/SPEC.md, 4.8); <c>null</c> — поставляемая.</summary>
@@ -62,6 +63,7 @@ public static class CoreLauncher
             ? PortAllocator.Allocate(options.PreferredSocksPort, options.PreferredHttpPort, null)
             : PortAllocator.Allocate(options.PreferredSocksPort, options.PreferredHttpPort);
 
+        var log = CoreLogLevels.Plan(kind, options.LogLevel);
         var config = kind switch
         {
             CoreKind.Xray => XrayConfigGenerator.Generate(profile, new XrayConfigOptions
@@ -69,13 +71,13 @@ public static class CoreLauncher
                 SocksPort = ports[0],
                 HttpPort = ports[1],
                 ApiPort = withApi ? ports[2] : null,
-                LogLevel = options.LogLevel,
+                LogLevel = log.Level,
             }),
             CoreKind.SingBox => SingBoxConfigGenerator.Generate(profile, new SingBoxConfigOptions
             {
                 SocksPort = ports[0],
                 HttpPort = ports[1],
-                LogLevel = options.LogLevel,
+                LogLevel = log.Level,
             }),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
         };
@@ -90,7 +92,10 @@ public static class CoreLauncher
         }
 
         string[] arguments = kind == CoreKind.Xray ? ["run", "-c", "stdin:"] : ["run", "-c", "stdin", "--disable-color"];
-        var launch = new CoreLaunch(executable, arguments, config.Json, new IPEndPoint(IPAddress.Loopback, ports[0]), options.ReadyTimeout);
+        var launch = new CoreLaunch(executable, arguments, config.Json, new IPEndPoint(IPAddress.Loopback, ports[0]), options.ReadyTimeout)
+        {
+            KeepLine = log.KeepLine,
+        };
 
         try
         {

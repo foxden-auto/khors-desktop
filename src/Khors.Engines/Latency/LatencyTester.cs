@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using Khors.Core.Profiles;
 using Khors.Engines.Connection;
+using Khors.Engines.Diagnostics;
 using Khors.Engines.Processes;
 
 namespace Khors.Engines.Latency;
@@ -25,7 +26,8 @@ public enum LatencyStatus
 /// Задержка через туннель: время запроса по уже установленному соединению — близко к «пингу через VPN».
 /// </param>
 /// <param name="FirstConnection">Время первого запроса с установкой туннеля и TLS (несколько круговых задержек).</param>
-public sealed record LatencyResult(LatencyStatus Status, TimeSpan? Delay = null, TimeSpan? FirstConnection = null)
+/// <param name="Problem">Причина неудачи по логу временного ядра (<see cref="CoreErrorClassifier"/>).</param>
+public sealed record LatencyResult(LatencyStatus Status, TimeSpan? Delay = null, TimeSpan? FirstConnection = null, CoreDiagnosis? Problem = null)
 {
     public static LatencyResult Success(TimeSpan delay, TimeSpan? firstConnection = null) => new(LatencyStatus.Ok, delay, firstConnection);
 }
@@ -40,6 +42,9 @@ public static class LatencyTester
     public static Uri DefaultTestUrl { get; } = new("https://cp.cloudflare.com/generate_204");
 
     public static TimeSpan DefaultTimeout { get; } = TimeSpan.FromSeconds(10);
+
+    // Ядро пишет причину неудачи примерно тогда же, когда закрывает соединение, — даём строке дойти до буфера.
+    private static readonly TimeSpan s_problemLogGrace = TimeSpan.FromMilliseconds(500);
 
     /// <summary>Время TCP-подключения к серверу (без ядра). Разрешение имени в замер не входит.</summary>
     public static async Task<LatencyResult> MeasureTcpAsync(ServerEndpoint server, TimeSpan timeout, CancellationToken cancellationToken = default)
@@ -128,6 +133,9 @@ public static class LatencyTester
         return response.StatusCode is HttpStatusCode.NoContent or HttpStatusCode.OK ? elapsed : null;
     }
 
+    private static CoreDiagnosis? Diagnose(ICoreSession session) =>
+        CoreErrorClassifier.Diagnose(session.Core, session.Log.Snapshot().Select(l => l.Text));
+
     /// <summary>Прокси без исключений: стандартный WebProxy пропускает адреса loopback мимо прокси.</summary>
     private sealed class AlwaysProxy(Uri proxy) : IWebProxy
     {
@@ -164,14 +172,27 @@ public static class LatencyTester
         }
         catch (CoreStartException ex)
         {
-            return new LatencyResult(ex.Failure is CoreStartFailure.ExitedDuringStart or CoreStartFailure.ReadyTimeout
-                ? LatencyStatus.Failed
-                : LatencyStatus.Unsupported);
+            return ex.Failure is CoreStartFailure.ExitedDuringStart or CoreStartFailure.ReadyTimeout
+                ? new LatencyResult(LatencyStatus.Failed, Problem: ex.Core is { } core ? CoreErrorClassifier.Diagnose(core, ex.LogTail) : null)
+                : new LatencyResult(LatencyStatus.Unsupported);
         }
 
         await using (session.ConfigureAwait(false))
         {
-            return await MeasureThroughProxyAsync(session.HttpPort, url, timeout, cancellationToken).ConfigureAwait(false);
+            var result = await MeasureThroughProxyAsync(session.HttpPort, url, timeout, cancellationToken).ConfigureAwait(false);
+            if (result.Status == LatencyStatus.Ok)
+            {
+                return result;
+            }
+
+            var problem = Diagnose(session);
+            if (problem is null)
+            {
+                await Task.Delay(s_problemLogGrace, cancellationToken).ConfigureAwait(false);
+                problem = Diagnose(session);
+            }
+
+            return result with { Problem = problem };
         }
     }
 }

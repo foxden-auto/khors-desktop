@@ -1,4 +1,5 @@
 using Khors.Core.Profiles;
+using Khors.Engines.Diagnostics;
 using Khors.Engines.Processes;
 using Khors.Platform;
 
@@ -8,6 +9,8 @@ namespace Khors.Engines.Connection;
 /// Подключение в режиме «Системный прокси»: проверка профиля → ядро → сторож → системный прокси.
 /// Отключение и падение ядра всегда возвращают системный прокси (CLAUDE.md, правило 9).
 /// Операции выполняются по одной; событие <see cref="StatusChanged"/> приходит в фоновом потоке.
+/// Пока подключено, лог ядра разбирается <see cref="CoreErrorClassifier"/>: неудачные соединения с сервером
+/// попадают в <see cref="ConnectionStatus.Problem"/>.
 /// </summary>
 public sealed class ConnectionManager : IAsyncDisposable
 {
@@ -16,7 +19,9 @@ public sealed class ConnectionManager : IAsyncDisposable
     private readonly Action? _ensureWatchdog;
     private readonly TimeProvider _time;
     private readonly SemaphoreSlim _gate = new(1, 1);
+    private readonly Lock _statusLock = new();
     private ICoreSession? _session;
+    private EventHandler<CoreLogLine>? _problemWatch;
     private ConnectionStatus _status = ConnectionStatus.Disconnected;
     private int _disposed;
 
@@ -91,6 +96,7 @@ public sealed class ConnectionManager : IAsyncDisposable
 
             Volatile.Write(ref _session, session);
             SetStatus(new ConnectionStatus(ConnectionState.Connected, profile, session.SocksPort, session.HttpPort, _time.GetUtcNow(), Core: session.Core));
+            WatchForProblems(session);
             _ = WatchForCrashAsync(session);
         }
         finally
@@ -123,6 +129,18 @@ public sealed class ConnectionManager : IAsyncDisposable
         }
     }
 
+    /// <summary>Соединения снова проходят (например, удался тест задержки) — убрать причину из статуса.</summary>
+    public void ClearProblem()
+    {
+        lock (_statusLock)
+        {
+            if (_status is { State: ConnectionState.Connected, Problem: not null })
+            {
+                SetStatus(_status with { Problem = null });
+            }
+        }
+    }
+
     /// <summary>Отключает и освобождает ресурсы. Повторный вызов ничего не делает.</summary>
     public async ValueTask DisposeAsync()
     {
@@ -142,6 +160,8 @@ public sealed class ConnectionManager : IAsyncDisposable
         {
             return;
         }
+
+        StopWatchingProblems(session);
 
         // Сначала прокси: браузер не должен ни мгновения смотреть на остановленное ядро.
         _systemProxy?.Restore();
@@ -165,13 +185,20 @@ public sealed class ConnectionManager : IAsyncDisposable
                 return;
             }
 
+            StopWatchingProblems(session);
             _systemProxy?.Restore();
             var profile = Status.Profile;
             await session.DisposeAsync().ConfigureAwait(false);
+            var tail = session.Log.Tail(20);
             SetStatus(new ConnectionStatus(
                 ConnectionState.Failed,
                 profile,
-                Failure: new ConnectionFailure(ConnectionFailureKind.CoreCrashed, ExitCode: exit.ExitCode, LogTail: new EquatableArray<string>(session.Log.Tail(20)), Core: session.Core),
+                Failure: new ConnectionFailure(
+                    ConnectionFailureKind.CoreCrashed,
+                    ExitCode: exit.ExitCode,
+                    LogTail: new EquatableArray<string>(tail),
+                    Core: session.Core,
+                    Problem: CoreErrorClassifier.Diagnose(session.Core, tail)),
                 Core: session.Core));
         }
         finally
@@ -184,12 +211,55 @@ public sealed class ConnectionManager : IAsyncDisposable
     {
         CoreStartFailure.ExecutableNotFound => new ConnectionFailure(ConnectionFailureKind.CoreNotFound, Core: ex.Core),
         CoreStartFailure.ConfigNotGenerated => new ConnectionFailure(ConnectionFailureKind.UnsupportedByCore, ConfigError: ex.ConfigError, Core: ex.Core),
-        _ => new ConnectionFailure(ConnectionFailureKind.CoreStartFailed, ExitCode: ex.ExitCode, LogTail: new EquatableArray<string>(ex.LogTail), Core: ex.Core),
+        _ => new ConnectionFailure(
+            ConnectionFailureKind.CoreStartFailed,
+            ExitCode: ex.ExitCode,
+            LogTail: new EquatableArray<string>(ex.LogTail),
+            Core: ex.Core,
+            Problem: ex.Core is { } core ? CoreErrorClassifier.Diagnose(core, ex.LogTail) : null),
     };
 
+    private void WatchForProblems(ICoreSession session)
+    {
+        _problemWatch = (_, line) => OnCoreLogLine(session, line);
+        session.Log.LineAdded += _problemWatch;
+    }
+
+    private void StopWatchingProblems(ICoreSession session)
+    {
+        if (Interlocked.Exchange(ref _problemWatch, null) is { } watch)
+        {
+            session.Log.LineAdded -= watch;
+        }
+    }
+
+    // Приходит в потоке чтения лога ядра. Проверка и смена статуса — под одной блокировкой, иначе причина
+    // от старой сессии могла бы прийти в окно после «Отключение».
+    private void OnCoreLogLine(ICoreSession session, CoreLogLine line)
+    {
+        if (CoreErrorClassifier.Classify(session.Core, line.Text) is not { } problem)
+        {
+            return;
+        }
+
+        lock (_statusLock)
+        {
+            if (ReferenceEquals(Volatile.Read(ref _session), session)
+                && _status.State == ConnectionState.Connected
+                && _status.Problem?.Problem != problem)
+            {
+                SetStatus(_status with { Problem = new CoreDiagnosis(problem, session.Core) });
+            }
+        }
+    }
+
+    // Событие — под блокировкой: порядок статусов у подписчиков совпадает с порядком смены (подписчик окна только ставит в очередь).
     private void SetStatus(ConnectionStatus status)
     {
-        Volatile.Write(ref _status, status);
-        StatusChanged?.Invoke(this, status);
+        lock (_statusLock)
+        {
+            Volatile.Write(ref _status, status);
+            StatusChanged?.Invoke(this, status);
+        }
     }
 }

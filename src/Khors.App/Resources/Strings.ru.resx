@@ -20,6 +20,7 @@
   <data name="ClipboardEmpty" xml:space="preserve"><value>В буфере обмена нет ни ссылки, ни картинки с QR-кодом.</value></data>
   <data name="ClipboardNoQr" xml:space="preserve"><value>На картинке в буфере обмена не найден QR-код.</value></data>
   <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Задержка: {0}</value></data>
+  <data name="ConnectionProblemFormat" xml:space="preserve"><value>Соединения с сервером не устанавливаются. {0}</value></data>
   <data name="CoreAutoFormat" xml:space="preserve"><value>Автоматически (сейчас {0})</value></data>
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>Ядро {0} не запустит этот профиль: {1}. Выбор ядра не изменён.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Лог ядра скопирован в буфер обмена: строк {0}. Адреса и ключи в нём замаскированы.</value></data>
@@ -97,6 +98,20 @@
   <data name="MenuShowQr" xml:space="preserve"><value>Показать QR-код</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Выберите профиль в списке</value></data>
+  <data name="Problem_AuthenticationFailed" xml:space="preserve"><value>Сервер отклонил пароль. Проверьте пароль в профиле или обновите подписку.</value></data>
+  <data name="Problem_CertificateExpired" xml:space="preserve"><value>Сертификат сервера просрочен или ещё не действует. Проверьте дату и время на компьютере.</value></data>
+  <data name="Problem_CertificateNameMismatch" xml:space="preserve"><value>Сертификат сервера выдан на другое имя. Проверьте SNI (имя сервера) в профиле.</value></data>
+  <data name="Problem_CertificateUntrusted" xml:space="preserve"><value>Сертификат сервера не прошёл проверку: он самоподписанный или соединение перехвачено. Уточните настройки у владельца сервера.</value></data>
+  <data name="Problem_ConfigRejected" xml:space="preserve"><value>Ядро отвергло конфигурацию. Скопируйте лог ядра и сообщите разработчикам KHORS.</value></data>
+  <data name="Problem_ConnectionRefused" xml:space="preserve"><value>Сервер отклонил соединение: на этом порту ничего не работает. Проверьте порт в профиле или обратитесь к владельцу сервера.</value></data>
+  <data name="Problem_ConnectionReset" xml:space="preserve"><value>Соединение с сервером сброшено. Возможно, провайдер блокирует этот протокол — попробуйте другой профиль.</value></data>
+  <data name="Problem_ConnectionTimeout" xml:space="preserve"><value>Сервер не отвечает: он выключен, порт закрыт файрволом или адрес заблокирован провайдером.</value></data>
+  <data name="Problem_NetworkUnreachable" xml:space="preserve"><value>Нет маршрута до сервера. Проверьте подключение к интернету.</value></data>
+  <data name="Problem_PortInUse" xml:space="preserve"><value>Локальный порт занят другой программой (например, другим VPN-клиентом). Закройте её и подключитесь снова.</value></data>
+  <data name="Problem_RealityRejected" xml:space="preserve"><value>Сервер не принял REALITY-рукопожатие. Проверьте публичный ключ, short id и SNI в профиле или обновите подписку.</value></data>
+  <data name="Problem_RealityRejected_SingBox" xml:space="preserve"><value>Сервер не принял REALITY-рукопожатие. Проверьте публичный ключ, short id, SNI и fingerprint; если сервер на Xray 26.9.8 или новее, переключите профиль на ядро Xray (меню профиля → «Ядро»).</value></data>
+  <data name="Problem_ServerNotFound" xml:space="preserve"><value>Адрес сервера не найден. Проверьте адрес в профиле и подключение к интернету.</value></data>
+  <data name="Problem_TlsHandshakeFailed" xml:space="preserve"><value>TLS-рукопожатие с сервером не удалось. Проверьте SNI, fingerprint и порт в профиле.</value></data>
   <data name="ProfileUnknownParamsFormat" xml:space="preserve"><value>Параметры ссылки, которые KHORS пока не понимает: {0}</value></data>
   <data name="ProfileWarningsFormat" xml:space="preserve"><value>Предупреждение: {0}</value></data>
   <data name="ProfilesHeader" xml:space="preserve"><value>Профили</value></data>

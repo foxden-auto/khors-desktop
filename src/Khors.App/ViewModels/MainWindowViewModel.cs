@@ -77,6 +77,10 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     [ObservableProperty]
     public partial string? StatusDetail { get; set; }
 
+    /// <summary>Подсказка по причине из лога ядра: при ошибке подключения или когда соединения с сервером не проходят.</summary>
+    [ObservableProperty]
+    public partial string? ProblemHint { get; set; }
+
     [ObservableProperty]
     public partial string? ActiveProfileName { get; set; }
 
@@ -348,6 +352,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
                     var result = await MeasureAsync(item).ConfigureAwait(true);
                     _latency[item.Id] = result;
                     item.SetLatency(result);
+                    ClearProblemIfConnectionWorks(item.Id, result);
                 }
                 finally
                 {
@@ -393,6 +398,16 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             ConnectionLatency = Localizer.Format("ConnectionLatencyFormat", Localizer.Describe(result));
             _latency[profile.Id] = result;
             Profiles.FirstOrDefault(p => p.Id == profile.Id)?.SetLatency(result);
+            ClearProblemIfConnectionWorks(profile.Id, result);
+        }
+    }
+
+    // Запрос через подключённый профиль прошёл — прежняя причина из лога устарела.
+    private void ClearProblemIfConnectionWorks(Guid profileId, LatencyResult result)
+    {
+        if (result.Status == LatencyStatus.Ok && _connection.Status is { State: ConnectionState.Connected, Profile: { } current } && current.Id == profileId)
+        {
+            _connection.ClearProblem();
         }
     }
 
@@ -591,6 +606,13 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             { State: ConnectionState.Connected, HttpPort: { } http, SocksPort: { } socks } => Localizer.Format("LocalProxyFormat", http, socks, Localizer.CoreName(status.Core)),
             { State: ConnectionState.Failed, Failure: { } failure } => Localizer.Describe(failure),
             { State: ConnectionState.Disconnected } when SelectedProfile is null => Localizer.Get("NoProfileSelected"),
+            _ => null,
+        };
+
+        ProblemHint = status switch
+        {
+            { State: ConnectionState.Connected, Problem: { } problem } => Localizer.Format("ConnectionProblemFormat", Localizer.Describe(problem)),
+            { State: ConnectionState.Failed, Failure.Problem: { } problem } => Localizer.Describe(problem),
             _ => null,
         };
 

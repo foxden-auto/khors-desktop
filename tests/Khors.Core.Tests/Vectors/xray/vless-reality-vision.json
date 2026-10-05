@@ -9,7 +9,8 @@
   },
   "expected": {
     "log": {
-      "loglevel": "info"
+      "loglevel": "info",
+      "access": "none"
     },
     "inbounds": [
       {

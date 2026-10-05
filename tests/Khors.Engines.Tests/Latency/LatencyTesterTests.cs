@@ -4,6 +4,7 @@ using System.Text;
 using Khors.Core.Diagnostics;
 using Khors.Core.Profiles;
 using Khors.Engines.Connection;
+using Khors.Engines.Diagnostics;
 using Khors.Engines.Latency;
 using Xunit;
 
@@ -62,7 +63,8 @@ public class LatencyTesterTests
         var ct = TestContext.Current.CancellationToken;
         await using var server = new LocalHttpServer("HTTP/1.1 204 No Content");
         var launcher = new CoreKindLauncher(CoreKind.Xray, s_masker, guard: null);
-        await using var session = await launcher.StartAsync(LocalProfile(), new CoreStartPreferences(null, null), ct);
+        // Уровень info выбран явно — строки о каждом запросе не отфильтровываются (журнал доступа Xray выключен).
+        await using var session = await launcher.StartAsync(LocalProfile(), new CoreStartPreferences(null, null, "info"), ct);
 
         var result = await LatencyTester.MeasureThroughProxyAsync(session.HttpPort, server.Url, TimeSpan.FromSeconds(5), ct);
 
@@ -71,7 +73,7 @@ public class LatencyTesterTests
         Assert.NotNull(result.FirstConnection);
         Assert.Equal(2, server.Requests);
         // Запрос действительно прошёл через HTTP-вход Xray, а не напрямую.
-        await WaitForAsync(() => session.Log.Snapshot().Any(l => l.Text.Contains("http-in", StringComparison.Ordinal)), ct);
+        await WaitForAsync(() => session.Log.Snapshot().Any(l => l.Text.Contains("proxy/http:", StringComparison.Ordinal)), ct);
     }
 
     [Fact]
@@ -115,6 +117,21 @@ public class LatencyTesterTests
         Assert.Equal(LatencyStatus.Ok, result.Status);
         var exit = await launcher.Session!.Completion.WaitAsync(TimeSpan.FromSeconds(5), ct);
         Assert.True(exit.Expected);
+    }
+
+    [Fact]
+    public async Task ProfileFailureIsDiagnosedFromCoreLog()
+    {
+        RequireXray();
+        var ct = TestContext.Current.CancellationToken;
+        var launcher = new CoreKindLauncher(CoreKind.Xray, s_masker, guard: null);
+
+        // Публичное имя идёт через сервер профиля (127.0.0.1:1 — никто не слушает), сети не требуется:
+        // Xray пишет отказ на уровне info, классификатор находит его в отфильтрованном логе.
+        var result = await LatencyTester.MeasureProfileAsync(LocalProfile(), launcher, new Uri("http://www.example.com/"), TimeSpan.FromSeconds(8), ct);
+
+        Assert.Equal(LatencyStatus.Failed, result.Status);
+        Assert.Equal(new CoreDiagnosis(CoreProblem.ConnectionRefused, CoreKind.Xray), result.Problem);
     }
 
     [Fact]

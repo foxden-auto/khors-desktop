@@ -59,6 +59,14 @@ public class LocalizationTests
                 keys.Add($"Status{state}");
             }
 
+            foreach (var problem in Enum.GetNames<Khors.Engines.Diagnostics.CoreProblem>())
+            {
+                keys.Add($"Problem_{problem}");
+            }
+
+            keys.Add("Problem_RealityRejected_SingBox");
+            keys.Add("ConnectionProblemFormat");
+
             foreach (var unsupported in s_unsupportedFields)
             {
                 keys.Add("Unsupported_" + unsupported.Replace('.', '_'));

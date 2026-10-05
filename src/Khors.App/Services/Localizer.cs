@@ -6,6 +6,7 @@ using Khors.Core.Profiles;
 using Khors.Core.Subscriptions;
 using Khors.Engines;
 using Khors.Engines.Connection;
+using Khors.Engines.Diagnostics;
 using Khors.Engines.Latency;
 
 namespace Khors.App.Services;
@@ -56,6 +57,15 @@ public static class Localizer
             ConnectionFailureKind.CoreNotFound => Format("Failure_CoreNotFound", core),
             _ => Get($"Failure_{failure.Kind}"),
         };
+    }
+
+    /// <summary>Подсказка по причине из лога ядра. REALITY в sing-box — со своим советом (переключить на Xray).</summary>
+    public static string Describe(CoreDiagnosis diagnosis)
+    {
+        ArgumentNullException.ThrowIfNull(diagnosis);
+        return diagnosis is { Problem: CoreProblem.RealityRejected, Core: CoreKind.SingBox }
+            ? Get("Problem_RealityRejected_SingBox")
+            : Get($"Problem_{diagnosis.Problem}");
     }
 
     /// <summary>Название ядра — как у проекта (не переводится).</summary>
