@@ -40,6 +40,7 @@ STRINGS = {
     "LatencyTesting": ("проверка…", "testing…"),
     "ConnectionLatencyFormat": ("Задержка: {0}", "Latency: {0}"),
     "Latency_Ok": ("{0} мс", "{0} ms"),
+    "LatencyTooltipFormat": ("Задержка через туннель по готовому соединению. Первое соединение (с установкой туннеля и TLS): {0} мс", "Latency through the tunnel over an established connection. First connection (tunnel and TLS setup): {0} ms"),
     "Latency_Timeout": ("тайм-аут", "timeout"),
     "Latency_Failed": ("нет ответа", "no response"),
     "Latency_Unsupported": ("не поддерживается", "not supported"),

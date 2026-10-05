@@ -52,6 +52,7 @@
   <data name="Issue_UnknownParameters" xml:space="preserve"><value>в ссылке есть параметры, которые KHORS пока не понимает</value></data>
   <data name="Issue_XhttpExtraInvalid" xml:space="preserve"><value>параметр extra XHTTP — не JSON-объект</value></data>
   <data name="LatencyTesting" xml:space="preserve"><value>проверка…</value></data>
+  <data name="LatencyTooltipFormat" xml:space="preserve"><value>Задержка через туннель по готовому соединению. Первое соединение (с установкой туннеля и TLS): {0} мс</value></data>
   <data name="Latency_Failed" xml:space="preserve"><value>нет ответа</value></data>
   <data name="Latency_Ok" xml:space="preserve"><value>{0} мс</value></data>
   <data name="Latency_Timeout" xml:space="preserve"><value>тайм-аут</value></data>

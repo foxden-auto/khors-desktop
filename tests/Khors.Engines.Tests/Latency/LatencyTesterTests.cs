@@ -68,6 +68,8 @@ public class LatencyTesterTests
 
         Assert.Equal(LatencyStatus.Ok, result.Status);
         Assert.True(result.Delay > TimeSpan.Zero);
+        Assert.NotNull(result.FirstConnection);
+        Assert.Equal(2, server.Requests);
         // Запрос действительно прошёл через HTTP-вход Xray, а не напрямую.
         await WaitForAsync(() => session.Log.Snapshot().Any(l => l.Text.Contains("http-in", StringComparison.Ordinal)), ct);
     }
@@ -154,6 +156,7 @@ public class LatencyTesterTests
         private readonly TcpListener _listener = new(IPAddress.Loopback, 0);
         private readonly CancellationTokenSource _stop = new();
         private readonly Task _loop;
+        private int _requests;
 
         public LocalHttpServer(string? response)
         {
@@ -162,6 +165,8 @@ public class LatencyTesterTests
         }
 
         public Uri Url => new($"http://127.0.0.1:{((IPEndPoint)_listener.LocalEndpoint).Port}/generate_204");
+
+        public int Requests => Volatile.Read(ref _requests);
 
         public async ValueTask DisposeAsync()
         {
@@ -206,6 +211,7 @@ public class LatencyTesterTests
                         request.Append(Encoding.ASCII.GetString(buffer, 0, read));
                     }
 
+                    Interlocked.Increment(ref _requests);
                     if (response is null)
                     {
                         await Task.Delay(Timeout.Infinite, _stop.Token);

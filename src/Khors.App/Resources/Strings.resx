@@ -52,6 +52,7 @@
   <data name="Issue_UnknownParameters" xml:space="preserve"><value>the link has parameters KHORS does not understand yet</value></data>
   <data name="Issue_XhttpExtraInvalid" xml:space="preserve"><value>XHTTP extra is not a JSON object</value></data>
   <data name="LatencyTesting" xml:space="preserve"><value>testing…</value></data>
+  <data name="LatencyTooltipFormat" xml:space="preserve"><value>Latency through the tunnel over an established connection. First connection (tunnel and TLS setup): {0} ms</value></data>
   <data name="Latency_Failed" xml:space="preserve"><value>no response</value></data>
   <data name="Latency_Ok" xml:space="preserve"><value>{0} ms</value></data>
   <data name="Latency_Timeout" xml:space="preserve"><value>timeout</value></data>

@@ -89,6 +89,7 @@
                 <TextBlock Text="{Binding Warning}" Classes="warning small" TextWrapping="Wrap" IsVisible="{Binding HasWarning}" />
               </StackPanel>
               <TextBlock Grid.Column="2" Text="{Binding LatencyText}" Classes="small latency" VerticalAlignment="Center" Margin="8,0,0,0"
+                         ToolTip.Tip="{Binding LatencyTooltip}"
                          Classes.ok="{Binding LatencyOk}" Classes.bad="{Binding LatencyBad}" />
               <Button Grid.Column="3" Classes="ghost" VerticalAlignment="Center"
                       Content="{x:Static res:Strings.ButtonDelete}"

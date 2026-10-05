@@ -34,6 +34,10 @@ public sealed partial class ProfileItemViewModel(Profile profile) : ObservableOb
     [ObservableProperty]
     public partial bool LatencyOk { get; set; }
 
+    /// <summary>Подсказка: время первого соединения рядом с задержкой.</summary>
+    [ObservableProperty]
+    public partial string? LatencyTooltip { get; set; }
+
     [ObservableProperty]
     public partial bool LatencyBad { get; set; }
 
@@ -42,6 +46,9 @@ public sealed partial class ProfileItemViewModel(Profile profile) : ObservableOb
         LatencyText = result is null ? Localizer.Get("LatencyTesting") : Localizer.Describe(result);
         LatencyOk = result?.Status == LatencyStatus.Ok;
         LatencyBad = result is not null && result.Status != LatencyStatus.Ok;
+        LatencyTooltip = result?.FirstConnection is { } first
+            ? Localizer.Format("LatencyTooltipFormat", (int)Math.Round(first.TotalMilliseconds))
+            : null;
     }
 
     // Имена неизвестных параметров не секретны (секретны значения) — показываем их, чтобы было ясно, что не поддержано.

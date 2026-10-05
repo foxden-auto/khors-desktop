@@ -21,9 +21,13 @@ public enum LatencyStatus
     Unsupported,
 }
 
-public sealed record LatencyResult(LatencyStatus Status, TimeSpan? Delay = null)
+/// <param name="Delay">
+/// Задержка через туннель: время запроса по уже установленному соединению — близко к «пингу через VPN».
+/// </param>
+/// <param name="FirstConnection">Время первого запроса с установкой туннеля и TLS (несколько круговых задержек).</param>
+public sealed record LatencyResult(LatencyStatus Status, TimeSpan? Delay = null, TimeSpan? FirstConnection = null)
 {
-    public static LatencyResult Success(TimeSpan delay) => new(LatencyStatus.Ok, delay);
+    public static LatencyResult Success(TimeSpan delay, TimeSpan? firstConnection = null) => new(LatencyStatus.Ok, delay, firstConnection);
 }
 
 /// <summary>
@@ -66,7 +70,11 @@ public static class LatencyTester
         }
     }
 
-    /// <summary>Время запроса <paramref name="url"/> через HTTP-вход ядра на 127.0.0.1.</summary>
+    /// <summary>
+    /// Задержка через HTTP-вход ядра на 127.0.0.1: два запроса <paramref name="url"/> по одному соединению.
+    /// Первый устанавливает туннель (TCP, REALITY/TLS до сервера, TLS до адреса теста), второй идёт по готовому —
+    /// его время и есть задержка. Если второй не удался, задержкой считается первый.
+    /// </summary>
     public static async Task<LatencyResult> MeasureThroughProxyAsync(int httpPort, Uri url, TimeSpan timeout, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(url);
@@ -80,14 +88,25 @@ public static class LatencyTester
         using var limit = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         limit.CancelAfter(timeout);
 
-        var stopwatch = Stopwatch.StartNew();
         try
         {
-            using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, limit.Token).ConfigureAwait(false);
-            var delay = stopwatch.Elapsed;
-            return response.StatusCode is HttpStatusCode.NoContent or HttpStatusCode.OK
-                ? LatencyResult.Success(delay)
-                : new LatencyResult(LatencyStatus.Failed);
+            var first = await TimeRequestAsync(client, url, limit.Token).ConfigureAwait(false);
+            if (first is null)
+            {
+                return new LatencyResult(LatencyStatus.Failed);
+            }
+
+            TimeSpan? warm = null;
+            try
+            {
+                warm = await TimeRequestAsync(client, url, limit.Token).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is HttpRequestException || (ex is OperationCanceledException && !cancellationToken.IsCancellationRequested))
+            {
+                // Второй запрос не обязателен: остаётся время первого.
+            }
+
+            return LatencyResult.Success(warm ?? first.Value, first);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
@@ -97,6 +116,16 @@ public static class LatencyTester
         {
             return new LatencyResult(LatencyStatus.Failed);
         }
+    }
+
+    /// <summary>Время до получения заголовков ответа; <c>null</c> — ответ не 204/200.</summary>
+    private static async Task<TimeSpan?> TimeRequestAsync(HttpClient client, Uri url, CancellationToken cancellationToken)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        var elapsed = stopwatch.Elapsed;
+        await response.Content.CopyToAsync(Stream.Null, cancellationToken).ConfigureAwait(false);
+        return response.StatusCode is HttpStatusCode.NoContent or HttpStatusCode.OK ? elapsed : null;
     }
 
     /// <summary>Прокси без исключений: стандартный WebProxy пропускает адреса loopback мимо прокси.</summary>
