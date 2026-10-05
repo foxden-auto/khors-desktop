@@ -1,0 +1,23 @@
+{
+  "description": "Hysteria2 в форме 3x-ui: security=tls (у QUIC TLS всегда), пустой sni, alpn h3, salamander",
+  "link": "hysteria2://Hy2Pa55@hy.example.com:22931?alpn=h3&obfs=salamander&obfs-password=0bfsPa55w0rd&security=tls&sni=#3x-ui%20Hysteria",
+  "expected": {
+    "name": "3x-ui Hysteria",
+    "server": {
+      "host": "hy.example.com",
+      "port": 22931
+    },
+    "protocol": {
+      "type": "hysteria2",
+      "password": "Hy2Pa55",
+      "obfs": "salamander",
+      "obfsPassword": "0bfsPa55w0rd"
+    },
+    "security": {
+      "type": "tls",
+      "alpn": [
+        "h3"
+      ]
+    }
+  }
+}

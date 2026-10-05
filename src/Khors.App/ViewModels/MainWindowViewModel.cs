@@ -23,6 +23,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly SubscriptionUpdater _subscriptionUpdater;
     private readonly DispatcherTimer _sessionTimer;
     private readonly Dictionary<Guid, LatencyResult> _latency = [];
+    private Khors.Engines.Processes.CoreLogBuffer? _liveLog;
+    private int _liveLogRefreshQueued;
 
     public MainWindowViewModel(
         ProfileRepository profiles,
@@ -136,6 +138,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        WatchLiveLog(null);
         _sessionTimer.Stop();
         _profiles.Changed -= OnProfilesChanged;
         _connection.StatusChanged -= OnConnectionStatusChanged;
@@ -403,7 +406,16 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
             _ => null,
         };
 
-        LogTail = status.Failure is { LogTail.Count: > 0 } withLog ? string.Join(Environment.NewLine, withLog.LogTail) : null;
+        // Лог ядра: при ошибке — хвост из причины, при подключении — живой (уже замаскирован при поступлении).
+        WatchLiveLog(status.State == ConnectionState.Connected ? _connection.Log : null);
+        if (status.Failure is { LogTail.Count: > 0 } withLog)
+        {
+            LogTail = string.Join(Environment.NewLine, withLog.LogTail);
+        }
+        else if (status.State != ConnectionState.Connected)
+        {
+            LogTail = null;
+        }
 
         if (status.State == ConnectionState.Connected)
         {
@@ -425,6 +437,45 @@ public sealed partial class MainWindowViewModel : ObservableObject, IDisposable
         else if (justConnected)
         {
             _ = MeasureConnectionAsync(status);
+        }
+    }
+
+    private void WatchLiveLog(Khors.Engines.Processes.CoreLogBuffer? log)
+    {
+        if (ReferenceEquals(log, _liveLog))
+        {
+            return;
+        }
+
+        if (_liveLog is not null)
+        {
+            _liveLog.LineAdded -= OnLiveLogLine;
+        }
+
+        _liveLog = log;
+        if (log is not null)
+        {
+            log.LineAdded += OnLiveLogLine;
+            RefreshLiveLog();
+        }
+    }
+
+    // Строки приходят в потоке чтения лога; обновляем окно не чаще двух раз в секунду.
+    private void OnLiveLogLine(object? sender, Khors.Engines.Processes.CoreLogLine line)
+    {
+        if (Interlocked.Exchange(ref _liveLogRefreshQueued, 1) == 0)
+        {
+            DispatcherTimer.RunOnce(RefreshLiveLog, TimeSpan.FromMilliseconds(500));
+        }
+    }
+
+    private void RefreshLiveLog()
+    {
+        Interlocked.Exchange(ref _liveLogRefreshQueued, 0);
+        if (_liveLog is { } log)
+        {
+            var tail = log.Tail(30);
+            LogTail = tail.Count > 0 ? string.Join(Environment.NewLine, tail) : null;
         }
     }
 

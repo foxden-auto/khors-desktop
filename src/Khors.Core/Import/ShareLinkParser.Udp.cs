@@ -36,6 +36,8 @@ public static partial class ShareLinkParser
             DownMbps = Number(query.TakeFirst("downmbps", "down")),
         };
 
+        // security=tls (так пишет 3x-ui): у QUIC TLS обязателен — параметр принимается, но ничего не меняет.
+        query.Take("security");
         var security = new TlsSecurity
         {
             Sni = query.TakeFirst("sni", "peer"),
@@ -78,6 +80,7 @@ public static partial class ShareLinkParser
             ZeroRttHandshake = IsTrue(query.TakeFirst("reduce_rtt", "zero_rtt_handshake", "zero-rtt-handshake")),
         };
 
+        query.Take("security");
         var security = new TlsSecurity
         {
             Sni = query.TakeFirst("sni", "peer"),
