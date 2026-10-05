@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Sockets;
 using Khors.Core.Diagnostics;
 using Khors.Core.Generators;
 using Khors.Core.Generators.SingBox;
@@ -34,6 +35,8 @@ public sealed record CoreStartOptions
 /// </summary>
 public static class CoreLauncher
 {
+    private static readonly TimeSpan s_resolveTimeout = TimeSpan.FromSeconds(5);
+
     public static async Task<CoreSession> StartAsync(
         CoreKind kind,
         Profile profile,
@@ -48,6 +51,11 @@ public static class CoreLauncher
 
         var executable = CoreLocator.Find(kind, options.ExecutablePath)
             ?? throw new CoreStartException(CoreStartFailure.ExecutableNotFound, $"{kind} executable not found.") { Core = kind };
+
+        if (kind == CoreKind.SingBox)
+        {
+            profile = await ResolveWireGuardServerAsync(profile, cancellationToken).ConfigureAwait(false);
+        }
 
         var withApi = kind == CoreKind.Xray && options.EnableStatsApi;
         var ports = withApi
@@ -92,6 +100,38 @@ public static class CoreLauncher
         catch (CoreStartException ex) when (ex.Core is null)
         {
             throw new CoreStartException(ex.Failure, ex.Message, ex.ExitCode, ex.LogTail, ex.Field) { ConfigError = ex.ConfigError, Core = kind };
+        }
+    }
+
+    /// <summary>
+    /// Адрес сервера WireGuard, заданный доменом, разрешается системным резолвером до запуска ядра.
+    /// Свой резолвер sing-box («local») шлёт UDP-запросы на DNS из настроек адаптера маршрутом по умолчанию —
+    /// при другом VPN в режиме TUN или через ещё не поднятый туннель они теряются, туннель не поднимается
+    /// («no known endpoint for peer»), а соединения висят. У WireGuard нет TLS, поэтому IP вместо имени ничего не меняет.
+    /// Если имя не разрешилось — остаётся как есть, sing-box попробует сам.
+    /// </summary>
+    internal static async Task<Profile> ResolveWireGuardServerAsync(Profile profile, CancellationToken cancellationToken)
+    {
+        if (profile.Protocol is not WireGuardSettings || IPAddress.TryParse(profile.Server.Host, out _))
+        {
+            return profile;
+        }
+
+        using var limit = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        limit.CancelAfter(s_resolveTimeout);
+        try
+        {
+            var addresses = await Dns.GetHostAddressesAsync(profile.Server.Host, limit.Token).ConfigureAwait(false);
+            var address = addresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork) ?? addresses.FirstOrDefault();
+            return address is null ? profile : profile with { Server = profile.Server with { Host = address.ToString() } };
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return profile;
+        }
+        catch (SocketException)
+        {
+            return profile;
         }
     }
 }

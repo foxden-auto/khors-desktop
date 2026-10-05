@@ -89,4 +89,24 @@ public class SingBoxLauncherTests
         Assert.Equal(CoreKind.SingBox, error.Core);
         Assert.Equal(new CoreConfigError(CoreConfigErrorCode.UnsupportedFeature, "security.pinnedPeerCertSha256"), error.ConfigError);
     }
+
+    [Fact]
+    public async Task WireGuardServerDomainIsResolvedBeforeLaunch()
+    {
+        // localhost разрешается системным резолвером без сети.
+        var profile = WireGuard() with { Server = new ServerEndpoint("localhost", 51820) };
+
+        var resolved = await CoreLauncher.ResolveWireGuardServerAsync(profile, TestContext.Current.CancellationToken);
+
+        Assert.True(System.Net.IPAddress.IsLoopback(System.Net.IPAddress.Parse(resolved.Server.Host)));
+        Assert.Equal(51820, resolved.Server.Port);
+    }
+
+    [Fact]
+    public async Task OnlyWireGuardDomainsAreResolved()
+    {
+        var tuic = Tuic() with { Server = new ServerEndpoint("localhost", 443) };
+
+        Assert.Same(tuic, await CoreLauncher.ResolveWireGuardServerAsync(tuic, TestContext.Current.CancellationToken));
+    }
 }
