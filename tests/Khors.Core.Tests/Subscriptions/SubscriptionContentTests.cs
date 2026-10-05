@@ -24,14 +24,18 @@ public class SubscriptionContentTests
         Assert.Equal([new ImportLineError(6, new LinkParseError(LinkParseErrorCode.UnsupportedScheme, "scheme"))], result.Errors);
     }
 
-    [Fact]
-    public void ClashYamlIsParsedIntoProfiles()
+    /// <summary>Векторы конфигов: рядом с файлом — *.expected.json с ожидаемыми профилями (без id) и ошибками.</summary>
+    [Theory]
+    [InlineData("clash.yaml", "clash.expected.json", SubscriptionFormat.ClashYaml)]
+    [InlineData("singbox.json", "singbox.expected.json", SubscriptionFormat.SingBoxJson)]
+    [InlineData("xray.json", "xray.expected.json", SubscriptionFormat.XrayJson)]
+    public void ConfigFormatsAreParsedIntoProfiles(string vector, string expectedVector, SubscriptionFormat format)
     {
-        var expected = System.Text.Json.Nodes.JsonNode.Parse(Vector("clash.expected.json"))!;
+        var expected = System.Text.Json.Nodes.JsonNode.Parse(Vector(expectedVector))!;
 
-        var result = SubscriptionContent.Parse(Vector("clash.yaml"));
+        var result = SubscriptionContent.Parse(Vector(vector));
 
-        Assert.Equal(SubscriptionFormat.ClashYaml, result.Format);
+        Assert.Equal(format, result.Format);
         var expectedProfiles = expected["profiles"]!.AsArray().Select(node =>
         {
             node!["id"] = Guid.Empty.ToString();
@@ -45,6 +49,14 @@ public class SubscriptionContentTests
                 new LinkParseError(Enum.Parse<LinkParseErrorCode>(e["code"]!.GetValue<string>()), e["field"]?.GetValue<string>()))),
             result.Errors);
     }
+
+    [Theory]
+    [InlineData("""{ "outbounds": [ { "type": "direct", "tag": "direct" } ] }""")]
+    [InlineData("""{ "inbounds": [] }""")]
+    [InlineData("""[1, 2, 3]""")]
+    [InlineData("""{ broken json""")]
+    public void JsonWithoutProxiesIsNotRecognized(string json) =>
+        Assert.Empty(SubscriptionContent.Parse(json).Profiles);
 
     [Fact]
     public void YamlWithoutProxiesIsNotClash() =>

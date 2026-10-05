@@ -1,0 +1,24 @@
+{
+  "description": "Ожидаемые профили xray.json (массив конфигов, имена из remarks); ошибка — прокси 3 (mKCP не поддерживается моделью)",
+  "format": "XrayJson",
+  "profiles": [
+    {
+      "name": "Германия XHTTP",
+      "server": { "host": "vpn.example.com", "port": 443 },
+      "protocol": { "type": "vless", "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b" },
+      "transport": { "type": "xhttp", "path": "/xh", "mode": "stream-one", "extra": "{\"xPaddingBytes\":\"100-1000\"}" },
+      "security": { "type": "reality", "sni": "www.example.org", "fingerprint": "chrome", "publicKey": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM", "shortId": "6ba85179e30d4fc2", "spiderX": "/" },
+      "unknownParams": [ { "key": "streamSettings.sockopt", "value": "{\"tcpFastOpen\":true}" } ]
+    },
+    {
+      "name": "Нидерланды",
+      "server": { "host": "198.51.100.7", "port": 8443 },
+      "protocol": { "type": "trojan", "password": "Fictional-Pa55" },
+      "transport": { "type": "ws", "path": "/tr", "host": "cdn.example.net" },
+      "security": { "type": "tls", "sni": "cdn.example.net", "pinnedPeerCertSha256": ["9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"], "verifyPeerCertByName": ["origin.example.net"] }
+    }
+  ],
+  "errors": [
+    { "line": 3, "code": "UnsupportedTransport", "field": "network" }
+  ]
+}

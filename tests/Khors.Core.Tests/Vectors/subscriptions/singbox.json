@@ -1,0 +1,41 @@
+{
+  "log": { "level": "warn" },
+  "outbounds": [
+    { "type": "selector", "tag": "proxy", "outbounds": ["Германия", "VMess WS"] },
+    {
+      "type": "vless", "tag": "Германия",
+      "server": "vpn.example.com", "server_port": 443,
+      "uuid": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b", "flow": "xtls-rprx-vision", "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true, "server_name": "www.example.org",
+        "utls": { "enabled": true, "fingerprint": "chrome" },
+        "reality": { "enabled": true, "public_key": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM", "short_id": "6ba85179e30d4fc2" }
+      }
+    },
+    {
+      "type": "vmess", "tag": "VMess WS",
+      "server": "cdn.example.net", "server_port": 443,
+      "uuid": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b", "security": "auto", "alter_id": 0,
+      "tls": { "enabled": true, "server_name": "cdn.example.net" },
+      "transport": { "type": "ws", "path": "/vm", "headers": { "Host": "cdn.example.net" }, "max_early_data": 2048, "early_data_header_name": "Sec-WebSocket-Protocol" }
+    },
+    {
+      "type": "trojan", "tag": "Trojan gRPC",
+      "server": "198.51.100.7", "server_port": 8443, "password": "Fictional-Pa55",
+      "tls": { "enabled": true, "server_name": "grpc.example.net", "insecure": true, "alpn": ["h2"] },
+      "transport": { "type": "grpc", "service_name": "tun" },
+      "multiplex": { "enabled": true, "max_connections": 4 }
+    },
+    {
+      "type": "shadowsocks", "tag": "SS 2022",
+      "server": "2001:db8::20", "server_port": 8388,
+      "method": "2022-blake3-aes-128-gcm", "password": "Aq3+Zt/9Kp1Lm0Xy7Wq2Bw==",
+      "domain_strategy": "prefer_ipv4"
+    },
+    { "type": "hysteria2", "tag": "Hysteria2", "server": "hy.example.com", "server_port": 443, "password": "Hy2Pa55" },
+    { "type": "vless", "tag": "H2", "server": "h2.example.com", "server_port": 443, "uuid": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b", "transport": { "type": "http" } },
+    { "type": "direct", "tag": "direct" },
+    { "type": "block", "tag": "block" }
+  ],
+  "route": { "final": "proxy" }
+}

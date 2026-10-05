@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Khors.Core.Import;
 using Khors.Core.Profiles;
 using Khors.Core.Text;
@@ -16,6 +18,12 @@ public enum SubscriptionFormat
 
     /// <summary>YAML Clash / mihomo с разделом <c>proxies</c>.</summary>
     ClashYaml,
+
+    /// <summary>Конфиг sing-box (выходы с полем <c>type</c>).</summary>
+    SingBoxJson,
+
+    /// <summary>Конфиг Xray или массив конфигов (выходы с полем <c>protocol</c>).</summary>
+    XrayJson,
 }
 
 /// <param name="Profiles">Профили подписки без Id (назначаются при слиянии), без повторов.</param>
@@ -28,6 +36,14 @@ public static class SubscriptionContent
     {
         ArgumentNullException.ThrowIfNull(body);
         var text = body.Trim().TrimStart('\uFEFF');
+
+        if (text.StartsWith('{') || text.StartsWith('['))
+        {
+            if (TryParseJson(text) is { } json)
+            {
+                return json;
+            }
+        }
 
         // YAML Clash проверяем первым: в нём бывают «://» (адреса наборов правил), а список ссылок — тоже валидный YAML.
         if (text.Contains("proxies", StringComparison.Ordinal) && ClashYaml.TryParse(text, out var clashProfiles, out var clashErrors))
@@ -46,6 +62,35 @@ public static class SubscriptionContent
         }
 
         return new SubscriptionContentResult(SubscriptionFormat.Unknown, default, default);
+    }
+
+    private static SubscriptionContentResult? TryParseJson(string text)
+    {
+        JsonNode? root;
+        try
+        {
+            root = JsonNode.Parse(text, documentOptions: new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+
+        var profiles = new List<Profile>();
+        var errors = new List<ImportLineError>();
+        if (root is not null && XrayJson.IsXray(root))
+        {
+            XrayJson.Parse(root, profiles, errors);
+            return Unique(SubscriptionFormat.XrayJson, profiles, errors);
+        }
+
+        if (root is JsonObject singBox && SingBoxJson.IsSingBox(singBox))
+        {
+            SingBoxJson.Parse(singBox, profiles, errors);
+            return Unique(SubscriptionFormat.SingBoxJson, profiles, errors);
+        }
+
+        return null;
     }
 
     private static SubscriptionContentResult FromLinks(SubscriptionFormat format, string text)

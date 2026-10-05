@@ -1,0 +1,53 @@
+[
+  {
+    "remarks": "Германия XHTTP",
+    "outbounds": [
+      {
+        "tag": "proxy",
+        "protocol": "vless",
+        "settings": {
+          "vnext": [ { "address": "vpn.example.com", "port": 443, "users": [ { "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b", "encryption": "none", "level": 0 } ] } ]
+        },
+        "streamSettings": {
+          "network": "xhttp",
+          "security": "reality",
+          "realitySettings": { "serverName": "www.example.org", "fingerprint": "chrome", "password": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM", "shortId": "6ba85179e30d4fc2", "spiderX": "/" },
+          "xhttpSettings": { "path": "/xh", "mode": "stream-one", "extra": { "xPaddingBytes": "100-1000" } },
+          "sockopt": { "tcpFastOpen": true }
+        }
+      },
+      { "tag": "direct", "protocol": "freedom" },
+      { "tag": "block", "protocol": "blackhole" }
+    ],
+    "routing": { "rules": [] }
+  },
+  {
+    "remarks": "Нидерланды",
+    "outbounds": [
+      {
+        "tag": "proxy",
+        "protocol": "trojan",
+        "settings": { "address": "198.51.100.7", "port": 8443, "password": "Fictional-Pa55" },
+        "streamSettings": {
+          "network": "ws",
+          "security": "tls",
+          "tlsSettings": { "serverName": "cdn.example.net", "pinnedPeerCertSha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", "verifyPeerCertByName": "origin.example.net" },
+          "wsSettings": { "path": "/tr", "host": "cdn.example.net" }
+        },
+        "mux": { "enabled": false }
+      },
+      { "tag": "direct", "protocol": "freedom" }
+    ]
+  },
+  {
+    "remarks": "mKCP",
+    "outbounds": [
+      {
+        "tag": "proxy",
+        "protocol": "vmess",
+        "settings": { "vnext": [ { "address": "kcp.example.com", "port": 443, "users": [ { "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b" } ] } ] },
+        "streamSettings": { "network": "kcp" }
+      }
+    ]
+  }
+]
