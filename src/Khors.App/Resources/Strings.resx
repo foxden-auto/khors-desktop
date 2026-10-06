@@ -44,9 +44,12 @@
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Core log copied to the clipboard: {0} lines. Addresses and keys are masked.</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a link, a subscription address or a QR code image and press “Paste from clipboard”.</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Core log</value></data>
-  <data name="Failure_CoreCrashed" xml:space="preserve"><value>The {0} core exited unexpectedly (code {1}). System proxy restored.</value></data>
+  <data name="Failure_CoreCrashed" xml:space="preserve"><value>The {0} core exited unexpectedly (code {1}). The connection was dropped; the network works directly.</value></data>
+  <data name="Failure_CoreCrashed_NoCode" xml:space="preserve"><value>The {0} core exited unexpectedly. The connection was dropped; the network works directly.</value></data>
   <data name="Failure_CoreNotFound" xml:space="preserve"><value>The {0} core executable was not found. Reinstall KHORS.</value></data>
-  <data name="Failure_CoreStartFailed" xml:space="preserve"><value>The {0} core failed to start (code {1}). See the log below.</value></data>
+  <data name="Failure_CoreStartFailed" xml:space="preserve"><value>The {0} core failed to start (code {1}).</value></data>
+  <data name="Failure_CoreStartFailed_NoCode" xml:space="preserve"><value>The {0} core failed to start.</value></data>
+  <data name="Failure_CoreNotReady" xml:space="preserve"><value>The {0} core started but did not respond in time.</value></data>
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>The profile has an error: {0}.</value></data>
   <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>The KHORS service does not respond — TUN mode is unavailable. Install the service in Settings or switch to System proxy.</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Could not enable the Windows system proxy.</value></data>

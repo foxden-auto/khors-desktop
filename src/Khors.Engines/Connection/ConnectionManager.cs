@@ -221,7 +221,7 @@ public sealed class ConnectionManager : IAsyncDisposable
         CoreStartFailure.ServiceUnavailable => new ConnectionFailure(ConnectionFailureKind.ServiceUnavailable, Core: ex.Core),
         CoreStartFailure.ConfigNotGenerated => new ConnectionFailure(ConnectionFailureKind.UnsupportedByCore, ConfigError: ex.ConfigError, Core: ex.Core),
         _ => new ConnectionFailure(
-            ConnectionFailureKind.CoreStartFailed,
+            ex.Failure == CoreStartFailure.ReadyTimeout ? ConnectionFailureKind.CoreNotReady : ConnectionFailureKind.CoreStartFailed,
             ExitCode: ex.ExitCode,
             LogTail: new EquatableArray<string>(ex.LogTail),
             Core: ex.Core,

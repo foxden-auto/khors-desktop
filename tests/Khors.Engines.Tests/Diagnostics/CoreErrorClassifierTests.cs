@@ -29,6 +29,7 @@ public class CoreErrorClassifierTests
         { CoreKind.SingBox, "FATAL[0000] decode config at stdin: outbounds[0].uuid: invalid UUID", CoreProblem.ConfigRejected },
         { CoreKind.SingBox, "FATAL[0000] start service: start inbound/socks[0]: listen tcp 127.0.0.1:10808: bind: address already in use", CoreProblem.PortInUse },
         { CoreKind.SingBox, "FATAL[0000] start service: start inbound/tun[tun-in]: configure tun interface: Access is denied.", CoreProblem.TunUnavailable },
+        { CoreKind.SingBox, "ERROR[0000] wintun: create adapter: The system cannot find the file specified.", CoreProblem.TunUnavailable },
         { CoreKind.Xray, "Failed to start: main: failed to start server > app/proxyman/inbound: failed to listen TCP on 10808 > transport/internet: failed to listen on address: 127.0.0.1:10808 > listen tcp 127.0.0.1:10808: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.", CoreProblem.PortInUse },
 
         // Подключение к серверу: Xray (Linux и Windows).
@@ -66,6 +67,11 @@ public class CoreErrorClassifierTests
         { CoreKind.Xray, "2026/10/05 21:00:00.000000 [Info] [2] app/proxyman/outbound: app/proxyman/outbound: failed to process outbound traffic > proxy/vless/outbound: connection ends > context canceled" },
         { CoreKind.Xray, "2026/10/05 21:00:00.000000 [Info] [3] proxy/http: failed to write response > write tcp 127.0.0.1:10809->127.0.0.1:50123: write: connection reset by peer" },
         { CoreKind.SingBox, "ERROR[0042] [4567 30s] inbound/http[http-in]: process connection from 127.0.0.1:50123: read tcp 127.0.0.1:10809->127.0.0.1:50123: connection reset by peer" },
+
+        // Обычная работа адаптера TUN — не сбой TUN.
+        { CoreKind.SingBox, "INFO[0001] inbound/tun[tun-in]: started at KHORS" },
+        { CoreKind.SingBox, "INFO[0005] [8901 0ms] inbound/tun[tun-in]: inbound connection from 172.19.0.1:50123" },
+        { CoreKind.SingBox, "ERROR[0060] [8901 55s] inbound/tun[tun-in]: process connection from 172.19.0.1:50123: context canceled" },
     };
 
     [Theory]

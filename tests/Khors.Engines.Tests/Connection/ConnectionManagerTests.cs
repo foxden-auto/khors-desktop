@@ -159,7 +159,7 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
     [InlineData(CoreStartFailure.ExecutableNotFound, ConnectionFailureKind.CoreNotFound)]
     [InlineData(CoreStartFailure.ConfigNotGenerated, ConnectionFailureKind.UnsupportedByCore)]
     [InlineData(CoreStartFailure.ExitedDuringStart, ConnectionFailureKind.CoreStartFailed)]
-    [InlineData(CoreStartFailure.ReadyTimeout, ConnectionFailureKind.CoreStartFailed)]
+    [InlineData(CoreStartFailure.ReadyTimeout, ConnectionFailureKind.CoreNotReady)]
     public async Task StartFailuresAreMapped(CoreStartFailure failure, ConnectionFailureKind expected)
     {
         _launcher.FailWith = new CoreStartException(failure, "fail", exitCode: 23, logTail: ["last line"])

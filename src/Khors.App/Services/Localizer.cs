@@ -55,14 +55,16 @@ public static class Localizer
     public static string Describe(ConnectionFailure failure)
     {
         ArgumentNullException.ThrowIfNull(failure);
-        var exitCode = failure.ExitCode?.ToString(CultureInfo.CurrentCulture) ?? "?";
         var core = CoreName(failure.Core);
         return failure.Kind switch
         {
             ConnectionFailureKind.ProfileInvalid => Format("Failure_ProfileInvalid", failure.Issue is { } issue ? Describe(issue) : string.Empty),
             ConnectionFailureKind.UnsupportedByCore => Format("Failure_UnsupportedByCore", core, DescribeUnsupported(failure.ConfigError)),
-            ConnectionFailureKind.CoreStartFailed or ConnectionFailureKind.CoreCrashed => Format($"Failure_{failure.Kind}", core, exitCode),
-            ConnectionFailureKind.CoreNotFound => Format("Failure_CoreNotFound", core),
+            // Кода выхода нет, если ядро не дошло до запуска (например, имя сервера не разрешилось).
+            ConnectionFailureKind.CoreStartFailed or ConnectionFailureKind.CoreCrashed => failure.ExitCode is { } exitCode
+                ? Format($"Failure_{failure.Kind}", core, exitCode.ToString(CultureInfo.CurrentCulture))
+                : Format($"Failure_{failure.Kind}_NoCode", core),
+            ConnectionFailureKind.CoreNotReady or ConnectionFailureKind.CoreNotFound => Format($"Failure_{failure.Kind}", core),
             _ => Get($"Failure_{failure.Kind}"),
         };
     }

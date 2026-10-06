@@ -44,9 +44,12 @@
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Лог ядра скопирован в буфер обмена: строк {0}. Адреса и ключи в нём замаскированы.</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку, адрес подписки или картинку с QR-кодом и нажмите «Вставить из буфера».</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Лог ядра</value></data>
-  <data name="Failure_CoreCrashed" xml:space="preserve"><value>Ядро {0} неожиданно завершилось (код {1}). Системный прокси возвращён.</value></data>
+  <data name="Failure_CoreCrashed" xml:space="preserve"><value>Ядро {0} неожиданно завершилось (код {1}). Соединение прервано, сеть работает напрямую.</value></data>
+  <data name="Failure_CoreCrashed_NoCode" xml:space="preserve"><value>Ядро {0} неожиданно завершилось. Соединение прервано, сеть работает напрямую.</value></data>
   <data name="Failure_CoreNotFound" xml:space="preserve"><value>Не найден исполняемый файл ядра {0}. Переустановите KHORS.</value></data>
-  <data name="Failure_CoreStartFailed" xml:space="preserve"><value>Ядро {0} не запустилось (код {1}). Подробности — в логе ниже.</value></data>
+  <data name="Failure_CoreStartFailed" xml:space="preserve"><value>Ядро {0} не запустилось (код {1}).</value></data>
+  <data name="Failure_CoreStartFailed_NoCode" xml:space="preserve"><value>Ядро {0} не запустилось.</value></data>
+  <data name="Failure_CoreNotReady" xml:space="preserve"><value>Ядро {0} запустилось, но не ответило вовремя.</value></data>
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>В профиле ошибка: {0}.</value></data>
   <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>Служба KHORS не отвечает — режим TUN недоступен. Установите службу в «Настройках» или переключитесь на «Системный прокси».</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Не удалось включить системный прокси Windows.</value></data>

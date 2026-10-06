@@ -48,6 +48,9 @@ public enum ConnectionFailureKind
     /// <summary>Ядро не запустилось.</summary>
     CoreStartFailed,
 
+    /// <summary>Ядро запущено, но не открыло локальный порт вовремя (зависло на старте).</summary>
+    CoreNotReady,
+
     /// <summary>Ядро завершилось во время работы.</summary>
     CoreCrashed,
 

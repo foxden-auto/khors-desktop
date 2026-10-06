@@ -112,17 +112,21 @@ public class LocalizationTests
                 Strings.Culture = culture;
                 foreach (var kind in Enum.GetValues<ConnectionFailureKind>())
                 {
-                    var failure = new ConnectionFailure(
-                        kind,
-                        Issue: ProfileIssueCode.PortOutOfRange,
-                        ConfigError: new CoreConfigError(CoreConfigErrorCode.UnsupportedFeature, "security.allowInsecure"),
-                        ExitCode: 23);
+                    foreach (int? exitCode in new int?[] { 23, null })
+                    {
+                        var failure = new ConnectionFailure(
+                            kind,
+                            Issue: ProfileIssueCode.PortOutOfRange,
+                            ConfigError: new CoreConfigError(CoreConfigErrorCode.UnsupportedFeature, "security.allowInsecure"),
+                            ExitCode: exitCode);
 
-                    var text = Localizer.Describe(failure);
+                        var text = Localizer.Describe(failure);
 
-                    Assert.DoesNotContain("Failure_", text, StringComparison.Ordinal);
-                    Assert.DoesNotContain("Unsupported_", text, StringComparison.Ordinal);
-                    Assert.DoesNotContain("Issue_", text, StringComparison.Ordinal);
+                        Assert.DoesNotContain("Failure_", text, StringComparison.Ordinal);
+                        Assert.DoesNotContain("Unsupported_", text, StringComparison.Ordinal);
+                        Assert.DoesNotContain("Issue_", text, StringComparison.Ordinal);
+                        Assert.DoesNotContain("?", text, StringComparison.Ordinal);
+                    }
                 }
             }
         }
