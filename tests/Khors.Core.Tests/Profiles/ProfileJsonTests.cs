@@ -30,7 +30,7 @@ public class ProfileJsonTests
         Assert.Equal("tcp", root.GetProperty("transport").GetProperty("type").GetString());
         Assert.Equal("reality", root.GetProperty("security").GetProperty("type").GetString());
         Assert.Equal(TestProfiles.Uuid, root.GetProperty("protocol").GetProperty("id").GetString());
-        Assert.Equal("chrome", root.GetProperty("security").GetProperty("fingerprint").GetString());
+        Assert.Equal("firefox", root.GetProperty("security").GetProperty("fingerprint").GetString());
         Assert.Equal(2, root.GetProperty("unknownParams").GetArrayLength());
         Assert.False(root.TryGetProperty("subscriptionId", out _));
     }

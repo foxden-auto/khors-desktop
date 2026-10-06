@@ -37,7 +37,7 @@ public sealed record TlsSecurity : SecuritySettings
 public sealed record RealitySecurity : SecuritySettings
 {
     /// <summary>Отпечаток по умолчанию для REALITY (docs/SPEC.md, 4.2).</summary>
-    public const string DefaultFingerprint = "chrome";
+    public const string DefaultFingerprint = "firefox";
 
     public required string Sni { get; init; }
 

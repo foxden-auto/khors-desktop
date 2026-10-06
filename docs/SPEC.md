@@ -126,7 +126,7 @@ UI → служба → sing-box поднимает TUN (`auto_route`, `strict_r
 
 Протокол и его параметры; адрес, порт; транспорт (tcp/raw, ws, grpc, httpupgrade, xhttp, quic); безопасность (none, tls, reality) с SNI, ALPN, fingerprint uTLS, закреплённым сертификатом (`pcs`) и проверкой по имени (`vcn`), REALITY public key, short id, spiderX, ключом ML-DSA-65 (`pqv`), признаком поддержки X25519MLKEM768 сервером (`support-x25519mlkem768`, такие профили — только через Xray); flow; мультиплекс; выбор ядра (auto/xray/singbox); имя, группа, источник (ручной/подписка), дата обновления; служебное поле `unknownParams`. `schemaVersion` хранится в корне файла профилей (миграции — на уровне файла).
 
-Fingerprint по умолчанию для REALITY — `chrome`.
+Fingerprint по умолчанию для REALITY — `firefox`.
 
 ### 4.3. Подключение
 

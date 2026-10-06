@@ -18,7 +18,7 @@
     "security": {
       "type": "reality",
       "sni": "www.example.org",
-      "fingerprint": "chrome",
+      "fingerprint": "firefox",
       "publicKey": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM",
       "shortId": "ab"
     }
