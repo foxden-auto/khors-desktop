@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Khors.App.ViewModels"
+             xmlns:res="using:Khors.App.Resources"
+             x:Class="Khors.App.Views.Pages.AboutPage"
+             x:DataType="vm:MainWindowViewModel">
+  <Border Classes="card" VerticalAlignment="Top" HorizontalAlignment="Left" MaxWidth="640" Padding="28">
+    <StackPanel Spacing="12">
+      <Border Width="112" Height="112" CornerRadius="28" ClipToBounds="True" HorizontalAlignment="Left">
+        <Image Source="/Assets/logo-512.png" RenderOptions.BitmapInterpolationMode="HighQuality" />
+      </Border>
+      <TextBlock Text="{x:Static res:Strings.AppTitle}" Classes="page-title" LetterSpacing="3" />
+      <TextBlock Text="{x:Static vm:MainWindowViewModel.AppVersionText}" Classes="muted" />
+      <TextBlock Text="{x:Static res:Strings.AboutDescription}" TextWrapping="Wrap" />
+      <TextBlock Text="{x:Static res:Strings.AboutLicense}" Classes="muted" TextWrapping="Wrap" />
+    </StackPanel>
+  </Border>
+</UserControl>

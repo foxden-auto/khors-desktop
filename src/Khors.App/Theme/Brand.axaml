@@ -33,6 +33,22 @@
   <SolidColorBrush x:Key="KhorsBorderBrush" Color="{StaticResource KhorsBorderColor}" />
   <SolidColorBrush x:Key="KhorsInputBrush" Color="{StaticResource KhorsInputColor}" />
 
+  <!-- Задержка «хорошо»: зелёный того же уровня яркости, что и золотой. Средняя — золотой, плохая — destructive. -->
+  <Color x:Key="KhorsSuccessColor">#7BC79A</Color>
+  <SolidColorBrush x:Key="KhorsSuccessBrush" Color="{StaticResource KhorsSuccessColor}" />
+
+  <!-- Свечение вокруг кнопки подключения: золотой с прозрачностью; при подключении — ярче. -->
+  <RadialGradientBrush x:Key="KhorsGlowIdleBrush" Center="50%,45%" GradientOrigin="50%,45%" RadiusX="55%" RadiusY="55%">
+    <GradientStop Offset="0" Color="#14E5BD70" />
+    <GradientStop Offset="1" Color="#00E5BD70" />
+  </RadialGradientBrush>
+  <RadialGradientBrush x:Key="KhorsGlowActiveBrush" Center="50%,45%" GradientOrigin="50%,45%" RadiusX="55%" RadiusY="55%">
+    <GradientStop Offset="0" Color="#38E5BD70" />
+    <GradientStop Offset="1" Color="#00E5BD70" />
+  </RadialGradientBrush>
+  <BoxShadows x:Key="KhorsOrbIdleShadow">0 0 40 0 #2EE5BD70</BoxShadows>
+  <BoxShadows x:Key="KhorsOrbActiveShadow">0 0 90 12 #73E5BD70</BoxShadows>
+
   <!-- Акцент Fluent — фирменный золотой вместо системного цвета Windows. -->
   <Color x:Key="SystemAccentColor">#E5BD70</Color>
   <Color x:Key="SystemAccentColorDark1">#E5BD70</Color>

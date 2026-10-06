@@ -108,8 +108,21 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     [ObservableProperty]
     public partial string? ActiveProfileName { get; set; }
 
+    /// <summary>Время сессии «01:02:03»; <c>null</c> — не подключено.</summary>
     [ObservableProperty]
     public partial string? SessionTime { get; set; }
+
+    /// <summary>Имя подключённого профиля без флага.</summary>
+    [ObservableProperty]
+    public partial string? SessionServer { get; set; }
+
+    /// <summary>Протокол подключённого профиля: «VLESS · REALITY · TCP».</summary>
+    [ObservableProperty]
+    public partial string? SessionProtocol { get; set; }
+
+    /// <summary>Режим и ядро подключения: «Прокси · Xray».</summary>
+    [ObservableProperty]
+    public partial string? SessionModeCore { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ToggleConnectionCommand))]
@@ -124,7 +137,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     [ObservableProperty]
     public partial string? LogTail { get; set; }
 
-    /// <summary>Задержка текущего подключения («Задержка: 123 мс»).</summary>
+    /// <summary>Задержка текущего подключения («123 мс», «проверка…»).</summary>
     [ObservableProperty]
     public partial string? ConnectionLatency { get; set; }
 
@@ -137,6 +150,11 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     public bool IsFailed => State == ConnectionState.Failed;
 
     public bool HasLogTail => !string.IsNullOrEmpty(LogTail);
+
+    public bool HasNoLogTail => !HasLogTail;
+
+    /// <summary>Ошибка подключения с логом ядра — ссылка «Подробности — в журнале».</summary>
+    public bool ShowsLogLink => IsFailed && HasLogTail;
 
     public bool HasNoProfiles => Profiles.Count == 0;
 
@@ -165,6 +183,10 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     /// <summary>«Служба KHORS (режим TUN): работает, версия …».</summary>
     [ObservableProperty]
     public partial string ServiceStatusText { get; set; } = Localizer.Format("ServiceLabelFormat", Localizer.Get("ServiceState_Unknown"));
+
+    /// <summary>Состояние службы без подписи: «работает, версия …», «не установлена».</summary>
+    [ObservableProperty]
+    public partial string ServiceStateText { get; set; } = Localizer.Get("ServiceState_Unknown");
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(InstallServiceCommand))]
@@ -344,6 +366,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         }
 
         ServiceStatusText = Localizer.Format("ServiceLabelFormat", text);
+        ServiceStateText = text;
         IsServiceRunning = serviceVersion is not null;
         CanInstallService = state == ServiceState.NotInstalled || mismatch;
         CanRemoveService = state is not ServiceState.NotInstalled and not ServiceState.Unknown;
@@ -563,13 +586,13 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             return;
         }
 
-        ConnectionLatency = Localizer.Format("ConnectionLatencyFormat", Localizer.Get("LatencyTesting"));
+        ConnectionLatency = Localizer.Get("LatencyTesting");
         var result = await LatencyTester.MeasureThroughProxyAsync(port, LatencyUrl(), LatencyTester.DefaultTimeout).ConfigureAwait(true);
 
         // Пока шёл замер, могли отключиться или переключиться.
         if (_connection.Status is { State: ConnectionState.Connected, Profile: { } current } && current.Id == profile.Id)
         {
-            ConnectionLatency = Localizer.Format("ConnectionLatencyFormat", Localizer.Describe(result));
+            ConnectionLatency = Localizer.Describe(result);
             _latency[profile.Id] = result;
             Profiles.FirstOrDefault(p => p.Id == profile.Id)?.SetLatency(result);
             ClearProblemIfConnectionWorks(profile.Id, result);
@@ -689,6 +712,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             await _connection.ConnectAsync(updated, CoreStartPreferences.From(_settings.Current)).ConfigureAwait(true);
         }
     }
+
+    public Task DeleteAsync(ProfileItemViewModel item) => DeleteProfileAsync(item);
 
     /// <summary>Ссылка профиля — в буфер обмена. В ней ключи доступа: предупреждаем, в лог не пишем.</summary>
     public async Task CopyLinkAsync(ProfileItemViewModel item)
@@ -810,11 +835,17 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     {
         OnPropertyChanged(nameof(IsConnected));
         OnPropertyChanged(nameof(IsFailed));
+        OnPropertyChanged(nameof(ShowsLogLink));
         OnPropertyChanged(nameof(CanChangeMode));
         OnPropertyChanged(nameof(CanSelectTun));
     }
 
-    partial void OnLogTailChanged(string? value) => OnPropertyChanged(nameof(HasLogTail));
+    partial void OnLogTailChanged(string? value)
+    {
+        OnPropertyChanged(nameof(HasLogTail));
+        OnPropertyChanged(nameof(HasNoLogTail));
+        OnPropertyChanged(nameof(ShowsLogLink));
+    }
 
     partial void OnMessageChanged(string? value) => OnPropertyChanged(nameof(HasMessage));
 
@@ -881,6 +912,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             { State: ConnectionState.Connected, HttpPort: { } http, SocksPort: { } socks } => Localizer.Format("LocalProxyFormat", http, socks, Localizer.CoreName(status.Core)),
             { State: ConnectionState.Failed, Failure: { } failure } => Localizer.Describe(failure),
             { State: ConnectionState.Disconnected } when SelectedProfile is null && !IsAutoSelected => Localizer.Get("NoProfileSelected"),
+            { State: ConnectionState.Disconnected } => Localizer.Get("HintDisconnected"),
             _ => null,
         };
 
@@ -931,6 +963,13 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
         UpdateSessionTime();
         MarkActiveProfile();
+
+        var sessionProfile = status.State == ConnectionState.Connected ? status.Profile : null;
+        SessionServer = sessionProfile is null ? null : CountryFlag.Split(sessionProfile.Name).Name;
+        SessionProtocol = sessionProfile is null ? null : ProfileItemViewModel.DescribeProtocol(sessionProfile);
+        SessionModeCore = sessionProfile is null
+            ? null
+            : Localizer.Format("SessionModeCoreFormat", Localizer.Get(IsTunMode ? "ModeTunOption" : "ModeProxyShort"), Localizer.CoreName(status.Core));
 
         if (status.State != ConnectionState.Connected)
         {
@@ -986,7 +1025,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         if (_connection.Status is { State: ConnectionState.Connected, ConnectedAt: { } since })
         {
             var elapsed = DateTimeOffset.UtcNow - since;
-            SessionTime = Localizer.Format("SessionTimeFormat", elapsed.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture));
+            SessionTime = elapsed.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture);
         }
     }
 

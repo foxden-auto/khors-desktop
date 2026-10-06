@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Khors.App.ViewModels"
+             xmlns:res="using:Khors.App.Resources"
+             x:Class="Khors.App.Views.AutoRowView"
+             x:DataType="vm:MainWindowViewModel">
+  <!-- «Авто»: самый быстрый профиль; выглядит как строка списка, выбирается вместо профиля. -->
+  <Button Classes="auto-row" Classes.selected="{Binding IsAutoSelected}"
+          Command="{Binding SelectAutoCommand}" IsVisible="{Binding HasProfiles}"
+          ToolTip.Tip="{x:Static res:Strings.AutoTooltip}">
+    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+      <Border Classes="badge" VerticalAlignment="Center" Margin="0,0,12,0">
+        <Path Classes="bolt" Data="{StaticResource IconBolt}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+      <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+        <TextBlock Text="{x:Static res:Strings.AutoName}" FontSize="15" FontWeight="SemiBold" />
+        <TextBlock Text="{Binding AutoSummary}" Classes="caption" TextWrapping="Wrap" />
+      </StackPanel>
+      <TextBlock Grid.Column="2" Text="{Binding AutoLatencyText}" Classes="latency good" VerticalAlignment="Center" Margin="10,0,0,0" />
+      <Ellipse Grid.Column="3" Classes="active-marker" Margin="10,0,0,0" VerticalAlignment="Center" IsVisible="{Binding IsAutoActive}" />
+    </Grid>
+  </Button>
+</UserControl>

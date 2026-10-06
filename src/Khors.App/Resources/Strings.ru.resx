@@ -5,6 +5,9 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AboutDescription" xml:space="preserve"><value>Открытый VPN/прокси-клиент. Подключается через ядра Xray-core и sing-box — это отдельные программы со своими лицензиями.</value></data>
+  <data name="AboutLicense" xml:space="preserve"><value>Лицензия Apache 2.0. Сторонние компоненты и их лицензии перечислены в файле NOTICE.</value></data>
+  <data name="AboutVersionFormat" xml:space="preserve"><value>Версия {0}</value></data>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
   <data name="AutoCurrentFormat" xml:space="preserve"><value>Сейчас: {0}</value></data>
   <data name="AutoIdleFormat" xml:space="preserve"><value>Самый быстрый профиль, перепроверка каждые {0} мин</value></data>
@@ -14,6 +17,7 @@
   <data name="AutoTooltip" xml:space="preserve"><value>Подключиться к самому быстрому профилю и переключаться при сбое</value></data>
   <data name="AutoWaiting" xml:space="preserve"><value>Ни один сервер сейчас не отвечает — «Авто» повторит подбор при следующей проверке.</value></data>
   <data name="AutoWaitingShort" xml:space="preserve"><value>Ни один сервер сейчас не отвечает</value></data>
+  <data name="ButtonAdd" xml:space="preserve"><value>Добавить</value></data>
   <data name="ButtonClose" xml:space="preserve"><value>Закрыть</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Подключить</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Копировать весь лог</value></data>
@@ -28,18 +32,17 @@
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} МБ</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>В буфере обмена нет ни ссылки, ни картинки с QR-кодом.</value></data>
   <data name="ClipboardNoQr" xml:space="preserve"><value>На картинке в буфере обмена не найден QR-код.</value></data>
-  <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Задержка: {0}</value></data>
   <data name="ConnectionProblemFormat" xml:space="preserve"><value>Соединения с сервером не устанавливаются. {0}</value></data>
   <data name="CoreAutoFormat" xml:space="preserve"><value>Автоматически (сейчас {0})</value></data>
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>Ядро {0} не запустит этот профиль: {1}. Выбор ядра не изменён.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Лог ядра скопирован в буфер обмена: строк {0}. Адреса и ключи в нём замаскированы.</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку, адрес подписки или картинку с QR-кодом и нажмите «Вставить из буфера».</value></data>
-  <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>Служба KHORS не отвечает — режим TUN недоступен. Установите службу (внизу окна) или переключитесь на «Системный прокси».</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Лог ядра</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>Ядро {0} неожиданно завершилось (код {1}). Системный прокси возвращён.</value></data>
   <data name="Failure_CoreNotFound" xml:space="preserve"><value>Не найден исполняемый файл ядра {0}. Переустановите KHORS.</value></data>
   <data name="Failure_CoreStartFailed" xml:space="preserve"><value>Ядро {0} не запустилось (код {1}). Подробности — в логе ниже.</value></data>
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>В профиле ошибка: {0}.</value></data>
+  <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>Служба KHORS не отвечает — режим TUN недоступен. Установите службу в «Настройках» или переключитесь на «Системный прокси».</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Не удалось включить системный прокси Windows.</value></data>
   <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>Ядро {0} не поддерживает этот профиль: {1}.</value></data>
   <data name="FileEmpty" xml:space="preserve"><value>Файл пустой.</value></data>
@@ -47,6 +50,7 @@
   <data name="FileReadFailed" xml:space="preserve"><value>Не удалось прочитать файл.</value></data>
   <data name="FileTooLarge" xml:space="preserve"><value>Файл больше 5 МБ — это не конфиг и не картинка с QR-кодом.</value></data>
   <data name="FileTypeImportable" xml:space="preserve"><value>Картинки с QR-кодом, ссылки и конфиги</value></data>
+  <data name="HintDisconnected" xml:space="preserve"><value>Выберите сервер и нажмите «Подключить»</value></data>
   <data name="ImportFileDialogTitle" xml:space="preserve"><value>Импорт: QR-код, ссылки или конфиг</value></data>
   <data name="ImportLineErrorFormat" xml:space="preserve"><value>Ссылка {0}: {1}</value></data>
   <data name="ImportResultFormat" xml:space="preserve"><value>Добавлено: {0}. Уже были: {1}. Не распознано: {2}.</value></data>
@@ -101,6 +105,9 @@
   <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>тип шифрования не поддерживается</value></data>
   <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>транспорт пока не поддерживается</value></data>
   <data name="LocalProxyFormat" xml:space="preserve"><value>Ядро {2}. Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
+  <data name="LogEmpty" xml:space="preserve"><value>Здесь появится лог ядра: пока подключено — последние строки, после ошибки — строки, из-за которых она произошла.</value></data>
+  <data name="LogHeader" xml:space="preserve"><value>Лог ядра</value></data>
+  <data name="LogMaskedNote" xml:space="preserve"><value>Адреса и ключи в логе замаскированы.</value></data>
   <data name="MenuCopyLink" xml:space="preserve"><value>Копировать ссылку</value></data>
   <data name="MenuCore" xml:space="preserve"><value>Ядро</value></data>
   <data name="MenuImportFile" xml:space="preserve"><value>Из файла…</value></data>
@@ -108,9 +115,16 @@
   <data name="MenuShowQr" xml:space="preserve"><value>Показать QR-код</value></data>
   <data name="ModeLabel" xml:space="preserve"><value>Режим:</value></data>
   <data name="ModeProxyOption" xml:space="preserve"><value>Системный прокси</value></data>
+  <data name="ModeProxyShort" xml:space="preserve"><value>Прокси</value></data>
   <data name="ModeProxyTooltip" xml:space="preserve"><value>Через KHORS идут программы, которые используют системный прокси Windows (браузеры и большинство приложений)</value></data>
+  <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
   <data name="ModeTunOption" xml:space="preserve"><value>TUN</value></data>
-  <data name="ModeTunTooltip" xml:space="preserve"><value>Весь трафик компьютера через KHORS — в том числе игры и программы без поддержки прокси. Нужна работающая служба KHORS (внизу окна).</value></data>
+  <data name="ModeTunTooltip" xml:space="preserve"><value>Весь трафик компьютера через KHORS — в том числе игры и программы без поддержки прокси. Нужна работающая служба KHORS (см. «Настройки»).</value></data>
+  <data name="NavAbout" xml:space="preserve"><value>О приложении</value></data>
+  <data name="NavConnection" xml:space="preserve"><value>Подключение</value></data>
+  <data name="NavLog" xml:space="preserve"><value>Журнал</value></data>
+  <data name="NavServers" xml:space="preserve"><value>Серверы</value></data>
+  <data name="NavSettings" xml:space="preserve"><value>Настройки</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Выберите профиль в списке</value></data>
   <data name="Problem_AuthenticationFailed" xml:space="preserve"><value>Сервер отклонил пароль. Проверьте пароль в профиле или обновите подписку.</value></data>
   <data name="Problem_CertificateExpired" xml:space="preserve"><value>Сертификат сервера просрочен или ещё не действует. Проверьте дату и время на компьютере.</value></data>
@@ -156,10 +170,27 @@
   <data name="ServiceState_Unknown" xml:space="preserve"><value>состояние неизвестно</value></data>
   <data name="ServiceUntrusted" xml:space="preserve"><value>канал службы занят другим процессом</value></data>
   <data name="ServiceVersionMismatch" xml:space="preserve"><value>другой версии — установите заново</value></data>
-  <data name="SessionTimeFormat" xml:space="preserve"><value>Время сессии: {0}</value></data>
+  <data name="SessionHeader" xml:space="preserve"><value>Текущая сессия</value></data>
+  <data name="SessionLatency" xml:space="preserve"><value>Задержка</value></data>
+  <data name="SessionModeCore" xml:space="preserve"><value>Режим · ядро</value></data>
+  <data name="SessionModeCoreFormat" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="SessionNoValue" xml:space="preserve"><value>—</value></data>
+  <data name="SessionNotConnected" xml:space="preserve"><value>Не подключено</value></data>
+  <data name="SessionProtocol" xml:space="preserve"><value>Протокол</value></data>
+  <data name="SessionReceived" xml:space="preserve"><value>Получено</value></data>
+  <data name="SessionSent" xml:space="preserve"><value>Отправлено</value></data>
+  <data name="SessionServer" xml:space="preserve"><value>Сервер</value></data>
+  <data name="SessionTime" xml:space="preserve"><value>Время</value></data>
+  <data name="SettingsModeHeader" xml:space="preserve"><value>Режим подключения</value></data>
+  <data name="SettingsModeHint" xml:space="preserve"><value>Режим меняется, пока нет подключения. Для TUN нужна служба KHORS.</value></data>
+  <data name="SettingsProfilesHeader" xml:space="preserve"><value>Список серверов</value></data>
+  <data name="SettingsServiceHeader" xml:space="preserve"><value>Служба KHORS</value></data>
+  <data name="SettingsServiceHint" xml:space="preserve"><value>Нужна только для режима TUN: создаёт сетевой адаптер и маршруты. Устанавливается один раз, Windows спросит права администратора.</value></data>
+  <data name="ShowLogLink" xml:space="preserve"><value>Подробности — в журнале</value></data>
   <data name="SortByLatency" xml:space="preserve"><value>Сортировать по задержке</value></data>
   <data name="SortByLatencyTooltip" xml:space="preserve"><value>Сортировать профили по задержке (сначала самые быстрые)</value></data>
   <data name="StatusAutoSelecting" xml:space="preserve"><value>Подбор сервера…</value></data>
+  <data name="StatusCaption" xml:space="preserve"><value>Статус</value></data>
   <data name="StatusConnected" xml:space="preserve"><value>Подключено</value></data>
   <data name="StatusConnecting" xml:space="preserve"><value>Подключение…</value></data>
   <data name="StatusDisconnected" xml:space="preserve"><value>Отключено</value></data>

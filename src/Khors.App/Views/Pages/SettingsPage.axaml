@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Khors.App.ViewModels"
+             xmlns:res="using:Khors.App.Resources"
+             x:Class="Khors.App.Views.Pages.SettingsPage"
+             x:DataType="vm:MainWindowViewModel">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="16" MaxWidth="760" HorizontalAlignment="Left">
+      <TextBlock Text="{x:Static res:Strings.NavSettings}" Classes="page-title" Margin="4,0,0,0" />
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{x:Static res:Strings.SettingsModeHeader}" Classes="section" />
+          <RadioButton GroupName="settingsMode" IsChecked="{Binding IsProxyMode}" IsEnabled="{Binding CanChangeMode}"
+                       Content="{x:Static res:Strings.ModeProxyOption}" ToolTip.Tip="{x:Static res:Strings.ModeProxyTooltip}" />
+          <TextBlock Text="{x:Static res:Strings.ModeProxyTooltip}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
+          <RadioButton GroupName="settingsMode" IsChecked="{Binding IsTunMode}" IsEnabled="{Binding CanSelectTun}"
+                       Content="{x:Static res:Strings.ModeTunOption}" />
+          <TextBlock Text="{x:Static res:Strings.ModeTunTooltip}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
+          <TextBlock Text="{x:Static res:Strings.SettingsModeHint}" Classes="muted" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
+      <!-- Служба KHORS (режим TUN): состояние, установка и удаление с запросом прав администратора. -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{x:Static res:Strings.SettingsServiceHeader}" Classes="section" />
+          <TextBlock Text="{x:Static res:Strings.SettingsServiceHint}" Classes="muted" TextWrapping="Wrap" />
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+            <Ellipse Classes="service-dot" Classes.running="{Binding IsServiceRunning}" VerticalAlignment="Center" Margin="0,0,10,0" />
+            <TextBlock Grid.Column="1" Text="{Binding ServiceStateText}" TextWrapping="Wrap" VerticalAlignment="Center" />
+            <Button Grid.Column="2" Classes="secondary" Margin="12,0,0,0" IsVisible="{Binding CanInstallService}"
+                    Command="{Binding InstallServiceCommand}" Content="{x:Static res:Strings.ButtonInstallService}"
+                    ToolTip.Tip="{x:Static res:Strings.ServiceInstallTooltip}" />
+            <Button Grid.Column="3" Classes="secondary" Margin="8,0,0,0" IsVisible="{Binding CanRemoveService}"
+                    Command="{Binding RemoveServiceCommand}" Content="{x:Static res:Strings.ButtonDelete}"
+                    ToolTip.Tip="{x:Static res:Strings.ServiceRemoveTooltip}" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{x:Static res:Strings.SettingsProfilesHeader}" Classes="section" />
+          <CheckBox IsChecked="{Binding SortByLatency}" Content="{x:Static res:Strings.SortByLatency}"
+                    ToolTip.Tip="{x:Static res:Strings.SortByLatencyTooltip}" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

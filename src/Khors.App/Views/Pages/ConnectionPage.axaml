@@ -1,0 +1,139 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Khors.App.ViewModels"
+             xmlns:res="using:Khors.App.Resources"
+             xmlns:views="using:Khors.App.Views"
+             x:Class="Khors.App.Views.Pages.ConnectionPage"
+             x:DataType="vm:MainWindowViewModel">
+  <Grid ColumnDefinitions="*,20,400" RowDefinitions="*,20,Auto">
+
+    <!-- Статус и кнопка подключения на фоне золотого свечения. -->
+    <Border Classes="card" Padding="0">
+      <Border Classes="glow" Classes.connected="{Binding IsConnected}" Padding="24,28">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <StackPanel Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="{x:Static res:Strings.StatusCaption}" Classes="muted" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding StatusText}" Classes="status-title" Classes.connected="{Binding IsConnected}" Classes.failed="{Binding IsFailed}"
+                       HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding StatusDetail}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
+                       IsVisible="{Binding StatusDetail, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBlock Text="{Binding ProblemHint}" Classes="warning" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
+                       IsVisible="{Binding ProblemHint, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <Button Classes="link" HorizontalAlignment="Center" IsVisible="{Binding ShowsLogLink}"
+                    Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:AppPage.Log}"
+                    Content="{x:Static res:Strings.ShowLogLink}" />
+
+            <Border Classes="orb-glow" Classes.connected="{Binding IsConnected}" HorizontalAlignment="Center" Margin="0,22,0,0">
+              <Button Classes="orb" Classes.connected="{Binding IsConnected}" Command="{Binding ToggleConnectionCommand}"
+                      ToolTip.Tip="{Binding ConnectButtonText}" AutomationProperties.Name="{Binding ConnectButtonText}">
+                <Border Width="226" Height="226" CornerRadius="113" ClipToBounds="True">
+                  <Image Source="/Assets/logo-512.png" Width="250" Height="250" Stretch="UniformToFill"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                </Border>
+              </Button>
+            </Border>
+
+            <Button Classes="cta" Classes.connected="{Binding IsConnected}" HorizontalAlignment="Center" Margin="0,26,0,0"
+                    Command="{Binding ToggleConnectionCommand}">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <Path Classes="icon" Data="{StaticResource IconPower}" />
+                <TextBlock Text="{Binding ConnectButtonText}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+
+            <!-- Режим: системный прокси или TUN через службу; меняется без подключения. -->
+            <Border Classes="segmented" HorizontalAlignment="Center" Margin="0,14,0,0">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <RadioButton Classes="segment" Theme="{StaticResource {x:Type ToggleButton}}" GroupName="heroMode"
+                             IsChecked="{Binding IsProxyMode}" IsEnabled="{Binding CanChangeMode}"
+                             Content="{x:Static res:Strings.ModeProxyOption}" ToolTip.Tip="{x:Static res:Strings.ModeProxyTooltip}" />
+                <RadioButton Classes="segment" Theme="{StaticResource {x:Type ToggleButton}}" GroupName="heroMode"
+                             IsChecked="{Binding IsTunMode}" IsEnabled="{Binding CanSelectTun}"
+                             Content="{x:Static res:Strings.ModeTunOption}" ToolTip.Tip="{x:Static res:Strings.ModeTunTooltip}"
+                             ToolTip.ShowOnDisabled="True" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Border>
+
+    <!-- Текущая сессия. Отправлено/получено — после чтения статистики ядер (ROADMAP). -->
+    <Border Grid.Row="2" Classes="card" Padding="22,18">
+      <StackPanel Spacing="14">
+        <TextBlock Text="{x:Static res:Strings.SessionHeader}" Classes="section" />
+        <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,16,Auto">
+          <StackPanel Spacing="4">
+            <TextBlock Text="{x:Static res:Strings.SessionTime}" Classes="caption" />
+            <TextBlock Text="{Binding SessionTime, TargetNullValue={x:Static res:Strings.SessionNoValue}}" Classes="value" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <TextBlock Text="{x:Static res:Strings.SessionSent}" Classes="caption" />
+            <TextBlock Text="{x:Static res:Strings.SessionNoValue}" Classes="value" />
+          </StackPanel>
+          <StackPanel Grid.Column="2" Spacing="4">
+            <TextBlock Text="{x:Static res:Strings.SessionReceived}" Classes="caption" />
+            <TextBlock Text="{x:Static res:Strings.SessionNoValue}" Classes="value" />
+          </StackPanel>
+          <StackPanel Grid.Column="3" Spacing="4">
+            <TextBlock Text="{x:Static res:Strings.SessionLatency}" Classes="caption" />
+            <TextBlock Text="{Binding ConnectionLatency, TargetNullValue={x:Static res:Strings.SessionNoValue}}" Classes="value" />
+          </StackPanel>
+          <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="4" Margin="0,0,16,0">
+            <TextBlock Text="{x:Static res:Strings.SessionServer}" Classes="caption" />
+            <TextBlock Text="{Binding SessionServer, TargetNullValue={x:Static res:Strings.SessionNotConnected}}" FontSize="15" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+          <StackPanel Grid.Row="2" Grid.Column="2" Spacing="4" Margin="0,0,16,0">
+            <TextBlock Text="{x:Static res:Strings.SessionProtocol}" Classes="caption" />
+            <TextBlock Text="{Binding SessionProtocol, TargetNullValue={x:Static res:Strings.SessionNoValue}}" FontSize="15" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+          <StackPanel Grid.Row="2" Grid.Column="3" Spacing="4">
+            <TextBlock Text="{x:Static res:Strings.SessionModeCore}" Classes="caption" />
+            <TextBlock Text="{Binding SessionModeCore, TargetNullValue={x:Static res:Strings.SessionNoValue}}" FontSize="15" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <!-- Выбор сервера. Управление списком (подписки, удаление) — на странице «Серверы». -->
+    <Border Grid.Column="2" Grid.RowSpan="3" Classes="card" Padding="16,18,16,12">
+      <DockPanel>
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="4,0,0,12">
+          <TextBlock Text="{x:Static res:Strings.NavServers}" Classes="section" VerticalAlignment="Center" />
+          <Button Grid.Column="1" Classes="icon-button outlined" Margin="0,0,8,0" Command="{Binding TestLatencyCommand}"
+                  ToolTip.Tip="{x:Static res:Strings.TestLatencyTooltip}" AutomationProperties.Name="{x:Static res:Strings.TestLatencyTooltip}">
+            <Path Classes="icon small" Data="{StaticResource IconRefresh}" />
+          </Button>
+          <SplitButton Grid.Column="2" Classes="secondary" Command="{Binding ImportFromClipboardCommand}"
+                       ToolTip.Tip="{x:Static res:Strings.ButtonImportClipboard}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Path Classes="icon small" Data="{StaticResource IconPlus}" Stroke="{DynamicResource KhorsForegroundBrush}" />
+              <TextBlock Text="{x:Static res:Strings.ButtonAdd}" VerticalAlignment="Center" />
+            </StackPanel>
+            <SplitButton.Flyout>
+              <MenuFlyout Placement="BottomEdgeAlignedRight">
+                <MenuItem Header="{x:Static res:Strings.ButtonImportClipboard}" Command="{Binding ImportFromClipboardCommand}" />
+                <MenuItem Header="{x:Static res:Strings.MenuImportFile}" Command="{Binding ImportFromFileCommand}" />
+                <MenuItem Header="{x:Static res:Strings.MenuImportScreen}" Command="{Binding ImportFromScreenCommand}" />
+              </MenuFlyout>
+            </SplitButton.Flyout>
+          </SplitButton>
+        </Grid>
+
+        <views:AutoRowView DockPanel.Dock="Top" Margin="0,0,0,6" />
+
+        <Panel>
+          <ListBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Classes="profiles">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:ProfileItemViewModel">
+                <views:ProfileRowView />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <TextBlock Text="{x:Static res:Strings.EmptyProfilesHint}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
+                     VerticalAlignment="Center" Margin="24" IsVisible="{Binding HasNoProfiles}" />
+        </Panel>
+      </DockPanel>
+    </Border>
+  </Grid>
+</UserControl>

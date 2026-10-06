@@ -2,168 +2,109 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Khors.App.ViewModels"
         xmlns:res="using:Khors.App.Resources"
-        xmlns:profiles="using:Khors.Core.Profiles"
+        xmlns:pages="using:Khors.App.Views.Pages"
+        xmlns:chrome="using:Avalonia.Controls.Chrome"
         x:Class="Khors.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="{x:Static res:Strings.AppTitle}"
         Icon="/Assets/khors.ico"
-        Width="420" Height="840"
-        MinWidth="380" MinHeight="560"
-        WindowStartupLocation="CenterScreen">
-  <DockPanel Margin="20">
+        Width="1280" Height="860"
+        MinWidth="1000" MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="60">
+  <!-- Своя шапка: клиентская область заходит под заголовок, системные кнопки окна остаются справа (привязка окон Windows работает). -->
+  <DockPanel Margin="{Binding $parent[Window].OffScreenMargin}">
 
-    <!-- Логотип KHORS (Assets/logo-512.png — тот же, что у KHORS Android). -->
-    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12">
-      <Image Source="/Assets/logo-512.png" Width="44" Height="44" RenderOptions.BitmapInterpolationMode="HighQuality" />
-      <TextBlock Text="{x:Static res:Strings.AppTitle}" Classes="title" VerticalAlignment="Center" />
-    </StackPanel>
-
-    <!-- Статус и кнопка подключения. -->
-    <Border DockPanel.Dock="Top" Classes="card" Margin="0,20,0,0">
-      <StackPanel Spacing="10">
-        <Button Classes="connect" Classes.connected="{Binding IsConnected}"
-                HorizontalAlignment="Center"
-                Command="{Binding ToggleConnectionCommand}"
-                Content="{Binding ConnectButtonText}" />
-        <TextBlock Text="{Binding StatusText}" Classes="status" Classes.failed="{Binding IsFailed}" HorizontalAlignment="Center" />
-        <TextBlock Text="{Binding ActiveProfileName}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"
-                   IsVisible="{Binding ActiveProfileName, Converter={x:Static ObjectConverters.IsNotNull}}" />
-        <TextBlock Text="{Binding StatusDetail}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
-                   IsVisible="{Binding StatusDetail, Converter={x:Static ObjectConverters.IsNotNull}}" />
-        <TextBlock Text="{Binding ProblemHint}" Classes="warning" TextWrapping="Wrap" TextAlignment="Center"
-                   IsVisible="{Binding ProblemHint, Converter={x:Static ObjectConverters.IsNotNull}}" />
-        <TextBlock Text="{Binding SessionTime}" Classes="muted" HorizontalAlignment="Center" IsVisible="{Binding IsConnected}" />
-        <TextBlock Text="{Binding ConnectionLatency}" Classes="muted" HorizontalAlignment="Center"
-                   IsVisible="{Binding ConnectionLatency, Converter={x:Static ObjectConverters.IsNotNull}}" />
-        <!-- Режим: системный прокси или TUN через службу; меняется без подключения. -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
-          <TextBlock Text="{x:Static res:Strings.ModeLabel}" Classes="muted" VerticalAlignment="Center" />
-          <RadioButton GroupName="mode" IsChecked="{Binding IsProxyMode}" IsEnabled="{Binding CanChangeMode}"
-                       Content="{x:Static res:Strings.ModeProxyOption}" ToolTip.Tip="{x:Static res:Strings.ModeProxyTooltip}" />
-          <RadioButton GroupName="mode" IsChecked="{Binding IsTunMode}" IsEnabled="{Binding CanSelectTun}"
-                       Content="{x:Static res:Strings.ModeTunOption}" ToolTip.Tip="{x:Static res:Strings.ModeTunTooltip}"
-                       ToolTip.ShowOnDisabled="True" />
+    <Border DockPanel.Dock="Top" Classes="titlebar" chrome:WindowDecorationProperties.ElementRole="TitleBar">
+      <Grid ColumnDefinitions="Auto,Auto,*,Auto" Margin="20,0,0,0">
+        <!-- Логотип KHORS (Assets/logo-512.png — тот же, что у KHORS Android). -->
+        <Border Width="36" Height="36" CornerRadius="9" ClipToBounds="True" VerticalAlignment="Center">
+          <Image Source="/Assets/logo-512.png" RenderOptions.BitmapInterpolationMode="HighQuality" />
+        </Border>
+        <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center" Spacing="0">
+          <TextBlock Text="{x:Static res:Strings.AppTitle}" Classes="brand" />
         </StackPanel>
-        <Expander Header="{x:Static res:Strings.FailureDetails}" IsVisible="{Binding HasLogTail}" HorizontalAlignment="Stretch">
-          <StackPanel Spacing="8">
-            <SelectableTextBlock Text="{Binding LogTail}" Classes="log" TextWrapping="Wrap" />
-            <Button Classes="secondary" HorizontalAlignment="Left" Command="{Binding CopyCoreLogCommand}" Content="{x:Static res:Strings.ButtonCopyCoreLog}" />
-          </StackPanel>
-        </Expander>
-      </StackPanel>
-    </Border>
-
-    <!-- Служба KHORS (режим TUN): состояние, установка и удаление с запросом прав администратора. -->
-    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto,Auto" Margin="0,12,0,0">
-      <TextBlock Text="{Binding ServiceStatusText}" Classes="muted small" TextWrapping="Wrap" VerticalAlignment="Center" />
-      <Button Grid.Column="1" Classes="ghost" VerticalAlignment="Center" IsVisible="{Binding CanInstallService}"
-              Command="{Binding InstallServiceCommand}" Content="{x:Static res:Strings.ButtonInstallService}"
-              ToolTip.Tip="{x:Static res:Strings.ServiceInstallTooltip}" />
-      <Button Grid.Column="2" Classes="ghost" VerticalAlignment="Center" IsVisible="{Binding CanRemoveService}"
-              Command="{Binding RemoveServiceCommand}" Content="{x:Static res:Strings.ButtonDelete}"
-              ToolTip.Tip="{x:Static res:Strings.ServiceRemoveTooltip}" />
-    </Grid>
-
-    <!-- Сообщения: итог импорта, восстановление после сбоя. -->
-    <Border DockPanel.Dock="Bottom" Classes="message" IsVisible="{Binding HasMessage}" Margin="0,12,0,0">
-      <SelectableTextBlock Text="{Binding Message}" TextWrapping="Wrap" />
-    </Border>
-
-    <!-- Подписки: трафик, срок, обновление. -->
-    <Expander DockPanel.Dock="Top" Margin="0,16,0,0" HorizontalAlignment="Stretch"
-              Header="{Binding SubscriptionsHeader}" IsVisible="{Binding HasSubscriptions}" IsExpanded="True">
-      <ItemsControl ItemsSource="{Binding Subscriptions}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="vm:SubscriptionItemViewModel">
-            <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,4">
-              <StackPanel Spacing="2">
-                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
-                <TextBlock Text="{Binding Details}" Classes="muted small" IsVisible="{Binding HasDetails}" />
-                <TextBlock Text="{Binding Status}" Classes="muted small" Classes.error="{Binding HasError}" TextWrapping="Wrap" />
-              </StackPanel>
-              <Button Grid.Column="1" Classes="ghost" VerticalAlignment="Center" IsEnabled="{Binding !IsUpdating}"
-                      Content="{x:Static res:Strings.ButtonUpdate}"
-                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).UpdateSubscriptionCommand}"
-                      CommandParameter="{Binding}" />
-              <Button Grid.Column="2" Classes="ghost" VerticalAlignment="Center"
-                      Content="{x:Static res:Strings.ButtonDelete}"
-                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).RemoveSubscriptionCommand}"
-                      CommandParameter="{Binding}" />
-            </Grid>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </Expander>
-
-    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,20,0,8">
-      <TextBlock Text="{x:Static res:Strings.ProfilesHeader}" Classes="section" VerticalAlignment="Center" />
-      <Button Grid.Column="1" Classes="secondary" Margin="0,0,8,0" Command="{Binding TestLatencyCommand}"
-              Content="{x:Static res:Strings.ButtonTestLatency}" ToolTip.Tip="{x:Static res:Strings.TestLatencyTooltip}" />
-      <SplitButton Grid.Column="2" Classes="secondary" Command="{Binding ImportFromClipboardCommand}" Content="{x:Static res:Strings.ButtonImportClipboard}">
-        <SplitButton.Flyout>
-          <MenuFlyout Placement="BottomEdgeAlignedRight">
-            <MenuItem Header="{x:Static res:Strings.MenuImportFile}" Command="{Binding ImportFromFileCommand}" />
-            <MenuItem Header="{x:Static res:Strings.MenuImportScreen}" Command="{Binding ImportFromScreenCommand}" />
-          </MenuFlyout>
-        </SplitButton.Flyout>
-      </SplitButton>
-    </Grid>
-
-    <CheckBox DockPanel.Dock="Top" Margin="0,0,0,4" IsChecked="{Binding SortByLatency}" IsVisible="{Binding HasProfiles}"
-              Content="{x:Static res:Strings.SortByLatency}" ToolTip.Tip="{x:Static res:Strings.SortByLatencyTooltip}" />
-
-    <!-- «Авто»: самый быстрый профиль; выглядит как строка списка, выбирается вместо профиля. -->
-    <Button DockPanel.Dock="Top" Classes="auto-row" Classes.selected="{Binding IsAutoSelected}"
-            Command="{Binding SelectAutoCommand}" IsVisible="{Binding HasProfiles}"
-            ToolTip.Tip="{x:Static res:Strings.AutoTooltip}">
-      <Grid ColumnDefinitions="Auto,*,Auto">
-        <Ellipse Width="8" Height="8" Margin="0,0,10,0" Classes="active-marker" IsVisible="{Binding IsAutoActive}" VerticalAlignment="Center" />
-        <StackPanel Grid.Column="1" Spacing="2">
-          <TextBlock Text="{x:Static res:Strings.AutoName}" FontWeight="SemiBold" />
-          <TextBlock Text="{Binding AutoSummary}" Classes="muted small" TextWrapping="Wrap" />
-        </StackPanel>
-        <TextBlock Grid.Column="2" Text="{Binding AutoLatencyText}" Classes="small latency ok" VerticalAlignment="Center" Margin="8,0,0,0" />
+        <!-- Справа — место под системные кнопки «свернуть / развернуть / закрыть». -->
+        <Button Grid.Column="3" Classes="icon-button" Margin="0,0,150,0" VerticalAlignment="Center"
+                chrome:WindowDecorationProperties.ElementRole="User"
+                Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:AppPage.Settings}"
+                ToolTip.Tip="{x:Static res:Strings.NavSettings}" AutomationProperties.Name="{x:Static res:Strings.NavSettings}">
+          <Path Classes="icon" Data="{StaticResource IconSliders}" />
+        </Button>
       </Grid>
-    </Button>
+    </Border>
 
-    <Panel>
-      <ListBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Classes="profiles">
-        <ListBox.ItemTemplate>
-          <DataTemplate x:DataType="vm:ProfileItemViewModel">
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto" Background="Transparent">
-              <Grid.ContextMenu>
-                <ContextMenu>
-                  <MenuItem Header="{x:Static res:Strings.MenuCopyLink}" Command="{Binding CopyLinkCommand}" />
-                  <MenuItem Header="{x:Static res:Strings.MenuShowQr}" Command="{Binding ShowQrCommand}" />
-                  <MenuItem Header="{x:Static res:Strings.MenuCore}">
-                    <MenuItem Header="{Binding CoreAutoText}" ToggleType="Radio" IsChecked="{Binding IsCoreAuto, Mode=OneWay}"
-                              Command="{Binding SetCoreCommand}" CommandParameter="{x:Static profiles:CorePreference.Auto}" />
-                    <MenuItem Header="Xray" ToggleType="Radio" IsChecked="{Binding IsCoreXray, Mode=OneWay}"
-                              Command="{Binding SetCoreCommand}" CommandParameter="{x:Static profiles:CorePreference.Xray}" />
-                    <MenuItem Header="sing-box" ToggleType="Radio" IsChecked="{Binding IsCoreSingBox, Mode=OneWay}"
-                              Command="{Binding SetCoreCommand}" CommandParameter="{x:Static profiles:CorePreference.SingBox}" />
-                  </MenuItem>
-                </ContextMenu>
-              </Grid.ContextMenu>
-              <Ellipse Width="8" Height="8" Margin="0,0,10,0" Classes="active-marker" IsVisible="{Binding IsActive}" VerticalAlignment="Center" />
-              <StackPanel Grid.Column="1" Spacing="2">
-                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
-                <TextBlock Text="{Binding Summary}" Classes="muted small" />
-                <TextBlock Text="{Binding Warning}" Classes="warning small" TextWrapping="Wrap" IsVisible="{Binding HasWarning}" />
-              </StackPanel>
-              <TextBlock Grid.Column="2" Text="{Binding LatencyText}" Classes="small latency" VerticalAlignment="Center" Margin="8,0,0,0"
-                         ToolTip.Tip="{Binding LatencyTooltip}"
-                         Classes.ok="{Binding LatencyOk}" Classes.bad="{Binding LatencyBad}" />
-              <Button Grid.Column="3" Classes="ghost" VerticalAlignment="Center"
-                      Content="{x:Static res:Strings.ButtonDelete}"
-                      Command="{Binding $parent[ListBox].((vm:MainWindowViewModel)DataContext).DeleteProfileCommand}"
-                      CommandParameter="{Binding}" />
-            </Grid>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-      <TextBlock Text="{x:Static res:Strings.EmptyProfilesHint}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
-                 VerticalAlignment="Center" Margin="24" IsVisible="{Binding HasNoProfiles}" />
+    <!-- Боковое меню -->
+    <Border DockPanel.Dock="Left" Width="248" BorderBrush="{DynamicResource KhorsBorderBrush}" BorderThickness="0,0,1,0" Padding="14,20">
+      <DockPanel>
+        <Border DockPanel.Dock="Bottom" Classes="message" Background="{DynamicResource KhorsCardBrush}"
+                ToolTip.Tip="{Binding ServiceStatusText}">
+          <Grid ColumnDefinitions="Auto,*">
+            <Ellipse Classes="service-dot" Classes.running="{Binding IsServiceRunning}" VerticalAlignment="Center" Margin="0,0,10,0" />
+            <StackPanel Grid.Column="1" Spacing="2">
+              <TextBlock Text="{x:Static res:Strings.SettingsServiceHeader}" FontSize="13" />
+              <TextBlock Text="{Binding ServiceStateText}" Classes="caption" TextWrapping="Wrap" />
+            </StackPanel>
+          </Grid>
+        </Border>
+        <Border DockPanel.Dock="Bottom" Width="112" Height="112" CornerRadius="28" ClipToBounds="True" Opacity="0.3"
+                HorizontalAlignment="Center" Margin="0,0,0,20">
+          <Image Source="/Assets/logo-512.png" RenderOptions.BitmapInterpolationMode="HighQuality" />
+        </Border>
+        <StackPanel Spacing="6">
+          <Button Classes="nav" Classes.active="{Binding IsConnectionPage}" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:AppPage.Connection}">
+            <StackPanel Orientation="Horizontal" Spacing="14">
+              <Path Classes="icon" Data="{StaticResource IconPower}" />
+              <TextBlock Text="{x:Static res:Strings.NavConnection}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Classes="nav" Classes.active="{Binding IsServersPage}" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:AppPage.Servers}">
+            <StackPanel Orientation="Horizontal" Spacing="14">
+              <Path Classes="icon" Data="{StaticResource IconServers}" />
+              <TextBlock Text="{x:Static res:Strings.NavServers}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Classes="nav" Classes.active="{Binding IsSettingsPage}" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:AppPage.Settings}">
+            <StackPanel Orientation="Horizontal" Spacing="14">
+              <Path Classes="icon" Data="{StaticResource IconSliders}" />
+              <TextBlock Text="{x:Static res:Strings.NavSettings}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Classes="nav" Classes.active="{Binding IsLogPage}" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:AppPage.Log}">
+            <StackPanel Orientation="Horizontal" Spacing="14">
+              <Path Classes="icon" Data="{StaticResource IconLog}" />
+              <TextBlock Text="{x:Static res:Strings.NavLog}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Classes="nav" Classes.active="{Binding IsAboutPage}" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:AppPage.About}">
+            <StackPanel Orientation="Horizontal" Spacing="14">
+              <Path Classes="icon" Data="{StaticResource IconInfo}" />
+              <TextBlock Text="{x:Static res:Strings.NavAbout}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <!-- Сообщения: итог импорта, восстановление после сбоя — на любой странице. -->
+    <Border DockPanel.Dock="Bottom" Classes="message" IsVisible="{Binding HasMessage}" Margin="20,0,20,20">
+      <Grid ColumnDefinitions="*,Auto">
+        <SelectableTextBlock Text="{Binding Message}" TextWrapping="Wrap" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Classes="icon-button" Width="32" Height="32" Margin="12,0,0,0" VerticalAlignment="Top"
+                Command="{Binding DismissMessageCommand}"
+                ToolTip.Tip="{x:Static res:Strings.ButtonClose}" AutomationProperties.Name="{x:Static res:Strings.ButtonClose}">
+          <Path Classes="icon small" Data="{StaticResource IconClose}" />
+        </Button>
+      </Grid>
+    </Border>
+
+    <Panel Margin="20">
+      <pages:ConnectionPage IsVisible="{Binding IsConnectionPage}" />
+      <pages:ServersPage IsVisible="{Binding IsServersPage}" />
+      <pages:SettingsPage IsVisible="{Binding IsSettingsPage}" />
+      <pages:LogPage IsVisible="{Binding IsLogPage}" />
+      <pages:AboutPage IsVisible="{Binding IsAboutPage}" />
     </Panel>
   </DockPanel>
 </Window>

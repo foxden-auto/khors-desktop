@@ -19,16 +19,31 @@ public sealed partial class ProfileItemViewModel(Profile profile, IProfileAction
 
     public string Name => Profile.Name;
 
-    /// <summary>Например, «Подписка · VLESS · REALITY · TCP». Названия протоколов не переводятся.</summary>
-    public string Summary => string.Join(" · ", new[]
+    private readonly (string? Code, string Name) _flag = CountryFlag.Split(profile.Name);
+
+    /// <summary>Код страны из флага в имени («DE») для плашки; <c>null</c> — флага нет.</summary>
+    public string? CountryCode => _flag.Code;
+
+    public bool HasCountryCode => _flag.Code is not null;
+
+    /// <summary>Имя без флага — флаг показан плашкой с кодом страны.</summary>
+    public string DisplayName => _flag.Name;
+
+    /// <summary>Например, «Подписка · VLESS · REALITY · TCP · Xray». Названия протоколов не переводятся.</summary>
+    public string Summary => string.Join(" · ", new[] { Profile.Group ?? string.Empty, DescribeProtocol(Profile), Localizer.CoreName(Core.Core) }
+        .Where(s => s.Length > 0));
+
+    /// <summary>«VLESS · REALITY · TCP»; у Hysteria2/TUIC TLS встроен в QUIC, у WireGuard — свой транспорт: показываем UDP.</summary>
+    public static string DescribeProtocol(Profile profile)
     {
-        Profile.Group ?? string.Empty,
-        ProtocolName(Profile.Protocol),
-        // У Hysteria2/TUIC TLS встроен в QUIC, у WireGuard — свой транспорт: показываем UDP.
-        Profile.Protocol.HasOwnTransport ? string.Empty : SecurityName(Profile.Security),
-        Profile.Protocol.HasOwnTransport ? "UDP" : TransportName(Profile.Transport),
-        Localizer.CoreName(Core.Core),
-    }.Where(s => s.Length > 0));
+        ArgumentNullException.ThrowIfNull(profile);
+        return string.Join(" · ", new[]
+        {
+            ProtocolName(profile.Protocol),
+            profile.Protocol.HasOwnTransport ? string.Empty : SecurityName(profile.Security),
+            profile.Protocol.HasOwnTransport ? "UDP" : TransportName(profile.Transport),
+        }.Where(s => s.Length > 0));
+    }
 
     /// <summary>Сначала — что выбранное ядро не запустит профиль, затем предупреждения валидатора.</summary>
     public string? Warning { get; } = DescribeCore(profile) ?? ProfileValidator.Validate(profile)
@@ -64,11 +79,34 @@ public sealed partial class ProfileItemViewModel(Profile profile, IProfileAction
     [ObservableProperty]
     public partial bool LatencyBad { get; set; }
 
+    /// <summary>Уровень задержки для цвета и полосок сигнала: до 150 мс — хорошо, до 400 — средне, дольше — медленно.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsLatencyGood), nameof(IsLatencyMid), nameof(IsLatencySlow), nameof(HasLatencyBars))]
+    public partial LatencyLevel LatencyLevel { get; set; }
+
+    public bool IsLatencyGood => LatencyLevel == LatencyLevel.Good;
+
+    public bool IsLatencyMid => LatencyLevel == LatencyLevel.Mid;
+
+    public bool IsLatencySlow => LatencyLevel == LatencyLevel.Slow;
+
+    public bool HasLatencyBars => LatencyLevel != LatencyLevel.None;
+
+    public static LatencyLevel LevelOf(LatencyResult? result) => result switch
+    {
+        { Status: LatencyStatus.Ok, Delay: { } delay } when delay.TotalMilliseconds <= 150 => LatencyLevel.Good,
+        { Status: LatencyStatus.Ok, Delay: { } delay } when delay.TotalMilliseconds <= 400 => LatencyLevel.Mid,
+        { Status: LatencyStatus.Ok } => LatencyLevel.Slow,
+        null => LatencyLevel.None,
+        _ => LatencyLevel.Failed,
+    };
+
     public void SetLatency(LatencyResult? result)
     {
         LatencyText = result is null ? Localizer.Get("LatencyTesting") : Localizer.Describe(result);
         LatencyOk = result?.Status == LatencyStatus.Ok;
         LatencyBad = result is not null && result.Status != LatencyStatus.Ok;
+        LatencyLevel = LevelOf(result);
         LatencyTooltip = result switch
         {
             { Problem: { } problem } => Localizer.Describe(problem),
@@ -85,6 +123,9 @@ public sealed partial class ProfileItemViewModel(Profile profile, IProfileAction
 
     [RelayCommand]
     private Task ShowQrAsync() => actions?.ShowQrAsync(this) ?? Task.CompletedTask;
+
+    [RelayCommand]
+    private Task DeleteAsync() => actions?.DeleteAsync(this) ?? Task.CompletedTask;
 
     private static string? DescribeCore(Profile profile) => CoreSelection.Select(profile) is { Unsupported: { } field } choice
         ? Localizer.Format("Failure_UnsupportedByCore", Localizer.CoreName(choice.Core), Localizer.DescribeUnsupported(field))
@@ -133,4 +174,16 @@ public interface IProfileActions
     Task CopyLinkAsync(ProfileItemViewModel item);
 
     Task ShowQrAsync(ProfileItemViewModel item);
+
+    Task DeleteAsync(ProfileItemViewModel item);
+}
+
+/// <summary>Уровень задержки профиля: <see cref="None"/> — не проверялся или проверяется.</summary>
+public enum LatencyLevel
+{
+    None,
+    Good,
+    Mid,
+    Slow,
+    Failed,
 }

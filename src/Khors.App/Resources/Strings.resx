@@ -5,6 +5,9 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AboutDescription" xml:space="preserve"><value>An open VPN/proxy client. It connects through the Xray-core and sing-box cores, which are separate programs with their own licenses.</value></data>
+  <data name="AboutLicense" xml:space="preserve"><value>Licensed under Apache 2.0. Third-party components and their licenses are listed in the NOTICE file.</value></data>
+  <data name="AboutVersionFormat" xml:space="preserve"><value>Version {0}</value></data>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
   <data name="AutoCurrentFormat" xml:space="preserve"><value>Now: {0}</value></data>
   <data name="AutoIdleFormat" xml:space="preserve"><value>Fastest profile, rechecked every {0} min</value></data>
@@ -14,6 +17,7 @@
   <data name="AutoTooltip" xml:space="preserve"><value>Connect to the fastest profile and switch on failure</value></data>
   <data name="AutoWaiting" xml:space="preserve"><value>No server responds right now — Auto will try again at the next check.</value></data>
   <data name="AutoWaitingShort" xml:space="preserve"><value>No server responds right now</value></data>
+  <data name="ButtonAdd" xml:space="preserve"><value>Add</value></data>
   <data name="ButtonClose" xml:space="preserve"><value>Close</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Connect</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Copy the whole log</value></data>
@@ -28,18 +32,17 @@
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} MB</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>The clipboard contains neither a link nor a QR code image.</value></data>
   <data name="ClipboardNoQr" xml:space="preserve"><value>No QR code was found in the clipboard image.</value></data>
-  <data name="ConnectionLatencyFormat" xml:space="preserve"><value>Latency: {0}</value></data>
   <data name="ConnectionProblemFormat" xml:space="preserve"><value>Connections to the server fail. {0}</value></data>
   <data name="CoreAutoFormat" xml:space="preserve"><value>Automatic (now {0})</value></data>
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>The {0} core cannot run this profile: {1}. The core choice was not changed.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Core log copied to the clipboard: {0} lines. Addresses and keys are masked.</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a link, a subscription address or a QR code image and press “Paste from clipboard”.</value></data>
-  <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>The KHORS service does not respond — TUN mode is unavailable. Install the service (at the bottom of the window) or switch to System proxy.</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Core log</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>The {0} core exited unexpectedly (code {1}). System proxy restored.</value></data>
   <data name="Failure_CoreNotFound" xml:space="preserve"><value>The {0} core executable was not found. Reinstall KHORS.</value></data>
   <data name="Failure_CoreStartFailed" xml:space="preserve"><value>The {0} core failed to start (code {1}). See the log below.</value></data>
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>The profile has an error: {0}.</value></data>
+  <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>The KHORS service does not respond — TUN mode is unavailable. Install the service in Settings or switch to System proxy.</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Could not enable the Windows system proxy.</value></data>
   <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>The {0} core does not support this profile: {1}.</value></data>
   <data name="FileEmpty" xml:space="preserve"><value>The file is empty.</value></data>
@@ -47,6 +50,7 @@
   <data name="FileReadFailed" xml:space="preserve"><value>Could not read the file.</value></data>
   <data name="FileTooLarge" xml:space="preserve"><value>The file is larger than 5 MB — it is not a config or a QR code image.</value></data>
   <data name="FileTypeImportable" xml:space="preserve"><value>QR code images, links and configs</value></data>
+  <data name="HintDisconnected" xml:space="preserve"><value>Choose a server and press “Connect”</value></data>
   <data name="ImportFileDialogTitle" xml:space="preserve"><value>Import: QR code, links or config</value></data>
   <data name="ImportLineErrorFormat" xml:space="preserve"><value>Link {0}: {1}</value></data>
   <data name="ImportResultFormat" xml:space="preserve"><value>Added: {0}. Already present: {1}. Not recognized: {2}.</value></data>
@@ -101,6 +105,9 @@
   <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>security type is not supported</value></data>
   <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>transport is not supported yet</value></data>
   <data name="LocalProxyFormat" xml:space="preserve"><value>Core: {2}. Local proxy: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
+  <data name="LogEmpty" xml:space="preserve"><value>The core log appears here: the latest lines while connected, and the lines that caused an error after a failure.</value></data>
+  <data name="LogHeader" xml:space="preserve"><value>Core log</value></data>
+  <data name="LogMaskedNote" xml:space="preserve"><value>Addresses and keys in the log are masked.</value></data>
   <data name="MenuCopyLink" xml:space="preserve"><value>Copy link</value></data>
   <data name="MenuCore" xml:space="preserve"><value>Core</value></data>
   <data name="MenuImportFile" xml:space="preserve"><value>From file…</value></data>
@@ -108,9 +115,16 @@
   <data name="MenuShowQr" xml:space="preserve"><value>Show QR code</value></data>
   <data name="ModeLabel" xml:space="preserve"><value>Mode:</value></data>
   <data name="ModeProxyOption" xml:space="preserve"><value>System proxy</value></data>
+  <data name="ModeProxyShort" xml:space="preserve"><value>Proxy</value></data>
   <data name="ModeProxyTooltip" xml:space="preserve"><value>Apps that use the Windows system proxy (browsers and most apps) go through KHORS</value></data>
+  <data name="ModeSystemProxy" xml:space="preserve"><value>Mode: system proxy</value></data>
   <data name="ModeTunOption" xml:space="preserve"><value>TUN</value></data>
-  <data name="ModeTunTooltip" xml:space="preserve"><value>All traffic of this computer goes through KHORS, including games and apps without proxy support. Requires the KHORS service (at the bottom of the window).</value></data>
+  <data name="ModeTunTooltip" xml:space="preserve"><value>All traffic of this computer goes through KHORS, including games and apps without proxy support. Requires the running KHORS service (see Settings).</value></data>
+  <data name="NavAbout" xml:space="preserve"><value>About</value></data>
+  <data name="NavConnection" xml:space="preserve"><value>Connection</value></data>
+  <data name="NavLog" xml:space="preserve"><value>Log</value></data>
+  <data name="NavServers" xml:space="preserve"><value>Servers</value></data>
+  <data name="NavSettings" xml:space="preserve"><value>Settings</value></data>
   <data name="NoProfileSelected" xml:space="preserve"><value>Select a profile below</value></data>
   <data name="Problem_AuthenticationFailed" xml:space="preserve"><value>The server rejected the password. Check the password in the profile or update the subscription.</value></data>
   <data name="Problem_CertificateExpired" xml:space="preserve"><value>The server certificate has expired or is not yet valid. Check the date and time on this computer.</value></data>
@@ -156,10 +170,27 @@
   <data name="ServiceState_Unknown" xml:space="preserve"><value>state unknown</value></data>
   <data name="ServiceUntrusted" xml:space="preserve"><value>the service channel is taken by another process</value></data>
   <data name="ServiceVersionMismatch" xml:space="preserve"><value>different version — install again</value></data>
-  <data name="SessionTimeFormat" xml:space="preserve"><value>Session time: {0}</value></data>
+  <data name="SessionHeader" xml:space="preserve"><value>Current session</value></data>
+  <data name="SessionLatency" xml:space="preserve"><value>Latency</value></data>
+  <data name="SessionModeCore" xml:space="preserve"><value>Mode · core</value></data>
+  <data name="SessionModeCoreFormat" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="SessionNoValue" xml:space="preserve"><value>—</value></data>
+  <data name="SessionNotConnected" xml:space="preserve"><value>Not connected</value></data>
+  <data name="SessionProtocol" xml:space="preserve"><value>Protocol</value></data>
+  <data name="SessionReceived" xml:space="preserve"><value>Received</value></data>
+  <data name="SessionSent" xml:space="preserve"><value>Sent</value></data>
+  <data name="SessionServer" xml:space="preserve"><value>Server</value></data>
+  <data name="SessionTime" xml:space="preserve"><value>Time</value></data>
+  <data name="SettingsModeHeader" xml:space="preserve"><value>Connection mode</value></data>
+  <data name="SettingsModeHint" xml:space="preserve"><value>The mode can be changed while disconnected. TUN requires the KHORS service.</value></data>
+  <data name="SettingsProfilesHeader" xml:space="preserve"><value>Server list</value></data>
+  <data name="SettingsServiceHeader" xml:space="preserve"><value>KHORS service</value></data>
+  <data name="SettingsServiceHint" xml:space="preserve"><value>Needed only for TUN mode: it creates the network adapter and routes. Installed once; Windows will ask for administrator rights.</value></data>
+  <data name="ShowLogLink" xml:space="preserve"><value>Details in the log</value></data>
   <data name="SortByLatency" xml:space="preserve"><value>Sort by latency</value></data>
   <data name="SortByLatencyTooltip" xml:space="preserve"><value>Sort profiles by latency (fastest first)</value></data>
   <data name="StatusAutoSelecting" xml:space="preserve"><value>Choosing a server…</value></data>
+  <data name="StatusCaption" xml:space="preserve"><value>Status</value></data>
   <data name="StatusConnected" xml:space="preserve"><value>Connected</value></data>
   <data name="StatusConnecting" xml:space="preserve"><value>Connecting…</value></data>
   <data name="StatusDisconnected" xml:space="preserve"><value>Disconnected</value></data>
