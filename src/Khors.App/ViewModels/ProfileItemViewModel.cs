@@ -62,6 +62,22 @@ public sealed partial class ProfileItemViewModel(Profile profile, IProfileAction
 
     public bool HasWarning => Warning is not null;
 
+    public bool IsFavorite => Profile.IsFavorite;
+
+    public string FavoriteTooltip => Localizer.Get(IsFavorite ? "FavoriteRemove" : "FavoriteAdd");
+
+    /// <summary>Подходит под строку поиска: имя, код страны, подписка, протокол или ядро.</summary>
+    public bool Matches(string query) => MatchesQuery(query, DisplayName, CountryCode, Summary);
+
+    /// <summary>Каждое слово запроса есть хотя бы в одном поле (без учёта регистра); пустой запрос подходит всем.</summary>
+    public static bool MatchesQuery(string query, params string?[] fields)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(fields);
+        return query.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .All(word => fields.Any(f => f?.Contains(word, StringComparison.CurrentCultureIgnoreCase) == true));
+    }
+
     [ObservableProperty]
     public partial bool IsActive { get; set; }
 
@@ -125,6 +141,9 @@ public sealed partial class ProfileItemViewModel(Profile profile, IProfileAction
     private Task ShowQrAsync() => actions?.ShowQrAsync(this) ?? Task.CompletedTask;
 
     [RelayCommand]
+    private Task ToggleFavoriteAsync() => actions?.ToggleFavoriteAsync(this) ?? Task.CompletedTask;
+
+    [RelayCommand]
     private Task DeleteAsync() => actions?.DeleteAsync(this) ?? Task.CompletedTask;
 
     private static string? DescribeCore(Profile profile) => CoreSelection.Select(profile) is { Unsupported: { } field } choice
@@ -176,6 +195,8 @@ public interface IProfileActions
     Task ShowQrAsync(ProfileItemViewModel item);
 
     Task DeleteAsync(ProfileItemViewModel item);
+
+    Task ToggleFavoriteAsync(ProfileItemViewModel item);
 }
 
 /// <summary>Уровень задержки профиля: <see cref="None"/> — не проверялся или проверяется.</summary>

@@ -45,6 +45,9 @@
   <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>The KHORS service does not respond — TUN mode is unavailable. Install the service in Settings or switch to System proxy.</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Could not enable the Windows system proxy.</value></data>
   <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>The {0} core does not support this profile: {1}.</value></data>
+  <data name="FavoriteAdd" xml:space="preserve"><value>Add to favorites</value></data>
+  <data name="FavoriteRemove" xml:space="preserve"><value>Remove from favorites</value></data>
+  <data name="FavoritesEmpty" xml:space="preserve"><value>Star servers to see them here.</value></data>
   <data name="FileEmpty" xml:space="preserve"><value>The file is empty.</value></data>
   <data name="FileNoQr" xml:space="preserve"><value>No QR code was found in the file.</value></data>
   <data name="FileReadFailed" xml:space="preserve"><value>Could not read the file.</value></data>
@@ -151,6 +154,8 @@
   <data name="QrWindowTitle" xml:space="preserve"><value>Profile QR code</value></data>
   <data name="ScreenCaptureFailed" xml:space="preserve"><value>Could not capture the screen.</value></data>
   <data name="ScreenNoQr" xml:space="preserve"><value>No QR code was found on the screen. Open the image with the code on top of other windows and try again.</value></data>
+  <data name="SearchNoResults" xml:space="preserve"><value>Nothing found</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>Search</value></data>
   <data name="ServiceInstallTooltip" xml:space="preserve"><value>Install the KHORS service (Windows will ask for administrator rights)</value></data>
   <data name="ServiceLabelFormat" xml:space="preserve"><value>KHORS service (TUN mode): {0}</value></data>
   <data name="ServiceNotResponding" xml:space="preserve"><value>started but not responding</value></data>
@@ -215,6 +220,8 @@
   <data name="SubscriptionUpdatedFormat" xml:space="preserve"><value>“{0}” updated: {1} profiles, {2} new, {3} removed.</value></data>
   <data name="SubscriptionViaProxy" xml:space="preserve"><value>downloaded through KHORS — the subscription server is unreachable directly</value></data>
   <data name="SubscriptionsHeaderFormat" xml:space="preserve"><value>Subscriptions ({0})</value></data>
+  <data name="TabAll" xml:space="preserve"><value>All</value></data>
+  <data name="TabFavorites" xml:space="preserve"><value>Favorites</value></data>
   <data name="TestLatencyTooltip" xml:space="preserve"><value>Test latency of all profiles</value></data>
   <data name="TrayExit" xml:space="preserve"><value>Exit</value></data>
   <data name="TrayShow" xml:space="preserve"><value>Show window</value></data>

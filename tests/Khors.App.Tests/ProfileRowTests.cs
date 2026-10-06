@@ -57,4 +57,20 @@ public class ProfileRowTests
         Assert.Equal(LatencyLevel.Failed, ProfileItemViewModel.LevelOf(new LatencyResult(LatencyStatus.Timeout)));
         Assert.Equal(LatencyLevel.None, ProfileItemViewModel.LevelOf(null));
     }
+
+    [Theory]
+    [InlineData("", true)]
+    [InlineData("  ", true)]
+    [InlineData("герм", true)]
+    [InlineData("ГЕРМАНИЯ", true)]
+    [InlineData("de", true)]
+    [InlineData("reality xray", true)]
+    [InlineData("германия hysteria2", false)]
+    [InlineData("франция", false)]
+    public void SearchMatchesEveryWordInSomeField(string query, bool expected) =>
+        Assert.Equal(expected, ProfileItemViewModel.MatchesQuery(query, "Германия · Франкфурт", "DE", "Подписка · VLESS · REALITY · TCP · Xray"));
+
+    [Fact]
+    public void SearchIgnoresMissingFields() =>
+        Assert.False(ProfileItemViewModel.MatchesQuery("de", "Мой сервер", null, "WireGuard · UDP · sing-box"));
 }

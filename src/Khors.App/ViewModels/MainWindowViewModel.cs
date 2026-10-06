@@ -93,6 +93,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ToggleConnectionCommand))]
+    [NotifyPropertyChangedFor(nameof(ListSelectedProfile))]
     public partial ProfileItemViewModel? SelectedProfile { get; set; }
 
     [ObservableProperty]
@@ -715,6 +716,20 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     public Task DeleteAsync(ProfileItemViewModel item) => DeleteProfileAsync(item);
 
+    /// <summary>Звёздочка в строке: отметка сохраняется в профиле и переживает обновление подписки.</summary>
+    public Task ToggleFavoriteAsync(ProfileItemViewModel item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        if (_profiles.IsReadOnly)
+        {
+            Message = Localizer.Get("StorageReadOnly");
+            return Task.CompletedTask;
+        }
+
+        _profiles.Update(item.Profile with { IsFavorite = !item.Profile.IsFavorite });
+        return Task.CompletedTask;
+    }
+
     /// <summary>Ссылка профиля — в буфер обмена. В ней ключи доступа: предупреждаем, в лог не пишем.</summary>
     public async Task CopyLinkAsync(ProfileItemViewModel item)
     {
@@ -874,6 +889,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             IsAutoSelected = false;
         }
 
+        ApplyProfileFilter();
         MarkActiveProfile();
         UpdateAutoSummary();
         OnPropertyChanged(nameof(HasNoProfiles));

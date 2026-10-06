@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Khors.App.ViewModels"
+             xmlns:res="using:Khors.App.Resources"
+             x:Class="Khors.App.Views.FilterBarView"
+             x:DataType="vm:MainWindowViewModel">
+  <!-- Вкладки «Все / Избранные» и поиск по имени, стране, подписке, протоколу. -->
+  <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding HasProfiles}">
+    <Border Classes="segmented" Margin="0,0,8,0">
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <RadioButton Classes="segment" Theme="{StaticResource {x:Type ToggleButton}}" Height="32" Padding="14,0"
+                     IsChecked="{Binding ShowAllProfiles}" Content="{x:Static res:Strings.TabAll}" />
+        <RadioButton Classes="segment" Theme="{StaticResource {x:Type ToggleButton}}" Height="32" Padding="14,0"
+                     IsChecked="{Binding ShowFavoritesOnly}" Content="{x:Static res:Strings.TabFavorites}" />
+      </StackPanel>
+    </Border>
+    <TextBox Grid.Column="1" Classes="search" Text="{Binding SearchText}" PlaceholderText="{x:Static res:Strings.SearchPlaceholder}"
+             AutomationProperties.Name="{x:Static res:Strings.SearchPlaceholder}">
+      <TextBox.InnerLeftContent>
+        <Path Classes="icon small" Data="{StaticResource IconSearch}" Margin="10,0,0,0" />
+      </TextBox.InnerLeftContent>
+    </TextBox>
+  </Grid>
+</UserControl>

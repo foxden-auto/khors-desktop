@@ -45,6 +45,9 @@
   <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>Служба KHORS не отвечает — режим TUN недоступен. Установите службу в «Настройках» или переключитесь на «Системный прокси».</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Не удалось включить системный прокси Windows.</value></data>
   <data name="Failure_UnsupportedByCore" xml:space="preserve"><value>Ядро {0} не поддерживает этот профиль: {1}.</value></data>
+  <data name="FavoriteAdd" xml:space="preserve"><value>В избранное</value></data>
+  <data name="FavoriteRemove" xml:space="preserve"><value>Убрать из избранного</value></data>
+  <data name="FavoritesEmpty" xml:space="preserve"><value>Отметьте серверы звёздочкой — они появятся здесь.</value></data>
   <data name="FileEmpty" xml:space="preserve"><value>Файл пустой.</value></data>
   <data name="FileNoQr" xml:space="preserve"><value>В файле не найден QR-код.</value></data>
   <data name="FileReadFailed" xml:space="preserve"><value>Не удалось прочитать файл.</value></data>
@@ -151,6 +154,8 @@
   <data name="QrWindowTitle" xml:space="preserve"><value>QR-код профиля</value></data>
   <data name="ScreenCaptureFailed" xml:space="preserve"><value>Не удалось сделать снимок экрана.</value></data>
   <data name="ScreenNoQr" xml:space="preserve"><value>На экране не найден QR-код. Откройте картинку с кодом поверх других окон и повторите.</value></data>
+  <data name="SearchNoResults" xml:space="preserve"><value>Ничего не найдено</value></data>
+  <data name="SearchPlaceholder" xml:space="preserve"><value>Поиск</value></data>
   <data name="ServiceInstallTooltip" xml:space="preserve"><value>Установить службу KHORS (Windows спросит права администратора)</value></data>
   <data name="ServiceLabelFormat" xml:space="preserve"><value>Служба KHORS (режим TUN): {0}</value></data>
   <data name="ServiceNotResponding" xml:space="preserve"><value>запущена, но не отвечает</value></data>
@@ -215,6 +220,8 @@
   <data name="SubscriptionUpdatedFormat" xml:space="preserve"><value>«{0}» обновлена: профилей {1}, новых {2}, удалено {3}.</value></data>
   <data name="SubscriptionViaProxy" xml:space="preserve"><value>загружено через KHORS — напрямую сервер подписки недоступен</value></data>
   <data name="SubscriptionsHeaderFormat" xml:space="preserve"><value>Подписки ({0})</value></data>
+  <data name="TabAll" xml:space="preserve"><value>Все</value></data>
+  <data name="TabFavorites" xml:space="preserve"><value>Избранные</value></data>
   <data name="TestLatencyTooltip" xml:space="preserve"><value>Проверить задержку всех профилей</value></data>
   <data name="TrayExit" xml:space="preserve"><value>Выход</value></data>
   <data name="TrayShow" xml:space="preserve"><value>Показать окно</value></data>

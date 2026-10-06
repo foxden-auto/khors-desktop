@@ -120,10 +120,11 @@
           </SplitButton>
         </Grid>
 
+        <views:FilterBarView DockPanel.Dock="Top" Margin="0,0,0,10" />
         <views:AutoRowView DockPanel.Dock="Top" Margin="0,0,0,6" />
 
         <Panel>
-          <ListBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Classes="profiles">
+          <ListBox ItemsSource="{Binding VisibleProfiles}" SelectedItem="{Binding ListSelectedProfile}" Classes="profiles">
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="vm:ProfileItemViewModel">
                 <views:ProfileRowView />
@@ -132,6 +133,8 @@
           </ListBox>
           <TextBlock Text="{x:Static res:Strings.EmptyProfilesHint}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
                      VerticalAlignment="Center" Margin="24" IsVisible="{Binding HasNoProfiles}" />
+          <TextBlock Text="{Binding EmptyFilterText}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
+                     VerticalAlignment="Center" Margin="24" IsVisible="{Binding HasNoVisibleProfiles}" />
         </Panel>
       </DockPanel>
     </Border>

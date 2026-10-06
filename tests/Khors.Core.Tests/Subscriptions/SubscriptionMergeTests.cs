@@ -38,6 +38,17 @@ public class SubscriptionMergeTests
     }
 
     [Fact]
+    public void FavoriteSurvivesUpdate()
+    {
+        var favorite = Existing(TestProfiles.VlessReality(), "Германия") with { IsFavorite = true };
+
+        var result = SubscriptionMerge.Merge([favorite], [Incoming(TestProfiles.VlessReality(), "Германия (новое имя)")], s_subscription, Guid.NewGuid, s_now);
+
+        Assert.Equal(favorite.Id, Assert.Single(result.Profiles).Id);
+        Assert.True(result.Profiles[0].IsFavorite);
+    }
+
+    [Fact]
     public void ManualCoreChoiceSurvivesUpdate()
     {
         var chosen = Existing(TestProfiles.VlessReality(), "Германия") with { Core = CorePreference.SingBox };

@@ -23,6 +23,17 @@ public partial class StorageJsonTests
     }
 
     [Fact]
+    public void FavoriteIsStoredOnlyWhenSet()
+    {
+        var plain = TestProfiles.VlessReality();
+        var favorite = plain with { IsFavorite = true };
+
+        Assert.Null(JsonNode.Parse(StorageJson.SerializeProfile(plain))!["isFavorite"]);
+        Assert.True(JsonNode.Parse(StorageJson.SerializeProfile(favorite))!["isFavorite"]!.GetValue<bool>());
+        Assert.Equal(favorite, StorageJson.ParseProfile(StorageJson.SerializeProfile(favorite)));
+    }
+
+    [Fact]
     public void VersionOneFileIsMigratedWithoutLosingProfiles()
     {
         // Файл формата 1.7 (до подписок).

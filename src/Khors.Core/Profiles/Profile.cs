@@ -21,6 +21,10 @@ public sealed record Profile
 
     public CorePreference Core { get; init; } = CorePreference.Auto;
 
+    /// <summary>Отмечен пользователем как избранный. В файле — только когда <c>true</c>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsFavorite { get; init; }
+
     public required ServerEndpoint Server { get; init; }
 
     public required ProtocolSettings Protocol { get; init; }

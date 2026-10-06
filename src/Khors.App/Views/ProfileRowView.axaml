@@ -6,7 +6,7 @@
              x:Class="Khors.App.Views.ProfileRowView"
              x:DataType="vm:ProfileItemViewModel">
   <!-- Строка профиля: код страны, имя и протокол, задержка с полосками сигнала. Действия — в контекстном меню. -->
-  <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" Background="Transparent">
+  <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto" Background="Transparent">
     <Grid.ContextMenu>
       <ContextMenu>
         <MenuItem Header="{x:Static res:Strings.MenuCopyLink}" Command="{Binding CopyLinkCommand}" />
@@ -52,5 +52,11 @@
     </StackPanel>
 
     <Ellipse Grid.Column="4" Classes="active-marker" Margin="10,0,0,0" VerticalAlignment="Center" IsVisible="{Binding IsActive}" />
+
+    <Button Grid.Column="5" Classes="icon-button" Width="36" Height="36" Margin="6,0,-6,0" VerticalAlignment="Center"
+            Command="{Binding ToggleFavoriteCommand}"
+            ToolTip.Tip="{Binding FavoriteTooltip}" AutomationProperties.Name="{Binding FavoriteTooltip}">
+      <Path Classes="star" Classes.on="{Binding IsFavorite}" Data="{StaticResource IconStar}" />
+    </Button>
   </Grid>
 </UserControl>

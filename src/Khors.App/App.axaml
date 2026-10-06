@@ -411,6 +411,27 @@
     <Style Selector="StackPanel.bars.slow Border.b1">
       <Setter Property="Background" Value="{DynamicResource KhorsDestructiveBrush}" />
     </Style>
+    <!-- Избранное: контурная звезда, отмеченная — золотая с заливкой -->
+    <Style Selector="Path.star">
+      <Setter Property="Width" Value="18" />
+      <Setter Property="Height" Value="18" />
+      <Setter Property="Stretch" Value="Uniform" />
+      <Setter Property="StrokeThickness" Value="1.6" />
+      <Setter Property="StrokeJoin" Value="Round" />
+      <Setter Property="Stroke" Value="{DynamicResource KhorsMutedForegroundBrush}" />
+      <Setter Property="Fill" Value="Transparent" />
+    </Style>
+    <Style Selector="Path.star.on">
+      <Setter Property="Stroke" Value="{DynamicResource KhorsPrimaryBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource KhorsPrimaryBrush}" />
+    </Style>
+    <Style Selector="TextBox.search">
+      <Setter Property="Height" Value="40" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Background" Value="{DynamicResource KhorsBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource KhorsBorderBrush}" />
+    </Style>
     <Style Selector="Ellipse.active-marker">
       <Setter Property="Width" Value="8" />
       <Setter Property="Height" Value="8" />

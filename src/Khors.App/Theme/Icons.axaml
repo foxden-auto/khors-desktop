@@ -13,5 +13,7 @@
   <StreamGeometry x:Key="IconPlus">M12 5 L12 19 M5 12 L19 12</StreamGeometry>
   <StreamGeometry x:Key="IconGlobe">M12 3 A9 9 0 1 1 12 21 A9 9 0 1 1 12 3 Z M3 12 L21 12 M12 3 C15 6 15 18 12 21 C9 18 9 6 12 3 Z</StreamGeometry>
   <StreamGeometry x:Key="IconBolt">M13 2 L4 14 L11 14 L10 22 L19 10 L12 10 Z</StreamGeometry>
+  <StreamGeometry x:Key="IconStar">M12 3 L14.7 8.6 L20.8 9.5 L16.4 13.8 L17.4 19.9 L12 17 L6.6 19.9 L7.6 13.8 L3.2 9.5 L9.3 8.6 Z</StreamGeometry>
+  <StreamGeometry x:Key="IconSearch">M11 4 A7 7 0 1 1 11 18 A7 7 0 1 1 11 4 Z M20 20 L16 16</StreamGeometry>
   <StreamGeometry x:Key="IconClose">M6 6 L18 18 M18 6 L6 18</StreamGeometry>
 </ResourceDictionary>
