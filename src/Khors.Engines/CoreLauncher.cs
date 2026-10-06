@@ -40,6 +40,9 @@ public sealed record CoreStartOptions
 
     /// <summary>Удалённый DNS sing-box (TUN, WireGuard); Xray его не использует — имена сайтов разрешает сервер.</summary>
     public DnsServer RemoteDns { get; init; } = DnsPresets.Default.Server;
+
+    /// <summary>Каталог гео-баз (<c>geosite.dat</c>, <c>geoip.dat</c>) для Xray; <c>null</c> — рядом с ядром.</summary>
+    public string? GeoDirectory { get; init; }
 }
 
 /// <summary>
@@ -113,6 +116,11 @@ public static class CoreLauncher
         var launch = new CoreLaunch(executable, arguments, config.Json, new IPEndPoint(IPAddress.Loopback, ports[0]), options.ReadyTimeout)
         {
             KeepLine = log.KeepLine,
+
+            // Xray ищет geosite.dat и geoip.dat в каталоге из XRAY_LOCATION_ASSET.
+            Environment = kind == CoreKind.Xray && options.GeoDirectory is { } geo
+                ? new Dictionary<string, string> { ["XRAY_LOCATION_ASSET"] = geo }
+                : null,
         };
 
         try

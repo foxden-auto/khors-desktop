@@ -58,7 +58,19 @@ Build-time only (not shipped): Avalonia.BuildServices 11.3.2 (MIT); its
 build telemetry is disabled in Directory.Build.targets.
 Tests only (not shipped): xunit.v3 4.0.1 (Apache-2.0) and its dependencies.
 
-Geo databases (geoip/geosite or rule sets): add each source with its license
-here before it is bundled or downloaded by default.
+-------------------------------------------------------------------------------
+Geo databases (downloaded at run time, not bundled)
+-------------------------------------------------------------------------------
+
+KHORS Desktop downloads these files from their release pages and uses them
+unmodified for routing rules (ROADMAP 3.6). Sources released under GPL are
+not used.
+
+File         License                         Source
+-----------  ------------------------------  ----------------------------------------------
+geosite.dat  MIT                             https://github.com/v2fly/domain-list-community
+geoip.dat    CC BY-SA 4.0 (the database);    https://github.com/v2fly/geoip
+             data: IP Geolocation by DB-IP,  https://db-ip.com
+             CC BY 4.0
 
 When a component is added, updated or removed, update this file.

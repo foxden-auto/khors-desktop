@@ -38,6 +38,12 @@ public static class WindowsPlatform
         ArgumentNullException.ThrowIfNull(services);
         services.AddWindowsService(options => options.ServiceName = WindowsServiceControl.ServiceName);
         services.AddSingleton<IIpcServerTransport>(_ => NamedPipeIpcServer.ForCurrentProcess());
+        services.AddSingleton(_ =>
+        {
+            var paths = new ServicePaths(ServiceDataDirectory.DefaultPath);
+            ServiceDataDirectory.Ensure(paths.DataDirectory, Path.GetFileName(paths.GeoDirectory));
+            return paths;
+        });
         return services;
     }
 

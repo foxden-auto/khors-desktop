@@ -4,11 +4,12 @@ using System.Text.Json.Serialization;
 namespace Khors.Ipc;
 
 /// <summary>
-/// Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений (2 — команды TUN, 3 — счётчики трафика TUN).
+/// Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений (2 — команды TUN, 3 — счётчики трафика TUN,
+/// 4 — удалённый DNS, 5 — гео-базы службы).
 /// </summary>
 public static class IpcProtocol
 {
-    public const int Version = 4;
+    public const int Version = 5;
 }
 
 /// <summary>
@@ -30,6 +31,9 @@ public static class IpcProtocol
 [JsonDerivedType(typeof(TunExitedEvent), "tunExited")]
 [JsonDerivedType(typeof(GetTunTrafficRequest), "getTunTraffic")]
 [JsonDerivedType(typeof(TunTrafficResponse), "tunTraffic")]
+[JsonDerivedType(typeof(GetGeoStatusRequest), "getGeoStatus")]
+[JsonDerivedType(typeof(UpdateGeoRequest), "updateGeo")]
+[JsonDerivedType(typeof(GeoStatusResponse), "geoStatus")]
 public abstract record IpcPayload;
 
 /// <summary>Первое сообщение клиента: версия протокола и версия приложения.</summary>
@@ -131,6 +135,32 @@ public sealed record GetTunTrafficRequest : IpcPayload;
 
 /// <summary>Отправлено и получено через сервер с включения TUN. <paramref name="Available"/> = <c>false</c> — TUN не включён этим соединением или ядро не ответило.</summary>
 public sealed record TunTrafficResponse(bool Available, long Uplink = 0, long Downlink = 0) : IpcPayload;
+
+public enum IpcGeoKind
+{
+    /// <summary><c>geosite.dat</c> — домены по категориям.</summary>
+    Site,
+
+    /// <summary><c>geoip.dat</c> — IP-адреса по странам.</summary>
+    Ip,
+}
+
+/// <summary>Гео-база в каталоге службы.</summary>
+/// <param name="Size">Размер в байтах; 0 — файла нет.</param>
+/// <param name="Updated">Когда установлен; <c>null</c> — файла нет.</param>
+/// <param name="Error">Код <c>GeoUpdateError</c> последней попытки обновления, если она не удалась.</param>
+public sealed record IpcGeoFile(IpcGeoKind Kind, long Size = 0, DateTimeOffset? Updated = null, string? Error = null);
+
+/// <summary>Состояние гео-баз службы (ROADMAP 3.6) — без загрузки.</summary>
+public sealed record GetGeoStatusRequest : IpcPayload;
+
+/// <summary>
+/// Обновить гео-базы службы. Источники и каталог выбирает служба (CLAUDE.md, правило 8); загрузка — напрямую
+/// (в режиме TUN — через туннель). Ответ — после загрузки, может занять минуты.
+/// </summary>
+public sealed record UpdateGeoRequest : IpcPayload;
+
+public sealed record GeoStatusResponse(IReadOnlyList<IpcGeoFile> Files) : IpcPayload;
 
 /// <summary>Кадр протокола: запрос и ответ на него с одинаковым <see cref="Id"/>; события службы — с <c>Id = 0</c>.</summary>
 public sealed record IpcEnvelope(long Id, IpcPayload Payload);

@@ -1,6 +1,7 @@
 using Khors.Core.Dns;
 using Khors.Core.Storage;
 using Khors.Ipc;
+using Khors.Service.Geo;
 using Khors.Service.Tun;
 
 namespace Khors.Service.Ipc;
@@ -13,7 +14,8 @@ public sealed record ServiceInfo(string Version, DateTimeOffset StartedAt);
 /// и только после рукопожатия с той же версией протокола; параметры проверяются (профиль — разбором модели,
 /// уровень лога — по списку). Соединение закрылось — включённый им TUN выключается.
 /// </summary>
-public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, Action<IpcPayload> sendEvent) : IAsyncDisposable
+/// <param name="geo">Гео-базы службы; <c>null</c> — команды гео-баз недоступны (тесты протокола).</param>
+public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, Action<IpcPayload> sendEvent, ServiceGeo? geo = null) : IAsyncDisposable
 {
     private static readonly HashSet<string> s_logLevels = ["debug", "info", "warning", "error", "none"];
 
@@ -43,6 +45,10 @@ public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, A
                 return await tun.StartAsync(this, profile, start.LogLevel, remoteDns, sendEvent, cancellationToken).ConfigureAwait(false);
             case GetTunTrafficRequest:
                 return await tun.ReadTrafficAsync(this, cancellationToken).ConfigureAwait(false);
+            case GetGeoStatusRequest when geo is not null:
+                return geo.Status();
+            case UpdateGeoRequest when geo is not null:
+                return await geo.UpdateAsync(cancellationToken).ConfigureAwait(false);
             case StopTunRequest:
                 await tun.StopAsync(this).ConfigureAwait(false);
                 return new OkResponse();

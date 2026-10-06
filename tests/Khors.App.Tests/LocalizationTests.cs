@@ -80,6 +80,16 @@ public class LocalizationTests
                 keys.Add($"DnsError_{error}");
             }
 
+            foreach (var error in Enum.GetNames<Khors.Engines.Geo.GeoUpdateError>())
+            {
+                keys.Add($"GeoError_{error}");
+            }
+
+            foreach (var kind in Enum.GetNames<Khors.Engines.Geo.GeoDatabaseKind>())
+            {
+                keys.Add($"GeoFile_{kind}");
+            }
+
             foreach (var type in Enum.GetNames<Khors.Core.Dns.DnsServerType>())
             {
                 keys.Add($"DnsKind_{type}");

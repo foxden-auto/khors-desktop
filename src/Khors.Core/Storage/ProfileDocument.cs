@@ -42,6 +42,8 @@ public enum ConnectionMode
 /// <param name="SortProfilesByLatency">Список профилей — по возрастанию задержки.</param>
 /// <param name="ConnectionMode">Режим подключения: системный прокси или TUN через службу (ROADMAP 3.2).</param>
 /// <param name="RemoteDns">Удалённый DNS в текстовой форме <see cref="Dns.DnsServer"/> — для TUN и WireGuard (ROADMAP 3.4).</param>
+/// <param name="GeoAutoUpdate">Проверять гео-базы раз в сутки (ROADMAP 3.6).</param>
+/// <param name="GeoLastCheck">Последняя успешная проверка гео-баз окна.</param>
 public sealed record AppSettings(
     int SchemaVersion = AppSettings.CurrentSchemaVersion,
     Guid? SelectedProfileId = null,
@@ -56,7 +58,9 @@ public sealed record AppSettings(
     int AutoRecheckMinutes = 10,
     bool SortProfilesByLatency = false,
     ConnectionMode ConnectionMode = ConnectionMode.SystemProxy,
-    string RemoteDns = AppSettings.DefaultRemoteDns)
+    string RemoteDns = AppSettings.DefaultRemoteDns,
+    bool GeoAutoUpdate = true,
+    DateTimeOffset? GeoLastCheck = null)
 {
     public const int CurrentSchemaVersion = 1;
 

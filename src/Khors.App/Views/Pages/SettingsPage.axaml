@@ -36,6 +36,24 @@
         </StackPanel>
       </Border>
 
+      <!-- Гео-базы: файлы окна и копия службы, ручное и автоматическое обновление. -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{x:Static res:Strings.SettingsGeoHeader}" Classes="section" />
+          <TextBlock Text="{x:Static res:Strings.SettingsGeoHint}" Classes="muted" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding GeoSiteText}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding GeoIpText}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding GeoServiceText}" Classes="caption" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding GeoErrorText}" Classes="error" TextWrapping="Wrap"
+                     IsVisible="{Binding GeoErrorText, Converter={x:Static ObjectConverters.IsNotNull}}" />
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <Button Classes="secondary" Command="{Binding UpdateGeoCommand}" Content="{x:Static res:Strings.ButtonUpdateGeo}" />
+            <TextBlock Text="{x:Static res:Strings.GeoUpdating}" Classes="muted" VerticalAlignment="Center" IsVisible="{Binding IsGeoUpdating}" />
+          </StackPanel>
+          <CheckBox IsChecked="{Binding GeoAutoUpdate}" Content="{x:Static res:Strings.GeoAutoUpdateOption}" />
+        </StackPanel>
+      </Border>
+
       <!-- Служба KHORS (режим TUN): состояние, установка и удаление с запросом прав администратора. -->
       <Border Classes="card">
         <StackPanel Spacing="10">

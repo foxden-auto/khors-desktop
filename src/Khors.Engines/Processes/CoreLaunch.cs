@@ -15,6 +15,9 @@ public sealed record CoreLaunch(
     /// <summary>Какие строки лога записывать в буфер (до маскировки); <c>null</c> — все.</summary>
     public Func<string, bool>? KeepLine { get; init; }
 
+    /// <summary>Дополнительные переменные окружения процесса ядра.</summary>
+    public IReadOnlyDictionary<string, string>? Environment { get; init; }
+
     // Конфиг содержит секреты — не выводим.
     public override string ToString() => $"CoreLaunch {{ {Path.GetFileName(ExecutablePath)} {string.Join(' ', Arguments)}, Ready = {ReadinessEndpoint} }}";
 }

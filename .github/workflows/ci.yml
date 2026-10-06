@@ -74,7 +74,7 @@ jobs:
           New-Item -ItemType Directory -Force artifacts/khors-desktop-win-x64/cores | Out-Null
           Copy-Item -Recurse cores/win-x64/xray artifacts/khors-desktop-win-x64/cores/
           Copy-Item -Recurse cores/win-x64/sing-box artifacts/khors-desktop-win-x64/cores/
-          Get-Content docs/testing/app-1.6.md, docs/testing/app-1.8.md, docs/testing/app-2.1.md, docs/testing/app-2.4.md, docs/testing/app-2.5.md, docs/testing/app-2.6.md, docs/testing/app-2.7.md, docs/testing/app-2.8.md, docs/testing/app-3.1.md, docs/testing/app-3.2.md, docs/testing/app-3.4.md, docs/testing/app-ui.md -Encoding utf8 | Set-Content artifacts/khors-desktop-win-x64/README.md -Encoding utf8
+          Get-Content docs/testing/app-1.6.md, docs/testing/app-1.8.md, docs/testing/app-2.1.md, docs/testing/app-2.4.md, docs/testing/app-2.5.md, docs/testing/app-2.6.md, docs/testing/app-2.7.md, docs/testing/app-2.8.md, docs/testing/app-3.1.md, docs/testing/app-3.2.md, docs/testing/app-3.4.md, docs/testing/app-3.6.md, docs/testing/app-ui.md -Encoding utf8 | Set-Content artifacts/khors-desktop-win-x64/README.md -Encoding utf8
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

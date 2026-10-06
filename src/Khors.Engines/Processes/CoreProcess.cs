@@ -76,6 +76,11 @@ public sealed class CoreProcess : IAsyncDisposable
             startInfo.ArgumentList.Add(argument);
         }
 
+        foreach (var (name, value) in launch.Environment ?? new Dictionary<string, string>())
+        {
+            startInfo.Environment[name] = value;
+        }
+
         var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
         process.Start();
         var core = new CoreProcess(process, log, launch.KeepLine);

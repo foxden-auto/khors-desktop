@@ -6,6 +6,7 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AboutDescription" xml:space="preserve"><value>Открытый VPN/прокси-клиент. Подключается через ядра Xray-core и sing-box — это отдельные программы со своими лицензиями.</value></data>
+  <data name="AboutGeoData" xml:space="preserve"><value>Гео-базы: domain-list-community (v2fly, MIT) и geoip (v2fly, CC BY-SA 4.0); IP Geolocation by DB-IP (db-ip.com, CC BY 4.0).</value></data>
   <data name="AboutLicense" xml:space="preserve"><value>Лицензия Apache 2.0. Сторонние компоненты и их лицензии перечислены в файле NOTICE.</value></data>
   <data name="AboutVersionFormat" xml:space="preserve"><value>Версия {0}</value></data>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
@@ -28,6 +29,7 @@
   <data name="ButtonInstallService" xml:space="preserve"><value>Установить</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Задержка</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Обновить</value></data>
+  <data name="ButtonUpdateGeo" xml:space="preserve"><value>Обновить сейчас</value></data>
   <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} ГБ</value></data>
   <data name="BytesKbFormat" xml:space="preserve"><value>{0:0} КБ</value></data>
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} МБ</value></data>
@@ -74,6 +76,22 @@
   <data name="FileReadFailed" xml:space="preserve"><value>Не удалось прочитать файл.</value></data>
   <data name="FileTooLarge" xml:space="preserve"><value>Файл больше 5 МБ — это не конфиг и не картинка с QR-кодом.</value></data>
   <data name="FileTypeImportable" xml:space="preserve"><value>Картинки с QR-кодом, ссылки и конфиги</value></data>
+  <data name="GeoAutoUpdateOption" xml:space="preserve"><value>Проверять обновления раз в сутки</value></data>
+  <data name="GeoError_ChecksumMismatch" xml:space="preserve"><value>Файл не совпал с контрольной суммой — не установлен, остался прежний.</value></data>
+  <data name="GeoError_HttpError" xml:space="preserve"><value>Не удалось загрузить: сервер вернул ошибку.</value></data>
+  <data name="GeoError_Invalid" xml:space="preserve"><value>Файл повреждён или неполный — не установлен, остался прежний.</value></data>
+  <data name="GeoError_Network" xml:space="preserve"><value>Не удалось загрузить: нет связи с GitHub.</value></data>
+  <data name="GeoError_Timeout" xml:space="preserve"><value>Не удалось загрузить: сервер не ответил вовремя.</value></data>
+  <data name="GeoError_TooLarge" xml:space="preserve"><value>Файл больше допустимого — не установлен.</value></data>
+  <data name="GeoError_WriteFailed" xml:space="preserve"><value>Не удалось записать файл на диск.</value></data>
+  <data name="GeoFileFormat" xml:space="preserve"><value>{0}: обновлено {1}, {2}</value></data>
+  <data name="GeoFileMissingFormat" xml:space="preserve"><value>{0}: ещё не загружен</value></data>
+  <data name="GeoFile_Ip" xml:space="preserve"><value>IP-адреса (geoip.dat)</value></data>
+  <data name="GeoFile_Site" xml:space="preserve"><value>Домены (geosite.dat)</value></data>
+  <data name="GeoServiceMissing" xml:space="preserve"><value>Копия службы (режим TUN): ещё не загружена.</value></data>
+  <data name="GeoServiceUnavailable" xml:space="preserve"><value>Копия службы (режим TUN): служба не установлена или не отвечает.</value></data>
+  <data name="GeoServiceUpdatedFormat" xml:space="preserve"><value>Копия службы (режим TUN): обновлена {0}.</value></data>
+  <data name="GeoUpdating" xml:space="preserve"><value>Обновление…</value></data>
   <data name="HintDisconnected" xml:space="preserve"><value>Выберите сервер и нажмите «Подключить»</value></data>
   <data name="ImportFileDialogTitle" xml:space="preserve"><value>Импорт: QR-код, ссылки или конфиг</value></data>
   <data name="ImportLineErrorFormat" xml:space="preserve"><value>Ссылка {0}: {1}</value></data>
@@ -213,6 +231,8 @@
   <data name="SessionTime" xml:space="preserve"><value>Время</value></data>
   <data name="SettingsDnsHeader" xml:space="preserve"><value>DNS</value></data>
   <data name="SettingsDnsHint" xml:space="preserve"><value>Куда KHORS отправляет запросы имён сайтов в режиме TUN и для WireGuard. Запросы идут через сервер, провайдер их не видит; адрес в локальной сети (например, роутер) — напрямую. В режиме «Системный прокси» имена разрешает сервер. Изменение действует со следующего подключения.</value></data>
+  <data name="SettingsGeoHeader" xml:space="preserve"><value>Гео-базы</value></data>
+  <data name="SettingsGeoHint" xml:space="preserve"><value>Списки доменов и IP-адресов по странам и категориям для правил маршрутизации (например, «Обход для России»). Скачиваются с GitHub (v2fly), проверяются по контрольной сумме; у службы KHORS для режима TUN — своя копия.</value></data>
   <data name="SettingsModeHeader" xml:space="preserve"><value>Режим подключения</value></data>
   <data name="SettingsModeHint" xml:space="preserve"><value>Режим меняется, пока нет подключения. Для TUN нужна служба KHORS.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Список серверов</value></data>

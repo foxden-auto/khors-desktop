@@ -12,6 +12,7 @@ using Khors.Core.Qr;
 using Khors.Core.Storage;
 using Khors.Engines.Auto;
 using Khors.Engines.Connection;
+using Khors.Engines.Geo;
 using Khors.Engines.Latency;
 using Khors.Engines.Storage;
 using Khors.Engines.Subscriptions;
@@ -33,6 +34,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     private readonly AutoConnector _auto;
     private readonly IServiceControl _service;
     private readonly IIpcClientTransport _serviceTransport;
+    private readonly GeoManager _geo;
     private readonly DispatcherTimer _sessionTimer;
     private readonly Dictionary<Guid, LatencyResult> _latency = [];
     private Khors.Engines.Processes.CoreLogBuffer? _liveLog;
@@ -51,9 +53,11 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         SubscriptionUpdater subscriptionUpdater,
         AutoConnector auto,
         IServiceControl service,
-        IIpcClientTransport serviceTransport)
+        IIpcClientTransport serviceTransport,
+        GeoManager geo)
     {
         _auto = auto;
+        _geo = geo;
         _service = service;
         _serviceTransport = serviceTransport;
         _subscriptionUpdater = subscriptionUpdater;
@@ -67,6 +71,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
         IsTunMode = settings.Current.ConnectionMode == ConnectionMode.Tun;
         LoadDnsSetting();
+        InitGeo();
 
         // «Авто» — до загрузки списка, чтобы загрузка не выбрала первый профиль поверх сохранённого выбора.
         IsAutoSelected = settings.Current.AutoSelect;
@@ -325,9 +330,10 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     private async Task RunServiceSetupAsync(ServiceSetupAction action)
     {
         IsServiceBusy = true;
+        var result = ServiceSetupResult.Failed;
         try
         {
-            var result = await _service.RunElevatedSetupAsync(action, CancellationToken.None).ConfigureAwait(true);
+            result = await _service.RunElevatedSetupAsync(action, CancellationToken.None).ConfigureAwait(true);
             Message = result is ServiceSetupResult.Cancelled or ServiceSetupResult.SetupNotFound
                 ? Localizer.Get($"ServiceSetup_{result}")
                 : Localizer.Get($"ServiceSetup_{action}_{result}");
@@ -338,6 +344,11 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         }
 
         await RefreshServiceStatusAsync().ConfigureAwait(true);
+
+        // Новая служба скачивает свою копию гео-баз сразу, не дожидаясь суточной проверки.
+        _ = action == ServiceSetupAction.Install && result == ServiceSetupResult.Succeeded && IsServiceRunning
+            ? Task.Run(() => _geo.UpdateServiceAsync())
+            : Task.Run(() => _geo.RefreshServiceAsync());
     }
 
     /// <summary>Состояние службы; если запущена — рукопожатие по IPC (версия, тот ли процесс на другом конце канала).</summary>

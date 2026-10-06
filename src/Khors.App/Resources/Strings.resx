@@ -6,6 +6,7 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="AboutDescription" xml:space="preserve"><value>An open VPN/proxy client. It connects through the Xray-core and sing-box cores, which are separate programs with their own licenses.</value></data>
+  <data name="AboutGeoData" xml:space="preserve"><value>Geo databases: domain-list-community (v2fly, MIT) and geoip (v2fly, CC BY-SA 4.0); IP Geolocation by DB-IP (db-ip.com, CC BY 4.0).</value></data>
   <data name="AboutLicense" xml:space="preserve"><value>Licensed under Apache 2.0. Third-party components and their licenses are listed in the NOTICE file.</value></data>
   <data name="AboutVersionFormat" xml:space="preserve"><value>Version {0}</value></data>
   <data name="AppTitle" xml:space="preserve"><value>KHORS</value></data>
@@ -28,6 +29,7 @@
   <data name="ButtonInstallService" xml:space="preserve"><value>Install</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Latency</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Update</value></data>
+  <data name="ButtonUpdateGeo" xml:space="preserve"><value>Update now</value></data>
   <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} GB</value></data>
   <data name="BytesKbFormat" xml:space="preserve"><value>{0:0} KB</value></data>
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} MB</value></data>
@@ -74,6 +76,22 @@
   <data name="FileReadFailed" xml:space="preserve"><value>Could not read the file.</value></data>
   <data name="FileTooLarge" xml:space="preserve"><value>The file is larger than 5 MB — it is not a config or a QR code image.</value></data>
   <data name="FileTypeImportable" xml:space="preserve"><value>QR code images, links and configs</value></data>
+  <data name="GeoAutoUpdateOption" xml:space="preserve"><value>Check for updates once a day</value></data>
+  <data name="GeoError_ChecksumMismatch" xml:space="preserve"><value>The file did not match its checksum and was not installed; the previous one is kept.</value></data>
+  <data name="GeoError_HttpError" xml:space="preserve"><value>Download failed: the server returned an error.</value></data>
+  <data name="GeoError_Invalid" xml:space="preserve"><value>The file is damaged or incomplete and was not installed; the previous one is kept.</value></data>
+  <data name="GeoError_Network" xml:space="preserve"><value>Download failed: GitHub is unreachable.</value></data>
+  <data name="GeoError_Timeout" xml:space="preserve"><value>Download failed: the server did not respond in time.</value></data>
+  <data name="GeoError_TooLarge" xml:space="preserve"><value>The file is larger than allowed and was not installed.</value></data>
+  <data name="GeoError_WriteFailed" xml:space="preserve"><value>The file could not be written to disk.</value></data>
+  <data name="GeoFileFormat" xml:space="preserve"><value>{0}: updated {1}, {2}</value></data>
+  <data name="GeoFileMissingFormat" xml:space="preserve"><value>{0}: not downloaded yet</value></data>
+  <data name="GeoFile_Ip" xml:space="preserve"><value>IP addresses (geoip.dat)</value></data>
+  <data name="GeoFile_Site" xml:space="preserve"><value>Domains (geosite.dat)</value></data>
+  <data name="GeoServiceMissing" xml:space="preserve"><value>Service copy (TUN mode): not downloaded yet.</value></data>
+  <data name="GeoServiceUnavailable" xml:space="preserve"><value>Service copy (TUN mode): the service is not installed or not responding.</value></data>
+  <data name="GeoServiceUpdatedFormat" xml:space="preserve"><value>Service copy (TUN mode): updated {0}.</value></data>
+  <data name="GeoUpdating" xml:space="preserve"><value>Updating…</value></data>
   <data name="HintDisconnected" xml:space="preserve"><value>Choose a server and press “Connect”</value></data>
   <data name="ImportFileDialogTitle" xml:space="preserve"><value>Import: QR code, links or config</value></data>
   <data name="ImportLineErrorFormat" xml:space="preserve"><value>Link {0}: {1}</value></data>
@@ -213,6 +231,8 @@
   <data name="SessionTime" xml:space="preserve"><value>Time</value></data>
   <data name="SettingsDnsHeader" xml:space="preserve"><value>DNS</value></data>
   <data name="SettingsDnsHint" xml:space="preserve"><value>Where KHORS sends site name lookups in TUN mode and for WireGuard. Lookups go through the server, so your provider does not see them; an address on the local network (such as your router) is queried directly. In System proxy mode the server resolves names. Changes apply from the next connection.</value></data>
+  <data name="SettingsGeoHeader" xml:space="preserve"><value>Geo databases</value></data>
+  <data name="SettingsGeoHint" xml:space="preserve"><value>Lists of domains and IP addresses by country and category for routing rules (for example, “Bypass for Russia”). They are downloaded from GitHub (v2fly) and verified by checksum; the KHORS service keeps its own copy for TUN mode.</value></data>
   <data name="SettingsModeHeader" xml:space="preserve"><value>Connection mode</value></data>
   <data name="SettingsModeHint" xml:space="preserve"><value>The mode can be changed while disconnected. TUN requires the KHORS service.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Server list</value></data>

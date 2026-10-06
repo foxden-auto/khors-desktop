@@ -132,6 +132,9 @@ public sealed partial class WindowsServiceControl : IServiceControl
         {
             Directory.Delete(parent);
         }
+
+        // Данные службы (гео-базы) без неё не нужны.
+        DeleteWithRetry(ServiceDataDirectory.DefaultPath);
     }
 
     public async Task<ServiceSetupResult> RunElevatedSetupAsync(ServiceSetupAction action, CancellationToken cancellationToken)

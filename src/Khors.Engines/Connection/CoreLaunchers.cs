@@ -62,7 +62,8 @@ public static class CoreSelection
 }
 
 /// <summary>Запуск ядра заданного вида.</summary>
-public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildProcessGuard? guard) : ICoreLauncher
+/// <param name="geoDirectory">Каталог гео-баз для Xray (ROADMAP 3.6); <c>null</c> — рядом с ядром.</param>
+public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildProcessGuard? guard, string? geoDirectory = null) : ICoreLauncher
 {
     public async Task<ICoreSession> StartAsync(Profile profile, CoreStartPreferences preferences, CancellationToken cancellationToken)
     {
@@ -75,6 +76,7 @@ public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildP
             LogLevel = preferences.LogLevel,
             TrafficStats = preferences.TrafficStats,
             RemoteDns = DnsPresets.ServerOrDefault(preferences.RemoteDns),
+            GeoDirectory = geoDirectory,
         };
 
         var session = await CoreLauncher.StartAsync(kind, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);
@@ -107,8 +109,8 @@ public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildP
 /// </summary>
 public sealed class SelectingCoreLauncher(ICoreLauncher xray, ICoreLauncher singBox, ICoreLauncher? tun = null) : ICoreLauncher
 {
-    public SelectingCoreLauncher(SecretMasker masker, IChildProcessGuard? guard, ICoreLauncher? tun = null)
-        : this(new CoreKindLauncher(CoreKind.Xray, masker, guard), new CoreKindLauncher(CoreKind.SingBox, masker, guard), tun)
+    public SelectingCoreLauncher(SecretMasker masker, IChildProcessGuard? guard, ICoreLauncher? tun = null, string? geoDirectory = null)
+        : this(new CoreKindLauncher(CoreKind.Xray, masker, guard, geoDirectory), new CoreKindLauncher(CoreKind.SingBox, masker, guard, geoDirectory), tun)
     {
     }
 
