@@ -956,13 +956,14 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
                 break;
         }
 
-        // Лог ядра: при ошибке — хвост из причины, при подключении — живой (уже замаскирован при поступлении).
+        // Лог ядра: при подключении — живой (уже замаскирован при поступлении), при ошибке — хвост из причины.
+        // После отключения остаётся лог последней сессии; очищается только новой попыткой подключения.
         WatchLiveLog(status.State == ConnectionState.Connected ? _connection.Log : null);
         if (status.Failure is { LogTail.Count: > 0 } withLog)
         {
             LogTail = string.Join(Environment.NewLine, withLog.LogTail);
         }
-        else if (status.State != ConnectionState.Connected)
+        else if (status.State == ConnectionState.Connecting)
         {
             LogTail = null;
         }
@@ -1009,7 +1010,9 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
         if (_liveLog is not null)
         {
+            // Последние строки сессии — в окно, пока лог ещё доступен.
             _liveLog.LineAdded -= OnLiveLogLine;
+            RefreshLiveLog();
         }
 
         _liveLog = log;

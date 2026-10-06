@@ -119,7 +119,7 @@
   <data name="LinkError_UnsupportedSecurity" xml:space="preserve"><value>тип шифрования не поддерживается</value></data>
   <data name="LinkError_UnsupportedTransport" xml:space="preserve"><value>транспорт пока не поддерживается</value></data>
   <data name="LocalProxyFormat" xml:space="preserve"><value>Ядро {2}. Локальный прокси: HTTP 127.0.0.1:{0}, SOCKS5 127.0.0.1:{1}</value></data>
-  <data name="LogEmpty" xml:space="preserve"><value>Здесь появится лог ядра: пока подключено — последние строки, после ошибки — строки, из-за которых она произошла.</value></data>
+  <data name="LogEmpty" xml:space="preserve"><value>Здесь появится лог ядра: пока подключено — последние строки; после отключения или ошибки остаются строки последней сессии до следующего подключения.</value></data>
   <data name="LogHeader" xml:space="preserve"><value>Лог ядра</value></data>
   <data name="LogMaskedNote" xml:space="preserve"><value>Адреса и ключи в логе замаскированы.</value></data>
   <data name="MenuCopyLink" xml:space="preserve"><value>Копировать ссылку</value></data>
