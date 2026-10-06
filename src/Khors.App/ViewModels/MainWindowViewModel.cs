@@ -36,6 +36,9 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     private readonly DispatcherTimer _sessionTimer;
     private readonly Dictionary<Guid, LatencyResult> _latency = [];
     private Khors.Engines.Processes.CoreLogBuffer? _liveLog;
+
+    // Весь лог последней сессии — для «Копировать весь лог» после отключения (на странице — только хвост).
+    private Khors.Engines.Processes.CoreLogBuffer? _lastSessionLog;
     private int _liveLogRefreshQueued;
 
     public MainWindowViewModel(
@@ -613,7 +616,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     [RelayCommand]
     private async Task CopyCoreLogAsync()
     {
-        var lines = _connection.Log?.Snapshot().Select(l => l.Text).ToList() is { Count: > 0 } live ? live : LogTail?.Split(Environment.NewLine).ToList();
+        var lines = (_connection.Log ?? _lastSessionLog)?.Snapshot().Select(l => l.Text).ToList() is { Count: > 0 } full ? full : LogTail?.Split(Environment.NewLine).ToList();
         if (lines is { Count: > 0 })
         {
             await _clipboard.SetTextAsync(string.Join(Environment.NewLine, lines)).ConfigureAwait(true);
@@ -966,6 +969,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         else if (status.State == ConnectionState.Connecting)
         {
             LogTail = null;
+            _lastSessionLog = null;
         }
 
         if (status.State == ConnectionState.Connected)
@@ -1018,6 +1022,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         _liveLog = log;
         if (log is not null)
         {
+            _lastSessionLog = log;
             log.LineAdded += OnLiveLogLine;
             RefreshLiveLog();
         }
