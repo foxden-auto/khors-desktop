@@ -76,7 +76,7 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
         var options = new CoreStartOptions { PreferredSocksPort = null, PreferredHttpPort = null, LogLevel = logLevel };
         if (choice.Core == CoreKind.SingBox)
         {
-            var singBox = await CoreLauncher.StartAsync(CoreKind.SingBox, profile, options with { Tun = new SingBoxTunOptions(), TrafficStats = true, ReadyTimeout = s_tunReadyTimeout }, masker, guard, cancellationToken).ConfigureAwait(false);
+            var singBox = await StartSingBoxAsync(profile, options with { Tun = new SingBoxTunOptions(), TrafficStats = true, ReadyTimeout = s_tunReadyTimeout }, cancellationToken).ConfigureAwait(false);
             return new TunRun(CoreKind.SingBox, singBox, chained: null);
         }
 
@@ -91,7 +91,7 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
                 UpstreamSocksPort = xray.SocksPort,
                 ReadyTimeout = s_tunReadyTimeout,
             };
-            var singBox = await CoreLauncher.StartAsync(CoreKind.SingBox, resolved, tunOptions, masker, guard, cancellationToken).ConfigureAwait(false);
+            var singBox = await StartSingBoxAsync(resolved, tunOptions, cancellationToken).ConfigureAwait(false);
             return new TunRun(CoreKind.Xray, singBox, xray);
         }
         catch
@@ -100,6 +100,29 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
             throw;
         }
     }
+
+    /// <summary>
+    /// sing-box с адаптером TUN. Если в системе остался битый адаптер KHORS (создать нельзя — «уже существует»,
+    /// открыть тоже нельзя), первая попытка падает через ~15 с, а повторная проходит: неудачная попытка
+    /// его убирает (живые проверки 2026-10-06). Поэтому при этой ошибке — один повтор. Откуда берётся битый
+    /// адаптер, не установлено (ROADMAP, «Известные проблемы»).
+    /// </summary>
+    private async Task<CoreSession> StartSingBoxAsync(Profile profile, CoreStartOptions options, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await CoreLauncher.StartAsync(CoreKind.SingBox, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);
+        }
+        catch (CoreStartException ex) when (IsStaleAdapter(ex.LogTail))
+        {
+            return await CoreLauncher.StartAsync(CoreKind.SingBox, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>sing-box не смог ни создать адаптер (имя занято), ни открыть существующий.</summary>
+    internal static bool IsStaleAdapter(IEnumerable<string> logTail) =>
+        logTail.Any(line => line.Contains("create adapter", StringComparison.OrdinalIgnoreCase)
+            && line.Contains("open existing adapter", StringComparison.OrdinalIgnoreCase));
 
     private async Task<IPAddress> ResolveServerAsync(Profile profile, CancellationToken cancellationToken)
     {

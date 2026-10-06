@@ -24,7 +24,8 @@
           "detour": "proxy"
         }
       ],
-      "final": "remote"
+      "final": "remote",
+      "strategy": "ipv4_only"
     },
     "inbounds": [
       {

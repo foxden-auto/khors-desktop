@@ -121,4 +121,15 @@ public class TunEngineTests
         {
         }
     }
+
+    [Fact]
+    public void StaleAdapterIsRecognizedFromSingBoxError()
+    {
+        Assert.True(TunEngine.IsStaleAdapter([
+            "+0300 2026-10-06 16:49:25 WARN inbound/tun[tun-in]: open interface take too much time to finish!",
+            "FATAL[0015] start service: start inbound/tun[tun-in]: configure tun interface: (create adapter: Cannot create a file when that file already exists. | open existing adapter: Element not found.)",
+        ]));
+        Assert.False(TunEngine.IsStaleAdapter(["FATAL[0000] start service: start inbound/tun[tun-in]: configure tun interface: Access is denied."]));
+        Assert.False(TunEngine.IsStaleAdapter([]));
+    }
 }

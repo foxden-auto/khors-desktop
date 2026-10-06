@@ -24,7 +24,8 @@
           "detour": "proxy"
         }
       ],
-      "final": "tunnel-dns"
+      "final": "tunnel-dns",
+      "strategy": "ipv4_only"
     },
     "inbounds": [
       {

@@ -173,7 +173,8 @@ public static class SingBoxConfigGenerator
     /// <summary>
     /// TUN: весь трафик системы — в sing-box. Сам sing-box выходит в сеть через физический интерфейс
     /// (<c>auto_detect_interface</c>), иначе его соединения с сервером снова попали бы в TUN. DNS-запросы системы
-    /// перехватываются и уходят через туннель (DoH 1.1.1.1), чтобы провайдер их не видел; пресеты DNS — ROADMAP 3.4.
+    /// перехватываются и уходят через туннель (DoH 1.1.1.1), чтобы провайдер их не видел, и отдают только IPv4-адреса;
+    /// пресеты DNS — ROADMAP 3.4.
     /// </summary>
     private static void AddTun(JsonObject config, SingBoxTunOptions tun)
     {
@@ -195,6 +196,11 @@ public static class SingBoxConfigGenerator
         config["inbounds"]!.AsArray().Insert(0, inbound);
 
         var dns = config["dns"]!.AsObject();
+
+        // Приложениям — только IPv4-адреса: у адаптера есть IPv6 (чтобы IPv6 не шёл мимо туннеля), и Windows
+        // предпочла бы IPv6, а у многих серверов нет выхода в IPv6 — соединения браузера к таким адресам умирали.
+        // На запросы AAAA sing-box отвечает пустым ответом без ошибки.
+        dns["strategy"] = "ipv4_only";
         if (dns["final"] is null)
         {
             dns["servers"]!.AsArray().Add(new JsonObject { ["type"] = "https", ["tag"] = RemoteDnsTag, ["server"] = RemoteDnsServer, ["detour"] = ProxyTag });
