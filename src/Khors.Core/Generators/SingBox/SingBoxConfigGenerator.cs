@@ -46,9 +46,12 @@ public sealed record SingBoxTunOptions
 {
     public string InterfaceName { get; init; } = "KHORS";
 
-    public string Inet4Address { get; init; } = "172.19.0.1/30";
+    // Не адреса по умолчанию sing-box (172.18/172.19.0.1, fdfe:dcba:9876::1): их же берут другие клиенты на sing-box
+    // (Throne и др.), и два адаптера с одной подсетью конфликтуют. 198.19.0.0/16 — тестовый диапазон (RFC 2544)
+    // вне 198.18.0.0/16 fake-ip Clash, в локальных сетях не встречается; IPv6 — свой ULA.
+    public string Inet4Address { get; init; } = "198.19.75.1/30";
 
-    public string Inet6Address { get; init; } = "fdfe:dcba:9876::1/126";
+    public string Inet6Address { get; init; } = "fd4b:6873:72b5::1/126";
 
     public int Mtu { get; init; } = 9000;
 

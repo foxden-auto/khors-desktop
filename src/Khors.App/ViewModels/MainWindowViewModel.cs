@@ -1021,11 +1021,13 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     }
 
     // Строки приходят в потоке чтения лога; обновляем окно не чаще двух раз в секунду.
+    // Таймер создаётся в UI-потоке: в Avalonia 12 таймер из фонового потока привязан к его диспетчеру
+    // и не срабатывает никогда — журнал оставался пустым.
     private void OnLiveLogLine(object? sender, Khors.Engines.Processes.CoreLogLine line)
     {
         if (Interlocked.Exchange(ref _liveLogRefreshQueued, 1) == 0)
         {
-            DispatcherTimer.RunOnce(RefreshLiveLog, TimeSpan.FromMilliseconds(500));
+            Dispatcher.UIThread.Post(() => DispatcherTimer.RunOnce(RefreshLiveLog, TimeSpan.FromMilliseconds(500)));
         }
     }
 

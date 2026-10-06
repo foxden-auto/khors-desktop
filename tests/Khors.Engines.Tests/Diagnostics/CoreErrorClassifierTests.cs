@@ -29,6 +29,8 @@ public class CoreErrorClassifierTests
         { CoreKind.SingBox, "FATAL[0000] decode config at stdin: outbounds[0].uuid: invalid UUID", CoreProblem.ConfigRejected },
         { CoreKind.SingBox, "FATAL[0000] start service: start inbound/socks[0]: listen tcp 127.0.0.1:10808: bind: address already in use", CoreProblem.PortInUse },
         { CoreKind.SingBox, "FATAL[0000] start service: start inbound/tun[tun-in]: configure tun interface: Access is denied.", CoreProblem.TunUnavailable },
+        { CoreKind.SingBox, "FATAL[0015] start service: start inbound/tun[tun-in]: configure tun interface: (create adapter: Cannot create a file when that file already exists. | open existing adapter: Element not found.)", CoreProblem.TunUnavailable },
+        { CoreKind.SingBox, "+0300 2026-10-06 15:51:18 WARN inbound/tun[tun-in]: open interface take too much time to finish!", CoreProblem.TunUnavailable },
         { CoreKind.SingBox, "ERROR[0000] wintun: create adapter: The system cannot find the file specified.", CoreProblem.TunUnavailable },
         { CoreKind.Xray, "Failed to start: main: failed to start server > app/proxyman/inbound: failed to listen TCP on 10808 > transport/internet: failed to listen on address: 127.0.0.1:10808 > listen tcp 127.0.0.1:10808: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.", CoreProblem.PortInUse },
 

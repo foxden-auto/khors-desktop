@@ -53,6 +53,10 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
 {
     private static readonly TimeSpan s_resolveTimeout = TimeSpan.FromSeconds(10);
 
+    // sing-box на Windows ждёт открытия адаптера до ~15 с и только потом пишет причину («configure tun interface: …»).
+    // Ожидание короче убивало бы ядро молча: в логе пусто, а прерванное создание может оставить битый адаптер.
+    private static readonly TimeSpan s_tunReadyTimeout = TimeSpan.FromSeconds(30);
+
     /// <summary>Разрешение имени сервера (для тестов — подмена).</summary>
     public Func<string, CancellationToken, Task<IPAddress[]>> Resolve { get; init; } = Dns.GetHostAddressesAsync;
 
@@ -72,7 +76,7 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
         var options = new CoreStartOptions { PreferredSocksPort = null, PreferredHttpPort = null, LogLevel = logLevel };
         if (choice.Core == CoreKind.SingBox)
         {
-            var singBox = await CoreLauncher.StartAsync(CoreKind.SingBox, profile, options with { Tun = new SingBoxTunOptions(), TrafficStats = true }, masker, guard, cancellationToken).ConfigureAwait(false);
+            var singBox = await CoreLauncher.StartAsync(CoreKind.SingBox, profile, options with { Tun = new SingBoxTunOptions(), TrafficStats = true, ReadyTimeout = s_tunReadyTimeout }, masker, guard, cancellationToken).ConfigureAwait(false);
             return new TunRun(CoreKind.SingBox, singBox, chained: null);
         }
 
@@ -85,6 +89,7 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
             {
                 Tun = new SingBoxTunOptions { ExcludeAddresses = [server.ToString()] },
                 UpstreamSocksPort = xray.SocksPort,
+                ReadyTimeout = s_tunReadyTimeout,
             };
             var singBox = await CoreLauncher.StartAsync(CoreKind.SingBox, resolved, tunOptions, masker, guard, cancellationToken).ConfigureAwait(false);
             return new TunRun(CoreKind.Xray, singBox, xray);

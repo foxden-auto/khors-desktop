@@ -89,7 +89,7 @@ public static class CoreErrorClassifier
 
         // sing-box: «start inbound/tun[tun-in]: configure tun interface: …» — до общего «FATAL».
         // Обычные строки адаптера («inbound/tun[tun-in]: started at …», соединения через TUN) — не сбой.
-        if (Has(line, "start inbound/tun[") || Has(line, "configure tun interface") || (IsSingBoxError(line) && Has(line, "wintun")))
+        if (Has(line, "start inbound/tun[") || Has(line, "configure tun interface") || Has(line, "open interface take too much time") || (IsSingBoxError(line) && Has(line, "wintun")))
         {
             return CoreProblem.TunUnavailable;
         }
