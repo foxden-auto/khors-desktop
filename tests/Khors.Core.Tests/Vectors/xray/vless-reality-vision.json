@@ -4,7 +4,7 @@
   "options": {
     "socksPort": 20808,
     "httpPort": 20809,
-    "apiPort": 20810,
+    "metricsPort": 20810,
     "logLevel": "info"
   },
   "expected": {
@@ -114,12 +114,9 @@
         }
       ]
     },
-    "api": {
-      "tag": "api",
-      "listen": "127.0.0.1:20810",
-      "services": [
-        "StatsService"
-      ]
+    "metrics": {
+      "tag": "metrics",
+      "listen": "127.0.0.1:20810"
     },
     "stats": {},
     "policy": {

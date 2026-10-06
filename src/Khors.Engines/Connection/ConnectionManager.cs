@@ -44,6 +44,12 @@ public sealed class ConnectionManager : IAsyncDisposable
     /// <summary>Лог текущего ядра (замаскированный) или <c>null</c>, если ядро не запущено.</summary>
     public CoreLogBuffer? Log => Volatile.Read(ref _session)?.Log;
 
+    /// <summary>Счётчики трафика текущего подключения; <c>null</c> — не подключено или ядро не ответило.</summary>
+    public Task<Traffic.TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) =>
+        Volatile.Read(ref _session) is { } session && Status.State == ConnectionState.Connected
+            ? session.ReadTrafficAsync(cancellationToken)
+            : Task.FromResult<Traffic.TrafficCounters?>(null);
+
     /// <summary>Подключает профиль; если уже подключён другой — сначала отключает его.</summary>
     public async Task ConnectAsync(Profile profile, CoreStartPreferences preferences, CancellationToken cancellationToken = default)
     {

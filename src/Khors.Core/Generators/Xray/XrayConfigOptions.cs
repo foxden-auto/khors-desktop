@@ -13,6 +13,8 @@ public sealed record XrayConfigOptions
     /// <summary>Уровень лога Xray: debug, info, warning, error, none.</summary>
     public string LogLevel { get; init; } = "warning";
 
-    /// <summary>Порт API статистики; <c>null</c> — API выключен.</summary>
-    public int? ApiPort { get; init; }
+    /// <summary>
+    /// Порт счётчиков трафика (<c>metrics</c>: HTTP <c>/debug/vars</c> на loopback, без gRPC); <c>null</c> — выключены.
+    /// </summary>
+    public int? MetricsPort { get; init; }
 }

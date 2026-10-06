@@ -39,6 +39,8 @@ public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, A
                 }
 
                 return await tun.StartAsync(this, profile, start.LogLevel, sendEvent, cancellationToken).ConfigureAwait(false);
+            case GetTunTrafficRequest:
+                return await tun.ReadTrafficAsync(this, cancellationToken).ConfigureAwait(false);
             case StopTunRequest:
                 await tun.StopAsync(this).ConfigureAwait(false);
                 return new OkResponse();

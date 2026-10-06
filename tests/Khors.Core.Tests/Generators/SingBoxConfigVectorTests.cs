@@ -95,6 +95,9 @@ public class SingBoxConfigVectorTests
             HttpPort = options["httpPort"]!.GetValue<int>(),
             LogLevel = options["logLevel"]?.GetValue<string>() ?? "warning",
             UpstreamSocksPort = options["upstreamSocksPort"]?.GetValue<int>(),
+            ClashApi = options["clashApi"] is { } clashApi
+                ? new ClashApiOptions(clashApi["port"]!.GetValue<int>(), clashApi["secret"]!.GetValue<string>())
+                : null,
             Tun = options["tun"] is { } tun
                 ? new SingBoxTunOptions { ExcludeAddresses = tun["excludeAddresses"]?.AsArray().Select(a => a!.GetValue<string>()).ToArray() ?? [] }
                 : null,

@@ -3,10 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace Khors.Ipc;
 
-/// <summary>Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений (2 — команды TUN).</summary>
+/// <summary>
+/// Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений (2 — команды TUN, 3 — счётчики трафика TUN).
+/// </summary>
 public static class IpcProtocol
 {
-    public const int Version = 2;
+    public const int Version = 3;
 }
 
 /// <summary>
@@ -26,6 +28,8 @@ public static class IpcProtocol
 [JsonDerivedType(typeof(OkResponse), "ok")]
 [JsonDerivedType(typeof(TunLogEvent), "tunLog")]
 [JsonDerivedType(typeof(TunExitedEvent), "tunExited")]
+[JsonDerivedType(typeof(GetTunTrafficRequest), "getTunTraffic")]
+[JsonDerivedType(typeof(TunTrafficResponse), "tunTraffic")]
 public abstract record IpcPayload;
 
 /// <summary>Первое сообщение клиента: версия протокола и версия приложения.</summary>
@@ -119,6 +123,12 @@ public sealed record TunLogEvent(string Line) : IpcPayload;
 
 /// <summary>Событие: ядро режима TUN завершилось само (не по команде). Адаптер и маршруты сняты.</summary>
 public sealed record TunExitedEvent(int ExitCode, IReadOnlyList<string> LogTail) : IpcPayload;
+
+/// <summary>Счётчики трафика режима TUN, включённого этим соединением.</summary>
+public sealed record GetTunTrafficRequest : IpcPayload;
+
+/// <summary>Отправлено и получено через сервер с включения TUN. <paramref name="Available"/> = <c>false</c> — TUN не включён этим соединением или ядро не ответило.</summary>
+public sealed record TunTrafficResponse(bool Available, long Uplink = 0, long Downlink = 0) : IpcPayload;
 
 /// <summary>Кадр протокола: запрос и ответ на него с одинаковым <see cref="Id"/>; события службы — с <c>Id = 0</c>.</summary>
 public sealed record IpcEnvelope(long Id, IpcPayload Payload);

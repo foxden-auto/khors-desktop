@@ -4,6 +4,7 @@ using Khors.Core.Generators.Xray;
 using Khors.Core.Profiles;
 using Khors.Core.Storage;
 using Khors.Engines.Processes;
+using Khors.Engines.Traffic;
 using Khors.Platform;
 
 namespace Khors.Engines.Connection;
@@ -71,6 +72,7 @@ public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildP
             PreferredSocksPort = preferences.SocksPort,
             PreferredHttpPort = preferences.HttpPort,
             LogLevel = preferences.LogLevel,
+            TrafficStats = preferences.TrafficStats,
         };
 
         var session = await CoreLauncher.StartAsync(kind, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);
@@ -90,6 +92,8 @@ public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildP
         public Task<CoreExit> Completion => session.Process.Completion;
 
         public Task StopAsync(CancellationToken cancellationToken = default) => session.StopAsync(cancellationToken);
+
+        public Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) => session.ReadTrafficAsync(cancellationToken);
 
         public ValueTask DisposeAsync() => session.DisposeAsync();
     }

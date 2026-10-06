@@ -29,7 +29,13 @@
   <data name="ButtonTestLatency" xml:space="preserve"><value>Задержка</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Обновить</value></data>
   <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} ГБ</value></data>
+  <data name="BytesKbFormat" xml:space="preserve"><value>{0:0} КБ</value></data>
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} МБ</value></data>
+  <data name="ChartAutomationName" xml:space="preserve"><value>График скорости за последнюю минуту</value></data>
+  <data name="ChartAxisEnd" xml:space="preserve"><value>сейчас</value></data>
+  <data name="ChartAxisStart" xml:space="preserve"><value>−60 с</value></data>
+  <data name="ChartNoData" xml:space="preserve"><value>Нет подключения</value></data>
+  <data name="ChartTooltipFormat" xml:space="preserve"><value>Отправка {0} · загрузка {1}</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>В буфере обмена нет ни ссылки, ни картинки с QR-кодом.</value></data>
   <data name="ClipboardNoQr" xml:space="preserve"><value>На картинке в буфере обмена не найден QR-код.</value></data>
   <data name="ConnectionProblemFormat" xml:space="preserve"><value>Соединения с сервером не устанавливаются. {0}</value></data>
@@ -96,6 +102,8 @@
   <data name="Latency_Ok" xml:space="preserve"><value>{0} мс</value></data>
   <data name="Latency_Timeout" xml:space="preserve"><value>тайм-аут</value></data>
   <data name="Latency_Unsupported" xml:space="preserve"><value>не поддерживается</value></data>
+  <data name="LegendDownload" xml:space="preserve"><value>Загрузка</value></data>
+  <data name="LegendUpload" xml:space="preserve"><value>Отправка</value></data>
   <data name="LinkCopiedFormat" xml:space="preserve"><value>Ссылка «{0}» скопирована. В ней ключи доступа — передавайте её только тем, кому доверяете.</value></data>
   <data name="LinkError_Empty" xml:space="preserve"><value>пустая строка</value></data>
   <data name="LinkError_InvalidBase64" xml:space="preserve"><value>повреждённые данные base64</value></data>
@@ -152,6 +160,8 @@
   <data name="QrTooLong" xml:space="preserve"><value>Ссылка слишком длинная для QR-кода — используйте «Копировать ссылку».</value></data>
   <data name="QrWarning" xml:space="preserve"><value>В коде — ключи доступа к серверу. Показывайте его только тем, кому доверяете.</value></data>
   <data name="QrWindowTitle" xml:space="preserve"><value>QR-код профиля</value></data>
+  <data name="RateKbFormat" xml:space="preserve"><value>{0:0} КБ/с</value></data>
+  <data name="RateMbFormat" xml:space="preserve"><value>{0:0.#} МБ/с</value></data>
   <data name="ScreenCaptureFailed" xml:space="preserve"><value>Не удалось сделать снимок экрана.</value></data>
   <data name="ScreenNoQr" xml:space="preserve"><value>На экране не найден QR-код. Откройте картинку с кодом поверх других окон и повторите.</value></data>
   <data name="SearchNoResults" xml:space="preserve"><value>Ничего не найдено</value></data>
@@ -194,6 +204,7 @@
   <data name="ShowLogLink" xml:space="preserve"><value>Подробности — в журнале</value></data>
   <data name="SortByLatency" xml:space="preserve"><value>Сортировать по задержке</value></data>
   <data name="SortByLatencyTooltip" xml:space="preserve"><value>Сортировать профили по задержке (сначала самые быстрые)</value></data>
+  <data name="SpeedHeader" xml:space="preserve"><value>Скорость</value></data>
   <data name="StatusAutoSelecting" xml:space="preserve"><value>Подбор сервера…</value></data>
   <data name="StatusCaption" xml:space="preserve"><value>Статус</value></data>
   <data name="StatusConnected" xml:space="preserve"><value>Подключено</value></data>

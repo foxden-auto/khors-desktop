@@ -3,6 +3,7 @@
              xmlns:vm="using:Khors.App.ViewModels"
              xmlns:res="using:Khors.App.Resources"
              xmlns:views="using:Khors.App.Views"
+             xmlns:controls="using:Khors.App.Controls"
              x:Class="Khors.App.Views.Pages.ConnectionPage"
              x:DataType="vm:MainWindowViewModel">
   <Grid ColumnDefinitions="*,20,400" RowDefinitions="*,20,Auto">
@@ -58,7 +59,7 @@
       </Border>
     </Border>
 
-    <!-- Текущая сессия. Отправлено/получено — после чтения статистики ядер (ROADMAP). -->
+    <!-- Текущая сессия: время, трафик через сервер (счётчики ядра), задержка, сервер. -->
     <Border Grid.Row="2" Classes="card" Padding="22,18">
       <StackPanel Spacing="14">
         <TextBlock Text="{x:Static res:Strings.SessionHeader}" Classes="section" />
@@ -69,11 +70,11 @@
           </StackPanel>
           <StackPanel Grid.Column="1" Spacing="4">
             <TextBlock Text="{x:Static res:Strings.SessionSent}" Classes="caption" />
-            <TextBlock Text="{x:Static res:Strings.SessionNoValue}" Classes="value" />
+            <TextBlock Text="{Binding SessionSent, TargetNullValue={x:Static res:Strings.SessionNoValue}}" Classes="value" />
           </StackPanel>
           <StackPanel Grid.Column="2" Spacing="4">
             <TextBlock Text="{x:Static res:Strings.SessionReceived}" Classes="caption" />
-            <TextBlock Text="{x:Static res:Strings.SessionNoValue}" Classes="value" />
+            <TextBlock Text="{Binding SessionReceived, TargetNullValue={x:Static res:Strings.SessionNoValue}}" Classes="value" />
           </StackPanel>
           <StackPanel Grid.Column="3" Spacing="4">
             <TextBlock Text="{x:Static res:Strings.SessionLatency}" Classes="caption" />
@@ -96,7 +97,7 @@
     </Border>
 
     <!-- Выбор сервера. Управление списком (подписки, удаление) — на странице «Серверы». -->
-    <Border Grid.Column="2" Grid.RowSpan="3" Classes="card" Padding="16,18,16,12">
+    <Border Grid.Column="2" Classes="card" Padding="16,18,16,12">
       <DockPanel>
         <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="4,0,0,12">
           <TextBlock Text="{x:Static res:Strings.NavServers}" Classes="section" VerticalAlignment="Center" />
@@ -136,6 +137,43 @@
           <TextBlock Text="{Binding EmptyFilterText}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
                      VerticalAlignment="Center" Margin="24" IsVisible="{Binding HasNoVisibleProfiles}" />
         </Panel>
+      </DockPanel>
+    </Border>
+
+    <!-- Скорость за последнюю минуту: две линии, легенда с текущими значениями. -->
+    <Border Grid.Row="2" Grid.Column="2" Classes="card" Padding="20,16">
+      <DockPanel>
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,10">
+          <TextBlock Text="{x:Static res:Strings.SpeedHeader}" Classes="section" VerticalAlignment="Center" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="12,0,0,0" VerticalAlignment="Center">
+            <Border Width="14" Height="2" Background="{DynamicResource KhorsChartUploadBrush}" VerticalAlignment="Center" />
+            <TextBlock Text="{x:Static res:Strings.LegendUpload}" Classes="caption" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding RateUpText}" FontSize="12" VerticalAlignment="Center" />
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" Margin="14,0,0,0" VerticalAlignment="Center">
+            <Border Width="14" Height="2" Background="{DynamicResource KhorsChartDownloadBrush}" VerticalAlignment="Center" />
+            <TextBlock Text="{x:Static res:Strings.LegendDownload}" Classes="caption" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding RateDownText}" FontSize="12" VerticalAlignment="Center" />
+          </StackPanel>
+        </Grid>
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="*,Auto">
+          <Panel Margin="0,0,8,0" MinWidth="56">
+            <TextBlock Text="{Binding ChartMaximumText}" Classes="caption" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-6,0,0" />
+            <TextBlock Text="0" Classes="caption" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,-6" />
+          </Panel>
+          <Panel Grid.Column="1" MinHeight="72">
+            <controls:TrafficChart Samples="{Binding TrafficSamples}" Maximum="{Binding ChartMaximum}" Capacity="{Binding ChartCapacity}"
+                                   UploadBrush="{DynamicResource KhorsChartUploadBrush}" DownloadBrush="{DynamicResource KhorsChartDownloadBrush}"
+                                   GridBrush="{DynamicResource KhorsBorderBrush}" SurfaceBrush="{DynamicResource KhorsCardBrush}"
+                                   AutomationProperties.Name="{x:Static res:Strings.ChartAutomationName}" />
+            <TextBlock Text="{x:Static res:Strings.ChartNoData}" Classes="caption" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       IsVisible="{Binding !IsConnected}" IsHitTestVisible="False" />
+          </Panel>
+          <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,*" Margin="0,4,0,0">
+            <TextBlock Text="{x:Static res:Strings.ChartAxisStart}" Classes="caption" />
+            <TextBlock Grid.Column="1" Text="{x:Static res:Strings.ChartAxisEnd}" Classes="caption" HorizontalAlignment="Right" />
+          </Grid>
+        </Grid>
       </DockPanel>
     </Border>
   </Grid>

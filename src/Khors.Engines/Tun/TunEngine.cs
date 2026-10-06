@@ -7,6 +7,7 @@ using Khors.Core.Profiles;
 using Khors.Engines.Connection;
 using Khors.Engines.Diagnostics;
 using Khors.Engines.Processes;
+using Khors.Engines.Traffic;
 using Khors.Platform;
 
 namespace Khors.Engines.Tun;
@@ -29,6 +30,9 @@ public interface ITunRun : IAsyncDisposable
     Task<CoreExit> Completion { get; }
 
     IReadOnlyList<string> Tail(int count);
+
+    /// <summary>Трафик через сервер: у цепочки — счётчики Xray, иначе — sing-box.</summary>
+    Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) => Task.FromResult<TrafficCounters?>(null);
 }
 
 /// <summary>Запуск режима TUN (для тестов службы — подмена).</summary>
@@ -68,13 +72,13 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
         var options = new CoreStartOptions { PreferredSocksPort = null, PreferredHttpPort = null, LogLevel = logLevel };
         if (choice.Core == CoreKind.SingBox)
         {
-            var singBox = await CoreLauncher.StartAsync(CoreKind.SingBox, profile, options with { Tun = new SingBoxTunOptions() }, masker, guard, cancellationToken).ConfigureAwait(false);
+            var singBox = await CoreLauncher.StartAsync(CoreKind.SingBox, profile, options with { Tun = new SingBoxTunOptions(), TrafficStats = true }, masker, guard, cancellationToken).ConfigureAwait(false);
             return new TunRun(CoreKind.SingBox, singBox, chained: null);
         }
 
         var server = await ResolveServerAsync(profile, cancellationToken).ConfigureAwait(false);
         var resolved = ProfileAddress.WithResolvedHost(profile, server);
-        var xray = await CoreLauncher.StartAsync(CoreKind.Xray, resolved, options, masker, guard, cancellationToken).ConfigureAwait(false);
+        var xray = await CoreLauncher.StartAsync(CoreKind.Xray, resolved, options with { TrafficStats = true }, masker, guard, cancellationToken).ConfigureAwait(false);
         try
         {
             var tunOptions = options with
@@ -150,6 +154,9 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
         public Task<CoreExit> Completion => _completion.Task;
 
         private IEnumerable<CoreSession> Sessions => _chained is null ? [_singBox] : [_chained, _singBox];
+
+        public Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) =>
+            (_chained ?? _singBox).ReadTrafficAsync(cancellationToken);
 
         public IReadOnlyList<string> Tail(int count) =>
             [.. Sessions.SelectMany(s => s.Process.Log.Snapshot()).OrderBy(l => l.Time).TakeLast(count).Select(l => l.Text)];

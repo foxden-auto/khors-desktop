@@ -29,7 +29,13 @@
   <data name="ButtonTestLatency" xml:space="preserve"><value>Latency</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Update</value></data>
   <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} GB</value></data>
+  <data name="BytesKbFormat" xml:space="preserve"><value>{0:0} KB</value></data>
   <data name="BytesMbFormat" xml:space="preserve"><value>{0:0.#} MB</value></data>
+  <data name="ChartAutomationName" xml:space="preserve"><value>Speed over the last minute</value></data>
+  <data name="ChartAxisEnd" xml:space="preserve"><value>now</value></data>
+  <data name="ChartAxisStart" xml:space="preserve"><value>−60 s</value></data>
+  <data name="ChartNoData" xml:space="preserve"><value>Not connected</value></data>
+  <data name="ChartTooltipFormat" xml:space="preserve"><value>Upload {0} · download {1}</value></data>
   <data name="ClipboardEmpty" xml:space="preserve"><value>The clipboard contains neither a link nor a QR code image.</value></data>
   <data name="ClipboardNoQr" xml:space="preserve"><value>No QR code was found in the clipboard image.</value></data>
   <data name="ConnectionProblemFormat" xml:space="preserve"><value>Connections to the server fail. {0}</value></data>
@@ -96,6 +102,8 @@
   <data name="Latency_Ok" xml:space="preserve"><value>{0} ms</value></data>
   <data name="Latency_Timeout" xml:space="preserve"><value>timeout</value></data>
   <data name="Latency_Unsupported" xml:space="preserve"><value>not supported</value></data>
+  <data name="LegendDownload" xml:space="preserve"><value>Download</value></data>
+  <data name="LegendUpload" xml:space="preserve"><value>Upload</value></data>
   <data name="LinkCopiedFormat" xml:space="preserve"><value>The link for “{0}” was copied. It contains access keys — share it only with people you trust.</value></data>
   <data name="LinkError_Empty" xml:space="preserve"><value>empty line</value></data>
   <data name="LinkError_InvalidBase64" xml:space="preserve"><value>damaged base64 data</value></data>
@@ -152,6 +160,8 @@
   <data name="QrTooLong" xml:space="preserve"><value>The link is too long for a QR code — use “Copy link”.</value></data>
   <data name="QrWarning" xml:space="preserve"><value>The code contains server access keys. Show it only to people you trust.</value></data>
   <data name="QrWindowTitle" xml:space="preserve"><value>Profile QR code</value></data>
+  <data name="RateKbFormat" xml:space="preserve"><value>{0:0} KB/s</value></data>
+  <data name="RateMbFormat" xml:space="preserve"><value>{0:0.#} MB/s</value></data>
   <data name="ScreenCaptureFailed" xml:space="preserve"><value>Could not capture the screen.</value></data>
   <data name="ScreenNoQr" xml:space="preserve"><value>No QR code was found on the screen. Open the image with the code on top of other windows and try again.</value></data>
   <data name="SearchNoResults" xml:space="preserve"><value>Nothing found</value></data>
@@ -194,6 +204,7 @@
   <data name="ShowLogLink" xml:space="preserve"><value>Details in the log</value></data>
   <data name="SortByLatency" xml:space="preserve"><value>Sort by latency</value></data>
   <data name="SortByLatencyTooltip" xml:space="preserve"><value>Sort profiles by latency (fastest first)</value></data>
+  <data name="SpeedHeader" xml:space="preserve"><value>Speed</value></data>
   <data name="StatusAutoSelecting" xml:space="preserve"><value>Choosing a server…</value></data>
   <data name="StatusCaption" xml:space="preserve"><value>Status</value></data>
   <data name="StatusConnected" xml:space="preserve"><value>Connected</value></data>

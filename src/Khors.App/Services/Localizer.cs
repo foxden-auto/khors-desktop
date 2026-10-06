@@ -31,10 +31,18 @@ public static class Localizer
 
     public static string Describe(SubscriptionUpdateError error) => Get($"SubscriptionError_{error}");
 
-    /// <summary>Объём трафика: МБ до 1 ГБ, дальше ГБ.</summary>
-    public static string Bytes(long bytes) => bytes >= 1L << 30
-        ? Format("BytesGbFormat", bytes / (double)(1L << 30))
-        : Format("BytesMbFormat", bytes / (double)(1L << 20));
+    /// <summary>Объём трафика: КБ до 1 МБ, МБ до 1 ГБ, дальше ГБ.</summary>
+    public static string Bytes(long bytes) => bytes switch
+    {
+        >= 1L << 30 => Format("BytesGbFormat", bytes / (double)(1L << 30)),
+        >= 1L << 20 => Format("BytesMbFormat", bytes / (double)(1L << 20)),
+        _ => Format("BytesKbFormat", bytes / 1024.0),
+    };
+
+    /// <summary>Скорость: КБ/с до 1 МБ/с, дальше МБ/с.</summary>
+    public static string Rate(double bytesPerSecond) => bytesPerSecond >= 1 << 20
+        ? Format("RateMbFormat", bytesPerSecond / (1 << 20))
+        : Format("RateKbFormat", bytesPerSecond / 1024);
 
     public static string Describe(LatencyResult result)
     {

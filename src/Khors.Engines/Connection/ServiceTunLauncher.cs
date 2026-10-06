@@ -4,6 +4,7 @@ using Khors.Core.Profiles;
 using Khors.Core.Storage;
 using Khors.Engines.Diagnostics;
 using Khors.Engines.Processes;
+using Khors.Engines.Traffic;
 using Khors.Ipc;
 
 namespace Khors.Engines.Connection;
@@ -143,6 +144,25 @@ public sealed class ServiceTunLauncher(IIpcClientTransport transport, string cli
         }
 
         public ValueTask DisposeAsync() => new(StopAsync());
+
+        public async Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default)
+        {
+            if (Volatile.Read(ref _stopping) == 1)
+            {
+                return null;
+            }
+
+            try
+            {
+                return await _client.RequestAsync(new GetTunTrafficRequest(), cancellationToken).ConfigureAwait(false) is TunTrafficResponse { Available: true } traffic
+                    ? new TrafficCounters(traffic.Uplink, traffic.Downlink)
+                    : null;
+            }
+            catch (Exception ex) when (ex is IpcDisconnectedException or IpcProtocolException or ObjectDisposedException)
+            {
+                return null;
+            }
+        }
 
         private void OnEvent(object? sender, IpcPayload payload)
         {

@@ -60,7 +60,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         _clipboard = clipboard;
         _dialogs = dialogs;
         _launcher = launcher;
-        _sessionTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => UpdateSessionTime());
+        _sessionTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => OnSessionTick());
 
         IsTunMode = settings.Current.ConnectionMode == ConnectionMode.Tun;
 
@@ -990,10 +990,13 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         if (status.State != ConnectionState.Connected)
         {
             ConnectionLatency = null;
+            ResetTraffic();
         }
         else if (justConnected)
         {
+            ResetTraffic();
             _ = MeasureConnectionAsync(status);
+            _ = PollTrafficAsync();
         }
     }
 

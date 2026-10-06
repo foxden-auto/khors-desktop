@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using Khors.Core.Diagnostics;
 using Khors.Core.Generators;
 using Khors.Core.Generators.SingBox;
@@ -7,6 +8,7 @@ using Khors.Core.Generators.Xray;
 using Khors.Core.Profiles;
 using Khors.Engines.Diagnostics;
 using Khors.Engines.Processes;
+using Khors.Engines.Traffic;
 using Khors.Platform;
 
 namespace Khors.Engines;
@@ -18,8 +20,8 @@ public sealed record CoreStartOptions
 
     public int? PreferredHttpPort { get; init; } = 10809;
 
-    /// <summary>API статистики (только Xray).</summary>
-    public bool EnableStatsApi { get; init; }
+    /// <summary>Счётчики трафика на loopback (<see cref="CoreSession.Traffic"/>): Xray — metrics, sing-box — Clash API.</summary>
+    public bool TrafficStats { get; init; }
 
     /// <summary>Уровень лога в терминах Xray (debug, info, warning, error, none); как он применяется — <see cref="CoreLogLevels.Plan"/>.</summary>
     public string LogLevel { get; init; } = "warning";
@@ -64,10 +66,12 @@ public static class CoreLauncher
             profile = await ResolveWireGuardServerAsync(profile, cancellationToken).ConfigureAwait(false);
         }
 
-        var withApi = kind == CoreKind.Xray && options.EnableStatsApi;
-        var ports = withApi
+        var ports = options.TrafficStats
             ? PortAllocator.Allocate(options.PreferredSocksPort, options.PreferredHttpPort, null)
             : PortAllocator.Allocate(options.PreferredSocksPort, options.PreferredHttpPort);
+        var traffic = options.TrafficStats
+            ? new TrafficEndpoint(kind, ports[2], kind == CoreKind.SingBox ? Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(16)) : null)
+            : null;
 
         var log = CoreLogLevels.Plan(kind, options.LogLevel);
         var config = kind switch
@@ -76,7 +80,7 @@ public static class CoreLauncher
             {
                 SocksPort = ports[0],
                 HttpPort = ports[1],
-                ApiPort = withApi ? ports[2] : null,
+                MetricsPort = traffic?.Port,
                 LogLevel = log.Level,
             }),
             CoreKind.SingBox => SingBoxConfigGenerator.Generate(profile, new SingBoxConfigOptions
@@ -86,6 +90,7 @@ public static class CoreLauncher
                 LogLevel = log.Level,
                 Tun = options.Tun,
                 UpstreamSocksPort = options.UpstreamSocksPort,
+                ClashApi = traffic is { Secret: { } secret } ? new ClashApiOptions(traffic.Port, secret) : null,
             }),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
         };
@@ -108,7 +113,7 @@ public static class CoreLauncher
         try
         {
             var process = await CoreProcess.StartAsync(launch, new CoreLogBuffer(masker), guard, cancellationToken).ConfigureAwait(false);
-            return new CoreSession(kind, process, ports[0], ports[1], withApi ? ports[2] : null);
+            return new CoreSession(kind, process, ports[0], ports[1], traffic);
         }
         catch (CoreStartException ex) when (ex.Core is null)
         {
@@ -150,7 +155,7 @@ public static class CoreLauncher
 }
 
 /// <summary>Запущенное ядро и его локальные входы.</summary>
-public sealed class CoreSession(CoreKind core, CoreProcess process, int socksPort, int httpPort, int? apiPort) : IAsyncDisposable
+public sealed class CoreSession(CoreKind core, CoreProcess process, int socksPort, int httpPort, TrafficEndpoint? traffic = null) : IAsyncDisposable
 {
     public CoreKind Core { get; } = core;
 
@@ -160,7 +165,12 @@ public sealed class CoreSession(CoreKind core, CoreProcess process, int socksPor
 
     public int HttpPort { get; } = httpPort;
 
-    public int? ApiPort { get; } = apiPort;
+    /// <summary>Где читать счётчики трафика; <c>null</c> — запущено без них.</summary>
+    public TrafficEndpoint? Traffic { get; } = traffic;
+
+    /// <summary>Счётчики с запуска ядра; <c>null</c> — выключены или ядро не ответило.</summary>
+    public Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) =>
+        Traffic is { } endpoint ? TrafficReader.ReadAsync(endpoint, cancellationToken) : Task.FromResult<TrafficCounters?>(null);
 
     public Task StopAsync(CancellationToken cancellationToken = default) => Process.StopAsync(cancellationToken);
 

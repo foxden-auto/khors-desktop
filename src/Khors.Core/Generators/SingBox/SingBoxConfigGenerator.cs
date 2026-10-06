@@ -26,6 +26,19 @@ public sealed record SingBoxConfigOptions
     /// протокол профиля обрабатывает Xray. <c>null</c> — выход из профиля.
     /// </summary>
     public int? UpstreamSocksPort { get; init; }
+
+    /// <summary>
+    /// Счётчики трафика: Clash API на loopback (<c>/connections</c> — uploadTotal/downloadTotal); <c>null</c> — выключены.
+    /// API умеет и управлять ядром, поэтому без секрета не включается.
+    /// </summary>
+    public ClashApiOptions? ClashApi { get; init; }
+}
+
+/// <param name="Secret">Случайный на каждый запуск; конфиг уходит ядру через stdin и на диск не пишется.</param>
+public sealed record ClashApiOptions(int Port, string Secret)
+{
+    // Секрет — в журнал не выводим.
+    public override string ToString() => $"ClashApiOptions {{ Port = {Port} }}";
 }
 
 /// <summary>Адаптер TUN sing-box (wintun на Windows).</summary>
@@ -133,6 +146,18 @@ public static class SingBoxConfigGenerator
         if (options.Tun is { } tun)
         {
             AddTun(config, tun);
+        }
+
+        if (options.ClashApi is { } clashApi)
+        {
+            config["experimental"] = new JsonObject
+            {
+                ["clash_api"] = new JsonObject
+                {
+                    ["external_controller"] = $"{options.ListenAddress}:{clashApi.Port}",
+                    ["secret"] = clashApi.Secret,
+                },
+            };
         }
 
         return CoreConfigResult.Success(config.ToJsonString(s_jsonOptions));

@@ -37,6 +37,12 @@
   <Color x:Key="KhorsSuccessColor">#7BC79A</Color>
   <SolidColorBrush x:Key="KhorsSuccessBrush" Color="{StaticResource KhorsSuccessColor}" />
 
+  <!-- График скорости: два ряда разной светлоты (проверены на различимость, в том числе при дальтонизме, на фоне карточки). -->
+  <Color x:Key="KhorsChartUploadColor">#4F8FD0</Color>
+  <Color x:Key="KhorsChartDownloadColor">#B38D45</Color>
+  <SolidColorBrush x:Key="KhorsChartUploadBrush" Color="{StaticResource KhorsChartUploadColor}" />
+  <SolidColorBrush x:Key="KhorsChartDownloadBrush" Color="{StaticResource KhorsChartDownloadColor}" />
+
   <!-- Свечение вокруг кнопки подключения: золотой с прозрачностью; при подключении — ярче. -->
   <RadialGradientBrush x:Key="KhorsGlowIdleBrush" Center="50%,45%" GradientOrigin="50%,45%" RadiusX="55%" RadiusY="55%">
     <GradientStop Offset="0" Color="#14E5BD70" />

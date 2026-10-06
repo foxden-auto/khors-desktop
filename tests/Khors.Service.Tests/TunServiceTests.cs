@@ -7,6 +7,7 @@ using Khors.Core.Storage;
 using Khors.Engines;
 using Khors.Engines.Connection;
 using Khors.Engines.Processes;
+using Khors.Engines.Traffic;
 using Khors.Engines.Tun;
 using Khors.Ipc;
 using Khors.Service.Ipc;
@@ -52,6 +53,10 @@ internal sealed class FakeTunRun(CoreKind core) : ITunRun
     public Task<CoreExit> Completion => _completion.Task;
 
     public bool Disposed { get; private set; }
+
+    public TrafficCounters? Traffic { get; set; }
+
+    public Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) => Task.FromResult(Traffic);
 
     public IReadOnlyList<string> Tail(int count) => [.. _lines.TakeLast(count)];
 
@@ -131,6 +136,24 @@ public sealed class TunServiceTests : IAsyncDisposable
 
         Assert.Equal(new ErrorResponse(IpcErrorCode.BadRequest), answer);
         Assert.Empty(_starter.Runs);
+    }
+
+    [Fact]
+    public async Task TrafficIsReportedToOwnerOnly()
+    {
+        var (owner, _) = await ConnectAsync();
+        var (other, _) = await ConnectAsync();
+        Assert.Equal(new TunTrafficResponse(Available: false), await owner.RequestAsync(new GetTunTrafficRequest(), Ct));
+
+        await owner.RequestAsync(new StartTunRequest(Hysteria2Json(), "warning"), Ct);
+        var run = Assert.Single(_starter.Runs);
+        run.Traffic = new TrafficCounters(1200, 34000);
+
+        Assert.Equal(new TunTrafficResponse(true, 1200, 34000), await owner.RequestAsync(new GetTunTrafficRequest(), Ct));
+        Assert.Equal(new TunTrafficResponse(Available: false), await other.RequestAsync(new GetTunTrafficRequest(), Ct));
+
+        run.Traffic = null;
+        Assert.Equal(new TunTrafficResponse(Available: false), await owner.RequestAsync(new GetTunTrafficRequest(), Ct));
     }
 
     [Fact]

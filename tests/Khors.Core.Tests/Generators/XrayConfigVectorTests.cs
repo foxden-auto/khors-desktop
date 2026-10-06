@@ -102,7 +102,7 @@ public class XrayConfigVectorTests
         {
             SocksPort = options["socksPort"]!.GetValue<int>(),
             HttpPort = options["httpPort"]!.GetValue<int>(),
-            ApiPort = options["apiPort"]?.GetValue<int>(),
+            MetricsPort = options["metricsPort"]?.GetValue<int>(),
             LogLevel = options["logLevel"]?.GetValue<string>() ?? "warning",
         });
     }

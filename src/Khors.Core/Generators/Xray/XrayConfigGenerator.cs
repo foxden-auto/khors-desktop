@@ -19,7 +19,7 @@ public static class XrayConfigGenerator
     public const string BlockTag = "block";
     public const string SocksInboundTag = "socks-in";
     public const string HttpInboundTag = "http-in";
-    public const string ApiTag = "api";
+    public const string MetricsTag = "metrics";
 
     // Локальные и служебные сети — напрямую. CIDR вместо geoip:private: гео-базы не поставляются до ROADMAP 3.6.
     private static readonly string[] s_privateNetworks =
@@ -66,13 +66,13 @@ public static class XrayConfigGenerator
             ["routing"] = BuildRouting(),
         };
 
-        if (options.ApiPort is { } apiPort)
+        // Счётчики выхода proxy: отправлено и получено через сервер (локальные сети идут через direct и не считаются).
+        if (options.MetricsPort is { } metricsPort)
         {
-            config["api"] = new JsonObject
+            config["metrics"] = new JsonObject
             {
-                ["tag"] = ApiTag,
-                ["listen"] = $"{options.ListenAddress}:{apiPort}",
-                ["services"] = new JsonArray("StatsService"),
+                ["tag"] = MetricsTag,
+                ["listen"] = $"{options.ListenAddress}:{metricsPort}",
             };
             config["stats"] = new JsonObject();
             config["policy"] = new JsonObject

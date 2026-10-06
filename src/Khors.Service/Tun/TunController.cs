@@ -60,6 +60,20 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
         }
     }
 
+    /// <summary>Счётчики трафика TUN, если он принадлежит <paramref name="owner"/>.</summary>
+    public async Task<TunTrafficResponse> ReadTrafficAsync(object owner, CancellationToken cancellationToken)
+    {
+        var run = Volatile.Read(ref _run);
+        if (run is null || !ReferenceEquals(Volatile.Read(ref _owner), owner))
+        {
+            return new TunTrafficResponse(Available: false);
+        }
+
+        return await run.ReadTrafficAsync(cancellationToken).ConfigureAwait(false) is { } traffic
+            ? new TunTrafficResponse(Available: true, traffic.Uplink, traffic.Downlink)
+            : new TunTrafficResponse(Available: false);
+    }
+
     /// <summary>Выключает TUN, если он принадлежит <paramref name="owner"/>.</summary>
     public async Task StopAsync(object owner)
     {
