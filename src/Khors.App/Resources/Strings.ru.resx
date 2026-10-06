@@ -42,14 +42,26 @@
   <data name="CoreAutoFormat" xml:space="preserve"><value>Автоматически (сейчас {0})</value></data>
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>Ядро {0} не запустит этот профиль: {1}. Выбор ядра не изменён.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Лог ядра скопирован в буфер обмена: строк {0}. Адреса и ключи в нём замаскированы.</value></data>
+  <data name="DnsCustomHint" xml:space="preserve"><value>Форматы: https://адрес/путь (DoH), tls://адрес (DoT), udp://адрес, tcp://адрес или просто IP. Порт — через двоеточие.</value></data>
+  <data name="DnsCustomOption" xml:space="preserve"><value>Свой адрес</value></data>
+  <data name="DnsCustomPlaceholder" xml:space="preserve"><value>https://dns.example.com/dns-query</value></data>
+  <data name="DnsError_InvalidHost" xml:space="preserve"><value>Нужен IP-адрес или полное имя сервера, например dns.example.com.</value></data>
+  <data name="DnsError_InvalidPort" xml:space="preserve"><value>Порт должен быть от 1 до 65535.</value></data>
+  <data name="DnsError_Malformed" xml:space="preserve"><value>Это не адрес DNS-сервера. Пример: https://1.1.1.1/dns-query или tls://9.9.9.9.</value></data>
+  <data name="DnsError_UnsupportedScheme" xml:space="preserve"><value>Поддерживаются только https://, tls://, udp:// и tcp://.</value></data>
+  <data name="DnsKind_Https" xml:space="preserve"><value>DoH</value></data>
+  <data name="DnsKind_Tcp" xml:space="preserve"><value>TCP</value></data>
+  <data name="DnsKind_Tls" xml:space="preserve"><value>DoT</value></data>
+  <data name="DnsKind_Udp" xml:space="preserve"><value>UDP</value></data>
+  <data name="DnsPresetFormat" xml:space="preserve"><value>{0} — {1} ({2})</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Скопируйте ссылку, адрес подписки или картинку с QR-кодом и нажмите «Вставить из буфера».</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Лог ядра</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>Ядро {0} неожиданно завершилось (код {1}). Соединение прервано, сеть работает напрямую.</value></data>
   <data name="Failure_CoreCrashed_NoCode" xml:space="preserve"><value>Ядро {0} неожиданно завершилось. Соединение прервано, сеть работает напрямую.</value></data>
   <data name="Failure_CoreNotFound" xml:space="preserve"><value>Не найден исполняемый файл ядра {0}. Переустановите KHORS.</value></data>
+  <data name="Failure_CoreNotReady" xml:space="preserve"><value>Ядро {0} запустилось, но не ответило вовремя.</value></data>
   <data name="Failure_CoreStartFailed" xml:space="preserve"><value>Ядро {0} не запустилось (код {1}).</value></data>
   <data name="Failure_CoreStartFailed_NoCode" xml:space="preserve"><value>Ядро {0} не запустилось.</value></data>
-  <data name="Failure_CoreNotReady" xml:space="preserve"><value>Ядро {0} запустилось, но не ответило вовремя.</value></data>
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>В профиле ошибка: {0}.</value></data>
   <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>Служба KHORS не отвечает — режим TUN недоступен. Установите службу в «Настройках» или переключитесь на «Системный прокси».</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Не удалось включить системный прокси Windows.</value></data>
@@ -199,6 +211,8 @@
   <data name="SessionSent" xml:space="preserve"><value>Отправлено</value></data>
   <data name="SessionServer" xml:space="preserve"><value>Сервер</value></data>
   <data name="SessionTime" xml:space="preserve"><value>Время</value></data>
+  <data name="SettingsDnsHeader" xml:space="preserve"><value>DNS</value></data>
+  <data name="SettingsDnsHint" xml:space="preserve"><value>Куда KHORS отправляет запросы имён сайтов в режиме TUN и для WireGuard. Запросы идут через сервер, провайдер их не видит; адрес в локальной сети (например, роутер) — напрямую. В режиме «Системный прокси» имена разрешает сервер. Изменение действует со следующего подключения.</value></data>
   <data name="SettingsModeHeader" xml:space="preserve"><value>Режим подключения</value></data>
   <data name="SettingsModeHint" xml:space="preserve"><value>Режим меняется, пока нет подключения. Для TUN нужна служба KHORS.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Список серверов</value></data>

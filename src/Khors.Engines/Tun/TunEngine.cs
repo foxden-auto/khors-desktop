@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using Khors.Core.Diagnostics;
+using Khors.Core.Dns;
 using Khors.Core.Generators;
 using Khors.Core.Generators.SingBox;
 using Khors.Core.Profiles;
@@ -39,7 +40,7 @@ public interface ITunRun : IAsyncDisposable
 public interface ITunStarter
 {
     /// <exception cref="CoreStartException">Ядро не запустилось или профиль не поддерживается.</exception>
-    Task<ITunRun> StartAsync(Profile profile, string logLevel, CancellationToken cancellationToken);
+    Task<ITunRun> StartAsync(Profile profile, string logLevel, DnsServer remoteDns, CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -60,9 +61,10 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
     /// <summary>Разрешение имени сервера (для тестов — подмена).</summary>
     public Func<string, CancellationToken, Task<IPAddress[]>> Resolve { get; init; } = Dns.GetHostAddressesAsync;
 
-    public async Task<ITunRun> StartAsync(Profile profile, string logLevel, CancellationToken cancellationToken)
+    public async Task<ITunRun> StartAsync(Profile profile, string logLevel, DnsServer remoteDns, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(profile);
+        ArgumentNullException.ThrowIfNull(remoteDns);
         var choice = CoreSelection.Select(profile);
         if (choice.Unsupported is { } field)
         {
@@ -73,7 +75,7 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
             };
         }
 
-        var options = new CoreStartOptions { PreferredSocksPort = null, PreferredHttpPort = null, LogLevel = logLevel };
+        var options = new CoreStartOptions { PreferredSocksPort = null, PreferredHttpPort = null, LogLevel = logLevel, RemoteDns = remoteDns };
         if (choice.Core == CoreKind.SingBox)
         {
             var singBox = await StartSingBoxAsync(profile, options with { Tun = new SingBoxTunOptions(), TrafficStats = true, ReadyTimeout = s_tunReadyTimeout }, cancellationToken).ConfigureAwait(false);

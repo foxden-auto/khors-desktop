@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Nodes;
 using Khors.Core.Diagnostics;
+using Khors.Core.Dns;
 using Khors.Core.Generators;
 using Khors.Core.Generators.SingBox;
 using Khors.Core.Import;
@@ -13,7 +14,7 @@ namespace Khors.Core.Tests.Generators;
 
 /// <summary>
 /// Снапшоты конфигов sing-box: <c>Vectors/singbox-config/*.json</c> — ссылка (+ <c>core</c>), параметры (порты, уровень лога,
-/// <c>tun</c> с <c>excludeAddresses</c>, <c>upstreamSocksPort</c> для цепочки через Xray) и ожидаемый конфиг или ошибка. Каждый ожидаемый конфиг проверяется настоящим sing-box (<c>sing-box check</c>), если он скачан.
+/// <c>tun</c> с <c>excludeAddresses</c>, <c>upstreamSocksPort</c> для цепочки через Xray, <c>remoteDns</c>) и ожидаемый конфиг или ошибка. Каждый ожидаемый конфиг проверяется настоящим sing-box (<c>sing-box check</c>), если он скачан.
 /// </summary>
 public class SingBoxConfigVectorTests
 {
@@ -98,6 +99,9 @@ public class SingBoxConfigVectorTests
             ClashApi = options["clashApi"] is { } clashApi
                 ? new ClashApiOptions(clashApi["port"]!.GetValue<int>(), clashApi["secret"]!.GetValue<string>())
                 : null,
+            RemoteDns = options["remoteDns"] is { } remoteDns
+                ? DnsServer.Parse(remoteDns.GetValue<string>()).Server ?? throw new InvalidOperationException("remoteDns вектора не разбирается")
+                : DnsPresets.Default.Server,
             Tun = options["tun"] is { } tun
                 ? new SingBoxTunOptions { ExcludeAddresses = tun["excludeAddresses"]?.AsArray().Select(a => a!.GetValue<string>()).ToArray() ?? [] }
                 : null,

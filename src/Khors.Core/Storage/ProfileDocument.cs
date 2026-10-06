@@ -41,6 +41,7 @@ public enum ConnectionMode
 /// <param name="AutoRecheckMinutes">Как часто «Авто» перепроверяет задержку (1…1440 минут).</param>
 /// <param name="SortProfilesByLatency">Список профилей — по возрастанию задержки.</param>
 /// <param name="ConnectionMode">Режим подключения: системный прокси или TUN через службу (ROADMAP 3.2).</param>
+/// <param name="RemoteDns">Удалённый DNS в текстовой форме <see cref="Dns.DnsServer"/> — для TUN и WireGuard (ROADMAP 3.4).</param>
 public sealed record AppSettings(
     int SchemaVersion = AppSettings.CurrentSchemaVersion,
     Guid? SelectedProfileId = null,
@@ -54,7 +55,11 @@ public sealed record AppSettings(
     bool AutoSelect = false,
     int AutoRecheckMinutes = 10,
     bool SortProfilesByLatency = false,
-    ConnectionMode ConnectionMode = ConnectionMode.SystemProxy)
+    ConnectionMode ConnectionMode = ConnectionMode.SystemProxy,
+    string RemoteDns = AppSettings.DefaultRemoteDns)
 {
     public const int CurrentSchemaVersion = 1;
+
+    /// <summary>Совпадает с <see cref="Dns.DnsPresets.Default"/> (проверяется тестом).</summary>
+    public const string DefaultRemoteDns = "https://1.1.1.1/dns-query";
 }

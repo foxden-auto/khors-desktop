@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using Khors.Core.Diagnostics;
+using Khors.Core.Dns;
 using Khors.Core.Generators;
 using Khors.Core.Generators.SingBox;
 using Khors.Core.Generators.Xray;
@@ -36,6 +37,9 @@ public sealed record CoreStartOptions
 
     /// <summary>sing-box в цепочке: выход — SOCKS-вход Xray на этом порту (ROADMAP 3.3).</summary>
     public int? UpstreamSocksPort { get; init; }
+
+    /// <summary>Удалённый DNS sing-box (TUN, WireGuard); Xray его не использует — имена сайтов разрешает сервер.</summary>
+    public DnsServer RemoteDns { get; init; } = DnsPresets.Default.Server;
 }
 
 /// <summary>
@@ -90,6 +94,7 @@ public static class CoreLauncher
                 LogLevel = log.Level,
                 Tun = options.Tun,
                 UpstreamSocksPort = options.UpstreamSocksPort,
+                RemoteDns = options.RemoteDns,
                 ClashApi = traffic is { Secret: { } secret } ? new ClashApiOptions(traffic.Port, secret) : null,
             }),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),

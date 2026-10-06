@@ -1,10 +1,11 @@
 {
-  "description": "TUN: WireGuard endpoint — DNS через туннель WireGuard (как в режиме прокси), перехват DNS",
-  "link": "wireguard://RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14%3D@198.51.100.9:51820?publickey=S2BGSyYNxTf1wij4Qk%2F8nbbFhbbGfzsDwb4shXmfImw%3D&presharedkey=yZFSXD5CEPmcBaINbhEO0qJt7hLnqy6WwX%2FDiPcRLbs%3D&address=10.0.0.2%2F32%2Cfd00%3A%3A2%2F128&reserved=1%2C2%2C3&mtu=1280#WG",
+  "description": "TUN: удалённый DNS по имени с портом и путём — имя DNS-сервера разрешает системный резолвер (local)",
+  "link": "hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com",
   "options": {
     "socksPort": 10808,
     "httpPort": 10809,
-    "tun": {}
+    "tun": {},
+    "remoteDns": "https://dns.example.com:8443/resolve"
   },
   "expected": {
     "log": {
@@ -20,7 +21,10 @@
         {
           "type": "https",
           "tag": "remote",
-          "server": "1.1.1.1",
+          "server": "dns.example.com",
+          "server_port": 8443,
+          "path": "/resolve",
+          "domain_resolver": "local",
           "detour": "proxy"
         }
       ],
@@ -53,37 +57,18 @@
         "listen_port": 10809
       }
     ],
-    "endpoints": [
-      {
-        "type": "wireguard",
-        "tag": "proxy",
-        "address": [
-          "10.0.0.2/32",
-          "fd00::2/128"
-        ],
-        "private_key": "RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14=",
-        "peers": [
-          {
-            "address": "198.51.100.9",
-            "port": 51820,
-            "public_key": "S2BGSyYNxTf1wij4Qk/8nbbFhbbGfzsDwb4shXmfImw=",
-            "allowed_ips": [
-              "0.0.0.0/0",
-              "::/0"
-            ],
-            "pre_shared_key": "yZFSXD5CEPmcBaINbhEO0qJt7hLnqy6WwX/DiPcRLbs=",
-            "reserved": [
-              1,
-              2,
-              3
-            ]
-          }
-        ],
-        "domain_resolver": "local",
-        "mtu": 1280
-      }
-    ],
     "outbounds": [
+      {
+        "type": "hysteria2",
+        "tag": "proxy",
+        "server": "hy.example.com",
+        "server_port": 443,
+        "password": "Hy2Pa55",
+        "tls": {
+          "enabled": true,
+          "server_name": "hy.example.com"
+        }
+      },
       {
         "type": "direct",
         "tag": "direct"

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Khors.Core.Dns;
 using Khors.Core.Profiles;
 
 namespace Khors.Core.Generators.SingBox;
@@ -32,6 +33,12 @@ public sealed record SingBoxConfigOptions
     /// API умеет и управлять ядром, поэтому без секрета не включается.
     /// </summary>
     public ClashApiOptions? ClashApi { get; init; }
+
+    /// <summary>
+    /// Удалённый DNS для имён сайтов: в режиме TUN и для WireGuard (через WireGuard идут IP-пакеты, имена разрешает
+    /// клиент). Запросы идут через сервер прокси, к адресу в локальной сети — напрямую (ROADMAP 3.4).
+    /// </summary>
+    public DnsServer RemoteDns { get; init; } = DnsPresets.Default.Server;
 }
 
 /// <param name="Secret">Случайный на каждый запуск; конфиг уходит ядру через stdin и на диск не пишется.</param>
@@ -124,10 +131,8 @@ public static class SingBoxConfigGenerator
         else if (profile.Protocol is WireGuardSettings wireGuard)
         {
             // Через WireGuard идут IP-пакеты: имена сайтов разрешаются на клиенте. Системный резолвер
-            // недоступен через туннель (сервер обычно режет частные адреса), поэтому DNS — публичный, через туннель.
-            var dns = config["dns"]!.AsObject();
-            dns["servers"]!.AsArray().Add(new JsonObject { ["type"] = "udp", ["tag"] = TunnelDnsTag, ["server"] = TunnelDnsServer, ["detour"] = ProxyTag });
-            dns["final"] = TunnelDnsTag;
+            // недоступен через туннель (сервер обычно режет частные адреса), поэтому DNS — удалённый из настроек, через туннель.
+            AddRemoteDns(config, options.RemoteDns);
             config["endpoints"] = new JsonArray(WireGuardEndpoint(profile, wireGuard));
             config["outbounds"] = new JsonArray(new JsonObject { ["type"] = "direct", ["tag"] = DirectTag });
         }
@@ -148,7 +153,7 @@ public static class SingBoxConfigGenerator
 
         if (options.Tun is { } tun)
         {
-            AddTun(config, tun);
+            AddTun(config, tun, options.RemoteDns);
         }
 
         if (options.ClashApi is { } clashApi)
@@ -168,15 +173,14 @@ public static class SingBoxConfigGenerator
 
     private const string TunTag = "tun-in";
     private const string RemoteDnsTag = "remote";
-    private const string RemoteDnsServer = "1.1.1.1";
 
     /// <summary>
     /// TUN: весь трафик системы — в sing-box. Сам sing-box выходит в сеть через физический интерфейс
     /// (<c>auto_detect_interface</c>), иначе его соединения с сервером снова попали бы в TUN. DNS-запросы системы
-    /// перехватываются и уходят через туннель (DoH 1.1.1.1), чтобы провайдер их не видел, и отдают только IPv4-адреса;
-    /// пресеты DNS — ROADMAP 3.4.
+    /// перехватываются и уходят через туннель на удалённый DNS из настроек, чтобы провайдер их не видел, и отдают
+    /// только IPv4-адреса.
     /// </summary>
-    private static void AddTun(JsonObject config, SingBoxTunOptions tun)
+    private static void AddTun(JsonObject config, SingBoxTunOptions tun, DnsServer remoteDns)
     {
         var inbound = new JsonObject
         {
@@ -203,8 +207,7 @@ public static class SingBoxConfigGenerator
         dns["strategy"] = "ipv4_only";
         if (dns["final"] is null)
         {
-            dns["servers"]!.AsArray().Add(new JsonObject { ["type"] = "https", ["tag"] = RemoteDnsTag, ["server"] = RemoteDnsServer, ["detour"] = ProxyTag });
-            dns["final"] = RemoteDnsTag;
+            AddRemoteDns(config, remoteDns);
         }
 
         var route = config["route"]!.AsObject();
@@ -216,8 +219,48 @@ public static class SingBoxConfigGenerator
     private static string ToPrefix(string address) =>
         address.Contains('/', StringComparison.Ordinal) ? address : address + (address.Contains(':', StringComparison.Ordinal) ? "/128" : "/32");
 
-    private const string TunnelDnsTag = "tunnel-dns";
-    private const string TunnelDnsServer = "1.1.1.1";
+    /// <summary>
+    /// Удалённый DNS — главный (<c>final</c>). Имя самого DNS-сервера разрешает системный резолвер (<c>local</c>),
+    /// иначе сервер ждал бы сам себя; адрес в локальной сети — напрямую, остальные — через сервер прокси.
+    /// </summary>
+    private static void AddRemoteDns(JsonObject config, DnsServer server)
+    {
+        var node = new JsonObject
+        {
+            ["type"] = server.Type switch
+            {
+                DnsServerType.Udp => "udp",
+                DnsServerType.Tcp => "tcp",
+                DnsServerType.Tls => "tls",
+                _ => "https",
+            },
+            ["tag"] = RemoteDnsTag,
+            ["server"] = server.Host,
+        };
+        if (server.Port is { } port)
+        {
+            node["server_port"] = port;
+        }
+
+        if (server.Path is { } path)
+        {
+            node["path"] = path;
+        }
+
+        if (!server.HostIsAddress)
+        {
+            node["domain_resolver"] = "local";
+        }
+
+        if (!server.IsLocalNetwork)
+        {
+            node["detour"] = ProxyTag;
+        }
+
+        var dns = config["dns"]!.AsObject();
+        dns["servers"]!.AsArray().Add(node);
+        dns["final"] = RemoteDnsTag;
+    }
 
     /// <summary>
     /// Возможность профиля, которой нет в sing-box 1.14: поле профиля или <c>null</c>, если sing-box его запустит

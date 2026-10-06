@@ -8,7 +8,7 @@ namespace Khors.Ipc;
 /// </summary>
 public static class IpcProtocol
 {
-    public const int Version = 3;
+    public const int Version = 4;
 }
 
 /// <summary>
@@ -71,10 +71,12 @@ public sealed record OkResponse : IpcPayload;
 /// его и строит конфиги ядер (CLAUDE.md, правила 3 и 8). TUN живёт, пока открыто соединение, которое его включило.
 /// </summary>
 /// <param name="LogLevel">Уровень лога ядер: debug, info, warning, error, none.</param>
-public sealed record StartTunRequest(string Profile, string LogLevel) : IpcPayload
+/// <param name="RemoteDns">Удалённый DNS в текстовой форме <c>DnsServer</c> (служба разбирает и проверяет сама);
+/// <c>null</c> — по умолчанию.</param>
+public sealed record StartTunRequest(string Profile, string LogLevel, string? RemoteDns = null) : IpcPayload
 {
     // Профиль содержит ключи доступа — в журнал не выводим.
-    public override string ToString() => $"StartTunRequest {{ LogLevel = {LogLevel} }}";
+    public override string ToString() => $"StartTunRequest {{ LogLevel = {LogLevel}, RemoteDns = {RemoteDns} }}";
 }
 
 public enum IpcCore

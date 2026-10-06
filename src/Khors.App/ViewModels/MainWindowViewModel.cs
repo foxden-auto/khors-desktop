@@ -66,6 +66,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         _sessionTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => OnSessionTick());
 
         IsTunMode = settings.Current.ConnectionMode == ConnectionMode.Tun;
+        LoadDnsSetting();
 
         // «Авто» — до загрузки списка, чтобы загрузка не выбрала первый профиль поверх сохранённого выбора.
         IsAutoSelected = settings.Current.AutoSelect;

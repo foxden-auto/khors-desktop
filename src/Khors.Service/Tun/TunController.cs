@@ -1,3 +1,4 @@
+using Khors.Core.Dns;
 using Khors.Core.Profiles;
 using Khors.Engines;
 using Khors.Engines.Processes;
@@ -24,10 +25,11 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
     public bool IsRunning => Volatile.Read(ref _run) is not null;
 
     /// <summary>Включает TUN для <paramref name="owner"/>; работающий TUN (в том числе чужой) сначала выключается.</summary>
-    public async Task<IpcPayload> StartAsync(object owner, Profile profile, string logLevel, Action<IpcPayload> send, CancellationToken cancellationToken)
+    public async Task<IpcPayload> StartAsync(object owner, Profile profile, string logLevel, DnsServer remoteDns, Action<IpcPayload> send, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(owner);
         ArgumentNullException.ThrowIfNull(profile);
+        ArgumentNullException.ThrowIfNull(remoteDns);
         ArgumentNullException.ThrowIfNull(send);
 
         await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -38,7 +40,7 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
             ITunRun run;
             try
             {
-                run = await starter.StartAsync(profile, logLevel, cancellationToken).ConfigureAwait(false);
+                run = await starter.StartAsync(profile, logLevel, remoteDns, cancellationToken).ConfigureAwait(false);
             }
             catch (CoreStartException ex)
             {

@@ -1,4 +1,5 @@
 using Khors.Core.Diagnostics;
+using Khors.Core.Dns;
 using Khors.Core.Generators.SingBox;
 using Khors.Core.Generators.Xray;
 using Khors.Core.Profiles;
@@ -73,6 +74,7 @@ public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildP
             PreferredHttpPort = preferences.HttpPort,
             LogLevel = preferences.LogLevel,
             TrafficStats = preferences.TrafficStats,
+            RemoteDns = DnsPresets.ServerOrDefault(preferences.RemoteDns),
         };
 
         var session = await CoreLauncher.StartAsync(kind, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);

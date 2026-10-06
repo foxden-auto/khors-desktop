@@ -75,6 +75,16 @@ public class LocalizationTests
                 keys.Add($"ServiceSetup_{action}_Failed");
             }
 
+            foreach (var error in Enum.GetNames<Khors.Core.Dns.DnsServerParseError>().Where(e => e != "Empty"))
+            {
+                keys.Add($"DnsError_{error}");
+            }
+
+            foreach (var type in Enum.GetNames<Khors.Core.Dns.DnsServerType>())
+            {
+                keys.Add($"DnsKind_{type}");
+            }
+
             keys.Add("ServiceSetup_Cancelled");
             keys.Add("ServiceSetup_SetupNotFound");
             keys.Add("Problem_RealityRejected_SingBox");

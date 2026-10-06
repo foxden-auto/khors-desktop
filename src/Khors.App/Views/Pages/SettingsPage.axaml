@@ -21,6 +21,21 @@
         </StackPanel>
       </Border>
 
+      <!-- Удалённый DNS (режим TUN и WireGuard): пресет или свой адрес; неверный адрес не сохраняется. -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{x:Static res:Strings.SettingsDnsHeader}" Classes="section" />
+          <TextBlock Text="{x:Static res:Strings.SettingsDnsHint}" Classes="muted" TextWrapping="Wrap" />
+          <ComboBox ItemsSource="{Binding DnsOptions}" SelectedItem="{Binding SelectedDnsOption}" MinWidth="320" />
+          <StackPanel Spacing="6" IsVisible="{Binding IsCustomDns}">
+            <TextBox Text="{Binding CustomDnsText}" PlaceholderText="{x:Static res:Strings.DnsCustomPlaceholder}" />
+            <TextBlock Text="{Binding CustomDnsError}" Classes="error" TextWrapping="Wrap"
+                       IsVisible="{Binding CustomDnsError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBlock Text="{x:Static res:Strings.DnsCustomHint}" Classes="caption" TextWrapping="Wrap" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
       <!-- Служба KHORS (режим TUN): состояние, установка и удаление с запросом прав администратора. -->
       <Border Classes="card">
         <StackPanel Spacing="10">

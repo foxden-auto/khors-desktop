@@ -42,14 +42,26 @@
   <data name="CoreAutoFormat" xml:space="preserve"><value>Automatic (now {0})</value></data>
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>The {0} core cannot run this profile: {1}. The core choice was not changed.</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Core log copied to the clipboard: {0} lines. Addresses and keys are masked.</value></data>
+  <data name="DnsCustomHint" xml:space="preserve"><value>Formats: https://host/path (DoH), tls://host (DoT), udp://host, tcp://host or just an IP. Add a port after a colon.</value></data>
+  <data name="DnsCustomOption" xml:space="preserve"><value>Custom address</value></data>
+  <data name="DnsCustomPlaceholder" xml:space="preserve"><value>https://dns.example.com/dns-query</value></data>
+  <data name="DnsError_InvalidHost" xml:space="preserve"><value>An IP address or a full host name such as dns.example.com is required.</value></data>
+  <data name="DnsError_InvalidPort" xml:space="preserve"><value>The port must be between 1 and 65535.</value></data>
+  <data name="DnsError_Malformed" xml:space="preserve"><value>This is not a DNS server address. Example: https://1.1.1.1/dns-query or tls://9.9.9.9.</value></data>
+  <data name="DnsError_UnsupportedScheme" xml:space="preserve"><value>Only https://, tls://, udp:// and tcp:// are supported.</value></data>
+  <data name="DnsKind_Https" xml:space="preserve"><value>DoH</value></data>
+  <data name="DnsKind_Tcp" xml:space="preserve"><value>TCP</value></data>
+  <data name="DnsKind_Tls" xml:space="preserve"><value>DoT</value></data>
+  <data name="DnsKind_Udp" xml:space="preserve"><value>UDP</value></data>
+  <data name="DnsPresetFormat" xml:space="preserve"><value>{0} — {1} ({2})</value></data>
   <data name="EmptyProfilesHint" xml:space="preserve"><value>Copy a link, a subscription address or a QR code image and press “Paste from clipboard”.</value></data>
   <data name="FailureDetails" xml:space="preserve"><value>Core log</value></data>
   <data name="Failure_CoreCrashed" xml:space="preserve"><value>The {0} core exited unexpectedly (code {1}). The connection was dropped; the network works directly.</value></data>
   <data name="Failure_CoreCrashed_NoCode" xml:space="preserve"><value>The {0} core exited unexpectedly. The connection was dropped; the network works directly.</value></data>
   <data name="Failure_CoreNotFound" xml:space="preserve"><value>The {0} core executable was not found. Reinstall KHORS.</value></data>
+  <data name="Failure_CoreNotReady" xml:space="preserve"><value>The {0} core started but did not respond in time.</value></data>
   <data name="Failure_CoreStartFailed" xml:space="preserve"><value>The {0} core failed to start (code {1}).</value></data>
   <data name="Failure_CoreStartFailed_NoCode" xml:space="preserve"><value>The {0} core failed to start.</value></data>
-  <data name="Failure_CoreNotReady" xml:space="preserve"><value>The {0} core started but did not respond in time.</value></data>
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>The profile has an error: {0}.</value></data>
   <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>The KHORS service does not respond — TUN mode is unavailable. Install the service in Settings or switch to System proxy.</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Could not enable the Windows system proxy.</value></data>
@@ -199,6 +211,8 @@
   <data name="SessionSent" xml:space="preserve"><value>Sent</value></data>
   <data name="SessionServer" xml:space="preserve"><value>Server</value></data>
   <data name="SessionTime" xml:space="preserve"><value>Time</value></data>
+  <data name="SettingsDnsHeader" xml:space="preserve"><value>DNS</value></data>
+  <data name="SettingsDnsHint" xml:space="preserve"><value>Where KHORS sends site name lookups in TUN mode and for WireGuard. Lookups go through the server, so your provider does not see them; an address on the local network (such as your router) is queried directly. In System proxy mode the server resolves names. Changes apply from the next connection.</value></data>
   <data name="SettingsModeHeader" xml:space="preserve"><value>Connection mode</value></data>
   <data name="SettingsModeHint" xml:space="preserve"><value>The mode can be changed while disconnected. TUN requires the KHORS service.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Server list</value></data>

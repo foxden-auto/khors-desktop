@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using Khors.Core.Dns;
 using Khors.Core.Generators;
 using Khors.Core.Profiles;
 using Khors.Core.Storage;
@@ -24,8 +25,11 @@ internal sealed class FakeTunStarter : ITunStarter
 
     public ConcurrentQueue<FakeTunRun> Runs { get; } = new();
 
-    public Task<ITunRun> StartAsync(Profile profile, string logLevel, CancellationToken cancellationToken)
+    public DnsServer? LastRemoteDns { get; private set; }
+
+    public Task<ITunRun> StartAsync(Profile profile, string logLevel, DnsServer remoteDns, CancellationToken cancellationToken)
     {
+        LastRemoteDns = remoteDns;
         if (FailWith is not null)
         {
             throw FailWith;
@@ -125,14 +129,30 @@ public sealed class TunServiceTests : IAsyncDisposable
     }
 
     [Theory]
-    [InlineData("{}", "warning")]
-    [InlineData("not json", "warning")]
-    [InlineData(null, "trace; rm -rf")]
-    public async Task BadStartParametersAreRejected(string? profile, string logLevel)
+    [InlineData(null, "https://1.1.1.1/dns-query")]
+    [InlineData("tls://9.9.9.9:853", "tls://9.9.9.9")]
+    [InlineData(" udp://192.168.1.1 ", "udp://192.168.1.1")]
+    public async Task RemoteDnsReachesStarter(string? remoteDns, string expected)
     {
         var (client, _) = await ConnectAsync();
 
-        var answer = await client.RequestAsync(new StartTunRequest(profile ?? Hysteria2Json(), logLevel), Ct);
+        Assert.IsType<TunStartedResponse>(await client.RequestAsync(new StartTunRequest(Hysteria2Json(), "warning", remoteDns), Ct));
+
+        Assert.Equal(expected, _starter.LastRemoteDns?.ToString());
+    }
+
+    [Theory]
+    [InlineData("{}", "warning", null)]
+    [InlineData("not json", "warning", null)]
+    [InlineData(null, "trace; rm -rf", null)]
+    [InlineData(null, "warning", "")]
+    [InlineData(null, "warning", "https://1.1.1.1/dns-query\", \"detour\": \"direct")]
+    [InlineData(null, "warning", "quic://dns.example.com")]
+    public async Task BadStartParametersAreRejected(string? profile, string logLevel, string? remoteDns)
+    {
+        var (client, _) = await ConnectAsync();
+
+        var answer = await client.RequestAsync(new StartTunRequest(profile ?? Hysteria2Json(), logLevel, remoteDns), Ct);
 
         Assert.Equal(new ErrorResponse(IpcErrorCode.BadRequest), answer);
         Assert.Empty(_starter.Runs);

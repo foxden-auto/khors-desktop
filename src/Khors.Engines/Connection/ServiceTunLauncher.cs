@@ -1,4 +1,5 @@
 using Khors.Core.Diagnostics;
+using Khors.Core.Dns;
 using Khors.Core.Generators;
 using Khors.Core.Profiles;
 using Khors.Core.Storage;
@@ -38,7 +39,7 @@ public sealed class ServiceTunLauncher(IIpcClientTransport transport, string cli
         var session = new Session(client, masker);
         try
         {
-            var answer = await client.RequestAsync(new StartTunRequest(StorageJson.SerializeProfile(profile), preferences.LogLevel), cancellationToken).ConfigureAwait(false);
+            var answer = await client.RequestAsync(new StartTunRequest(StorageJson.SerializeProfile(profile), preferences.LogLevel, DnsPresets.ServerOrDefault(preferences.RemoteDns).ToString()), cancellationToken).ConfigureAwait(false);
             switch (answer)
             {
                 case TunStartedResponse started:

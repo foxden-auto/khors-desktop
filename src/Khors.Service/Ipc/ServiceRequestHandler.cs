@@ -1,3 +1,4 @@
+using Khors.Core.Dns;
 using Khors.Core.Storage;
 using Khors.Ipc;
 using Khors.Service.Tun;
@@ -33,12 +34,13 @@ public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, A
             case GetStatusRequest:
                 return new ServiceStatusResponse(info.Version, info.StartedAt);
             case StartTunRequest start:
-                if (!s_logLevels.Contains(start.LogLevel) || StorageJson.ParseProfile(start.Profile) is not { } profile)
+                var remoteDns = start.RemoteDns is null ? DnsPresets.Default.Server : DnsServer.Parse(start.RemoteDns).Server;
+                if (!s_logLevels.Contains(start.LogLevel) || remoteDns is null || StorageJson.ParseProfile(start.Profile) is not { } profile)
                 {
                     return new ErrorResponse(IpcErrorCode.BadRequest);
                 }
 
-                return await tun.StartAsync(this, profile, start.LogLevel, sendEvent, cancellationToken).ConfigureAwait(false);
+                return await tun.StartAsync(this, profile, start.LogLevel, remoteDns, sendEvent, cancellationToken).ConfigureAwait(false);
             case GetTunTrafficRequest:
                 return await tun.ReadTrafficAsync(this, cancellationToken).ConfigureAwait(false);
             case StopTunRequest:

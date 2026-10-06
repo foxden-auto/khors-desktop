@@ -34,16 +34,18 @@ public interface ICoreLauncher
 /// <summary>Пожелания к запуску из настроек пользователя.</summary>
 /// <param name="Mode">TUN — ядра запускает служба, системный прокси не меняется.</param>
 /// <param name="TrafficStats">Счётчики трафика (для подключения; временным ядрам теста задержки не нужны).</param>
+/// <param name="RemoteDns">Удалённый DNS из настроек (текст); пустой или неверный — по умолчанию.</param>
 public sealed record CoreStartPreferences(
     int? SocksPort = 10808,
     int? HttpPort = 10809,
     string LogLevel = "warning",
     ConnectionMode Mode = ConnectionMode.SystemProxy,
-    bool TrafficStats = false)
+    bool TrafficStats = false,
+    string? RemoteDns = null)
 {
     public static CoreStartPreferences From(AppSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        return new CoreStartPreferences(settings.SocksPort, settings.HttpPort, settings.CoreLogLevel, settings.ConnectionMode, TrafficStats: true);
+        return new CoreStartPreferences(settings.SocksPort, settings.HttpPort, settings.CoreLogLevel, settings.ConnectionMode, TrafficStats: true, settings.RemoteDns);
     }
 }

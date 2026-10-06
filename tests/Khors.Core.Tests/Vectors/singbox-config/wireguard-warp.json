@@ -17,13 +17,13 @@
           "tag": "local"
         },
         {
-          "type": "udp",
-          "tag": "tunnel-dns",
+          "type": "https",
+          "tag": "remote",
           "server": "1.1.1.1",
           "detour": "proxy"
         }
       ],
-      "final": "tunnel-dns"
+      "final": "remote"
     },
     "inbounds": [
       {

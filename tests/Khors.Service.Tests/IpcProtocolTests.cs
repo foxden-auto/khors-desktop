@@ -78,6 +78,7 @@ public class IpcProtocolTests
         new ErrorResponse(IpcErrorCode.BadRequest),
         new ErrorResponse(IpcErrorCode.ProtocolMismatch, 1),
         new StartTunRequest("{}", "warning"),
+        new StartTunRequest("{}", "warning", "tls://9.9.9.9"),
         new TunStartedResponse(IpcCore.Xray, 1, 2),
         new TunFailedResponse(IpcTunFailure.ExitedDuringStart),
         new TunFailedResponse(IpcTunFailure.ConfigNotGenerated, IpcCore.SingBox, "transport", "UnsupportedFeature", 1, ["line"], "ServerNotFound"),
