@@ -66,7 +66,7 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
             }
 
             // Без разрешения адаптера весь трафик стоял бы заблокированным — такое подключение бесполезно.
-            if (killSwitch?.TunStarted() == false)
+            if (killSwitch?.TunStarted(routing.TunIpv6) == false)
             {
                 await run.DisposeAsync().ConfigureAwait(false);
                 killSwitch.TunStartFailed();

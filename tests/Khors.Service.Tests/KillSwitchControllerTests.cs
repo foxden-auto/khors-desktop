@@ -214,4 +214,19 @@ public sealed class KillSwitchControllerTests : IDisposable
         await tun.StopAsync(owner, byUser: true);
         Assert.False(controller.Status().Active);
     }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task TunnelIpv6FollowsRouting(bool tunIpv6)
+    {
+        var controller = Controller(IpcKillSwitchMode.WhileConnected);
+        await using var tun = new TunController(new FakeTunStarter(), NullLogger<TunController>.Instance, controller);
+        var profile = ShareLinkParser.Parse("hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com").Profile!;
+
+        Assert.IsType<TunStartedResponse>(await tun.StartAsync(new object(), profile, "warning", DnsPresets.Default.Server, new RoutingSettings(TunIpv6: tunIpv6), _ => { }, TestContext.Current.CancellationToken));
+
+        Assert.Equal("KHORS", _wfp.Current?.TunnelInterface);
+        Assert.Equal(tunIpv6, _wfp.Current?.TunnelIpv6);
+    }
 }

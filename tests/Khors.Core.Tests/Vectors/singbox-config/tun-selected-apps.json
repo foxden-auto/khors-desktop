@@ -114,6 +114,10 @@
           "outbound": "direct"
         },
         {
+          "ip_version": 6,
+          "action": "reject"
+        },
+        {
           "process_name": [
             "firefox.exe"
           ],

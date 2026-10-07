@@ -88,7 +88,7 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
         {
             var singBox = await StartSingBoxAsync(
                 profile,
-                options with { Tun = new SingBoxTunOptions(), TrafficStats = true, ReadyTimeout = s_tunReadyTimeout, Routing = plan, GeoDirectory = geoDirectory },
+                options with { Tun = new SingBoxTunOptions { Ipv6 = routing.TunIpv6 }, TrafficStats = true, ReadyTimeout = s_tunReadyTimeout, Routing = plan, GeoDirectory = geoDirectory },
                 cancellationToken).ConfigureAwait(false);
             return new TunRun(CoreKind.SingBox, singBox, chained: null);
         }
@@ -100,7 +100,7 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
         {
             var tunOptions = options with
             {
-                Tun = new SingBoxTunOptions { ExcludeAddresses = [server.ToString()] },
+                Tun = new SingBoxTunOptions { ExcludeAddresses = [server.ToString()], Ipv6 = routing.TunIpv6 },
                 UpstreamSocksPort = xray.SocksPort,
                 ReadyTimeout = s_tunReadyTimeout,
                 Routing = plan,

@@ -214,6 +214,8 @@
   <data name="RateKbFormat" xml:space="preserve"><value>{0:0} KB/s</value></data>
   <data name="RateMbFormat" xml:space="preserve"><value>{0:0.#} MB/s</value></data>
   <data name="RoutingBypassLan" xml:space="preserve"><value>Local network direct (router, printers, shared folders)</value></data>
+  <data name="RoutingTunIpv6" xml:space="preserve"><value>IPv6 through VPN (TUN mode)</value></data>
+  <data name="RoutingTunIpv6Hint" xml:space="preserve"><value>Turn on only if the server has IPv6 connectivity. When off, IPv6 is blocked in TUN mode, apps fall back to IPv4 right away and nothing leaks over IPv6.</value></data>
   <data name="RoutingError_Duplicate" xml:space="preserve"><value>This rule already exists.</value></data>
   <data name="RoutingError_InvalidAddress" xml:space="preserve"><value>Enter an IP address or a subnet whose address has no bits beyond the mask, for example 203.0.113.0/24.</value></data>
   <data name="RoutingError_InvalidDomain" xml:space="preserve"><value>This is not a site name. Enter a name without https:// and a path, for example example.com.</value></data>

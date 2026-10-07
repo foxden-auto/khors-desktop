@@ -30,6 +30,7 @@ public sealed partial class KillSwitchController
     private KillSwitchSettings _settings;
     private bool _engaged;
     private bool _tunnelUp;
+    private bool _tunnelIpv6;
     private bool _active;
     private string? _error;
 
@@ -127,11 +128,13 @@ public sealed partial class KillSwitchController
     }
 
     /// <summary>Адаптер TUN поднят — трафик через него разрешён.</summary>
-    public bool TunStarted()
+    /// <param name="tunnelIpv6">IPv6 идёт через сервер; иначе IPv6 через адаптер тоже блокируется.</param>
+    public bool TunStarted(bool tunnelIpv6 = false)
     {
         lock (_lock)
         {
             _tunnelUp = true;
+            _tunnelIpv6 = tunnelIpv6;
             return Refresh();
         }
     }
@@ -192,7 +195,8 @@ public sealed partial class KillSwitchController
             Persistent: _settings.Mode == IpcKillSwitchMode.Always,
             _settings.AllowLocalNetwork,
             _applications,
-            _tunnelUp ? TunnelInterface : null);
+            _tunnelUp ? TunnelInterface : null,
+            _tunnelIpv6);
         if (!Try(() => _killSwitch.Apply(policy)))
         {
             return false;

@@ -53,7 +53,12 @@ public sealed record RoutingRule(RuleMatch Match, string Value, RuleAction Actio
 /// <summary>Маршрутизация — общая для всех профилей (<c>settings.json</c>).</summary>
 /// <param name="BypassLan">Локальные сети — напрямую (так было и до ROADMAP 3.5).</param>
 /// <param name="Rules">Свои правила: проверяются сверху вниз раньше пресета.</param>
+/// <param name="TunIpv6">
+/// Режим TUN: IPv6 идёт через сервер (для серверов с выходом в IPv6). По умолчанию IPv6 в TUN отклоняется сразу —
+/// программы быстро переходят на IPv4 (ROADMAP 4.2).
+/// </param>
 public sealed record RoutingSettings(
     RoutingPreset Preset = RoutingPreset.AllTraffic,
     bool BypassLan = true,
-    EquatableArray<RoutingRule> Rules = default);
+    EquatableArray<RoutingRule> Rules = default,
+    bool TunIpv6 = false);

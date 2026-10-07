@@ -214,6 +214,8 @@
   <data name="RateKbFormat" xml:space="preserve"><value>{0:0} КБ/с</value></data>
   <data name="RateMbFormat" xml:space="preserve"><value>{0:0.#} МБ/с</value></data>
   <data name="RoutingBypassLan" xml:space="preserve"><value>Локальная сеть напрямую (роутер, принтеры, общие папки)</value></data>
+  <data name="RoutingTunIpv6" xml:space="preserve"><value>IPv6 через VPN (режим TUN)</value></data>
+  <data name="RoutingTunIpv6Hint" xml:space="preserve"><value>Включайте, только если у сервера есть выход в IPv6. Выключено — в режиме TUN IPv6 блокируется, программы сразу переходят на IPv4, утечки через IPv6 нет.</value></data>
   <data name="RoutingError_Duplicate" xml:space="preserve"><value>Такое правило уже есть.</value></data>
   <data name="RoutingError_InvalidAddress" xml:space="preserve"><value>Нужен IP-адрес или подсеть с маской без лишних битов, например 203.0.113.0/24.</value></data>
   <data name="RoutingError_InvalidDomain" xml:space="preserve"><value>Это не имя сайта. Введите имя без https:// и пути, например example.com.</value></data>

@@ -1,0 +1,94 @@
+{
+  "description": "TUN: IPv6 через сервер (ROADMAP 4.2) — DNS отдаёт и AAAA (сначала IPv4), IPv6-соединения не отклоняются",
+  "link": "hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809,
+    "tun": {
+      "ipv6": true
+    }
+  },
+  "expected": {
+    "log": {
+      "level": "warn",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        },
+        {
+          "type": "https",
+          "tag": "remote",
+          "server": "1.1.1.1",
+          "detour": "proxy"
+        }
+      ],
+      "final": "remote",
+      "strategy": "prefer_ipv4"
+    },
+    "inbounds": [
+      {
+        "type": "tun",
+        "tag": "tun-in",
+        "interface_name": "KHORS",
+        "address": [
+          "198.19.75.1/30",
+          "fd4b:6873:72b5::1/126"
+        ],
+        "mtu": 9000,
+        "auto_route": true,
+        "strict_route": true
+      },
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "hysteria2",
+        "tag": "proxy",
+        "server": "hy.example.com",
+        "server_port": 443,
+        "password": "Hy2Pa55",
+        "tls": {
+          "enabled": true,
+          "server_name": "hy.example.com"
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "protocol": "dns",
+          "action": "hijack-dns"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local",
+      "auto_detect_interface": true
+    }
+  }
+}

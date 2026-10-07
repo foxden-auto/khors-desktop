@@ -29,11 +29,16 @@ public interface IKillSwitch
 /// <param name="AllowLocalNetwork">Локальные сети (частные адреса, link-local, multicast) — разрешены.</param>
 /// <param name="Applications">Полные пути программ, которым разрешено всё (ядра в каталоге службы).</param>
 /// <param name="TunnelInterface">Имя адаптера туннеля, через который трафик разрешён; <c>null</c> — туннеля нет.</param>
+/// <param name="TunnelIpv6">
+/// IPv6 через адаптер туннеля разрешён. <c>false</c> — туннель только для IPv4: IPv6 блокируется везде, кроме
+/// loopback, ядер, DHCPv6 и локальной сети (ROADMAP 4.2).
+/// </param>
 public sealed record KillSwitchPolicy(
     bool Persistent,
     bool AllowLocalNetwork,
     IReadOnlyList<string> Applications,
-    string? TunnelInterface)
+    string? TunnelInterface,
+    bool TunnelIpv6 = true)
 {
     /// <summary>Частные и служебные сети, разрешённые при <see cref="AllowLocalNetwork"/>.</summary>
     public static IReadOnlyList<IPNetwork> LocalNetworks { get; } =
@@ -51,5 +56,5 @@ public sealed record KillSwitchPolicy(
 
     // Пути программ не секрет, но список длинный — в журнал не выводим.
     public override string ToString() =>
-        $"KillSwitchPolicy {{ Persistent = {Persistent}, AllowLocalNetwork = {AllowLocalNetwork}, Applications = {Applications.Count}, TunnelInterface = {TunnelInterface} }}";
+        $"KillSwitchPolicy {{ Persistent = {Persistent}, AllowLocalNetwork = {AllowLocalNetwork}, Applications = {Applications.Count}, TunnelInterface = {TunnelInterface}, TunnelIpv6 = {TunnelIpv6} }}";
 }

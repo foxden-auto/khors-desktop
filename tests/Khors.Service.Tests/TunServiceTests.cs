@@ -156,7 +156,8 @@ public sealed class TunServiceTests : IAsyncDisposable
         var routing = new RoutingSettings(
             RoutingPreset.BypassRussia,
             BypassLan: false,
-            new([new RoutingRule(RuleMatch.Process, "firefox.exe", RuleAction.Proxy)]));
+            new([new RoutingRule(RuleMatch.Process, "firefox.exe", RuleAction.Proxy)]),
+            TunIpv6: true);
         _starter.MissingGeo = ["geosite:category-ru", "geoip:ru"];
         var (client, _) = await ConnectAsync();
 

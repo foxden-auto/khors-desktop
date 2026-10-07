@@ -52,6 +52,10 @@ public sealed partial class MainWindowViewModel
     [ObservableProperty]
     public partial bool RoutingBypassLan { get; set; }
 
+    /// <summary>Режим TUN: IPv6 через сервер (ROADMAP 4.2); выключено — IPv6 отклоняется, программы идут по IPv4.</summary>
+    [ObservableProperty]
+    public partial bool RoutingTunIpv6 { get; set; }
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewRulePlaceholder))]
     public partial RuleMatchOption NewRuleMatch { get; set; } = new(RuleMatch.Domain, Localizer.Get("RuleMatch_Domain"));
@@ -91,6 +95,7 @@ public sealed partial class MainWindowViewModel
         IsRoutingRussia = routing.Preset == RoutingPreset.BypassRussia;
         IsRoutingApps = routing.Preset == RoutingPreset.SelectedApps;
         RoutingBypassLan = routing.BypassLan;
+        RoutingTunIpv6 = routing.TunIpv6;
         ShowRoutingRules(routing.Rules);
     }
 
@@ -127,6 +132,8 @@ public sealed partial class MainWindowViewModel
     }
 
     partial void OnRoutingBypassLanChanged(bool value) => SaveRouting(r => r with { BypassLan = value });
+
+    partial void OnRoutingTunIpv6Changed(bool value) => SaveRouting(r => r with { TunIpv6 = value });
 
     partial void OnNewRuleMatchChanged(RuleMatchOption value)
     {

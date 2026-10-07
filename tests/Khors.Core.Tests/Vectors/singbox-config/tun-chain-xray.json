@@ -87,6 +87,10 @@
         {
           "ip_is_private": true,
           "outbound": "direct"
+        },
+        {
+          "ip_version": 6,
+          "action": "reject"
         }
       ],
       "final": "proxy",

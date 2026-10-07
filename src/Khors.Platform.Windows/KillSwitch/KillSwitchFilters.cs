@@ -44,7 +44,10 @@ internal static class KillSwitchFilters
     private const ushort DhcpServerPort = 67;
     private const ushort Dhcp6ServerPort = 547;
 
-    /// <param name="tunnelLuid">LUID адаптера туннеля; <c>null</c> — адаптера сейчас нет (тогда трафик только блокируется).</param>
+    /// <param name="tunnelLuid">
+    /// LUID адаптера туннеля; <c>null</c> — адаптера сейчас нет (тогда трафик только блокируется). IPv6 через адаптер —
+    /// только при <see cref="KillSwitchPolicy.TunnelIpv6"/>.
+    /// </param>
     public static IReadOnlyList<WfpFilterSpec> Build(KillSwitchPolicy policy, ulong? tunnelLuid)
     {
         ArgumentNullException.ThrowIfNull(policy);
@@ -54,7 +57,7 @@ internal static class KillSwitchFilters
             var suffix = layer == WfpLayer.ConnectV4 ? "IPv4" : "IPv6";
             filters.Add(Permit($"KHORS Kill Switch: loopback ({suffix})", layer, new LoopbackCondition()));
 
-            if (tunnelLuid is { } luid)
+            if (tunnelLuid is { } luid && (layer == WfpLayer.ConnectV4 || policy.TunnelIpv6))
             {
                 filters.Add(Permit($"KHORS Kill Switch: tunnel ({suffix})", layer, new InterfaceCondition(luid)));
             }

@@ -74,6 +74,8 @@
           <RadioButton GroupName="routingPreset" IsChecked="{Binding IsRoutingApps}" Content="{x:Static res:Strings.RoutingPresetApps}" />
           <TextBlock Text="{x:Static res:Strings.RoutingPresetAppsHint}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
           <CheckBox IsChecked="{Binding RoutingBypassLan}" Content="{x:Static res:Strings.RoutingBypassLan}" />
+          <CheckBox IsChecked="{Binding RoutingTunIpv6}" Content="{x:Static res:Strings.RoutingTunIpv6}" />
+          <TextBlock Text="{x:Static res:Strings.RoutingTunIpv6Hint}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
 
           <TextBlock Text="{x:Static res:Strings.RoutingRulesHeader}" FontWeight="SemiBold" Margin="0,8,0,0" />
           <TextBlock Text="{x:Static res:Strings.RoutingRulesHint}" Classes="caption" TextWrapping="Wrap" />

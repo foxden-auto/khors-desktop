@@ -43,6 +43,16 @@ public class KillSwitchFiltersTests
     }
 
     [Fact]
+    public void TunnelWithoutIpv6IsPermittedOnlyForIpv4()
+    {
+        var filters = KillSwitchFilters.Build(s_policy with { TunnelIpv6 = false }, tunnelLuid: 42);
+
+        var tunnel = Assert.Single(filters, f => f.Conditions is [InterfaceCondition]);
+        Assert.Equal(WfpLayer.ConnectV4, tunnel.Layer);
+        Assert.Single(filters, f => f.Layer == WfpLayer.ConnectV6 && !f.Permit);
+    }
+
+    [Fact]
     public void LocalNetworksFollowPolicyAndAddressFamily()
     {
         var allowed = KillSwitchFilters.Build(s_policy, null);

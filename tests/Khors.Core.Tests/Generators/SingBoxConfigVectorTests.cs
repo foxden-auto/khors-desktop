@@ -15,7 +15,7 @@ namespace Khors.Core.Tests.Generators;
 
 /// <summary>
 /// Снапшоты конфигов sing-box: <c>Vectors/singbox-config/*.json</c> — ссылка (+ <c>core</c>), параметры (порты, уровень лога,
-/// <c>tun</c> с <c>excludeAddresses</c>, <c>upstreamSocksPort</c> для цепочки через Xray, <c>remoteDns</c>), маршрутизация (<c>routing</c>, <see cref="RoutingVector"/>; в TUN — с процессами) с гео-базами
+/// <c>tun</c> с <c>excludeAddresses</c> и <c>ipv6</c>, <c>upstreamSocksPort</c> для цепочки через Xray, <c>remoteDns</c>), маршрутизация (<c>routing</c>, <see cref="RoutingVector"/>; в TUN — с процессами) с гео-базами
 /// (<c>geo</c>, <see cref="GeoFiles.FromVector"/>) и ожидаемый конфиг или ошибка. Каждый ожидаемый конфиг проверяется настоящим sing-box (<c>sing-box check</c>), если он скачан.
 /// </summary>
 public class SingBoxConfigVectorTests
@@ -108,7 +108,11 @@ public class SingBoxConfigVectorTests
                 ? DnsServer.Parse(remoteDns.GetValue<string>()).Server ?? throw new InvalidOperationException("remoteDns вектора не разбирается")
                 : DnsPresets.Default.Server,
             Tun = options["tun"] is { } tun
-                ? new SingBoxTunOptions { ExcludeAddresses = tun["excludeAddresses"]?.AsArray().Select(a => a!.GetValue<string>()).ToArray() ?? [] }
+                ? new SingBoxTunOptions
+                {
+                    ExcludeAddresses = tun["excludeAddresses"]?.AsArray().Select(a => a!.GetValue<string>()).ToArray() ?? [],
+                    Ipv6 = tun["ipv6"]?.GetValue<bool>() ?? false,
+                }
                 : null,
         });
     }

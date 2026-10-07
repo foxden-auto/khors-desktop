@@ -71,6 +71,13 @@ public sealed record SingBoxTunOptions
     public int Mtu { get; init; } = 9000;
 
     /// <summary>
+    /// IPv6 через сервер: DNS отдаёт и AAAA (сначала IPv4), IPv6-соединения идут по правилам. Иначе — только IPv4:
+    /// AAAA пустые, а IPv6-соединения (адрес из кэша, DNS браузера, адрес в программе) отклоняются сразу —
+    /// без этого sing-box принимал бы соединение и обрывал его, если у сервера нет IPv6, и сайт «висел» бы.
+    /// </summary>
+    public bool Ipv6 { get; init; }
+
+    /// <summary>
     /// Адреса (IP или подсеть), которые идут мимо туннеля: адрес сервера профиля, к которому подключается Xray
     /// в цепочке, — иначе его трафик снова попадёт в TUN (петля).
     /// </summary>
@@ -413,17 +420,25 @@ public static class SingBoxConfigGenerator
 
         var dns = config["dns"]!.AsObject();
 
-        // Приложениям — только IPv4-адреса: у адаптера есть IPv6 (чтобы IPv6 не шёл мимо туннеля), и Windows
-        // предпочла бы IPv6, а у многих серверов нет выхода в IPv6 — соединения браузера к таким адресам умирали.
+        // У адаптера есть IPv6, чтобы IPv6 не шёл мимо туннеля. Без IPv6 через сервер приложениям — только IPv4-адреса:
+        // Windows предпочла бы IPv6, а у многих серверов нет выхода в IPv6 — соединения браузера к таким адресам умирали.
         // На запросы AAAA sing-box отвечает пустым ответом без ошибки.
-        dns["strategy"] = "ipv4_only";
+        dns["strategy"] = tun.Ipv6 ? "prefer_ipv4" : "ipv4_only";
         if (dns["final"] is null)
         {
             AddRemoteDns(config, remoteDns);
         }
 
         var route = config["route"]!.AsObject();
-        route["rules"]!.AsArray().Insert(1, new JsonObject { ["protocol"] = "dns", ["action"] = "hijack-dns" });
+        var rules = route["rules"]!.AsArray();
+        rules.Insert(1, new JsonObject { ["protocol"] = "dns", ["action"] = "hijack-dns" });
+        if (!tun.Ipv6)
+        {
+            // После перехвата DNS и локальной сети: IPv6-соединение отклоняется сразу (TCP — сброс), и программа
+            // переходит на IPv4, а не ждёт ответа сервера без IPv6. Касается и прямых правил.
+            rules.Insert(3, new JsonObject { ["ip_version"] = 6, ["action"] = "reject" });
+        }
+
         route["auto_detect_interface"] = true;
     }
 
