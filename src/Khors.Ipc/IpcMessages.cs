@@ -5,11 +5,11 @@ namespace Khors.Ipc;
 
 /// <summary>
 /// Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений (2 — команды TUN, 3 — счётчики трафика TUN,
-/// 4 — удалённый DNS, 5 — гео-базы службы, 6 — маршрутизация, 7 — Kill Switch).
+/// 4 — удалённый DNS, 5 — гео-базы службы, 6 — маршрутизация, 7 — Kill Switch, 8 — сброс сетевых настроек).
 /// </summary>
 public static class IpcProtocol
 {
-    public const int Version = 7;
+    public const int Version = 8;
 }
 
 /// <summary>
@@ -38,6 +38,8 @@ public static class IpcProtocol
 [JsonDerivedType(typeof(SetKillSwitchRequest), "setKillSwitch")]
 [JsonDerivedType(typeof(ReleaseKillSwitchRequest), "releaseKillSwitch")]
 [JsonDerivedType(typeof(KillSwitchStatusResponse), "killSwitchStatus")]
+[JsonDerivedType(typeof(ResetNetworkRequest), "resetNetwork")]
+[JsonDerivedType(typeof(NetworkResetResponse), "networkReset")]
 public abstract record IpcPayload;
 
 /// <summary>Первое сообщение клиента: версия протокола и версия приложения.</summary>
@@ -270,3 +272,38 @@ public static class IpcSerializer
     RespectRequiredConstructorParameters = true)]
 [JsonSerializable(typeof(IpcEnvelope))]
 internal sealed partial class IpcJsonContext : JsonSerializerContext;
+
+/// <summary>Что снимает «Сбросить сетевые настройки KHORS» в службе.</summary>
+public enum IpcResetStep
+{
+    /// <summary>Режим TUN (ядра и адаптер, который поднял sing-box).</summary>
+    Tunnel,
+
+    /// <summary>Фильтры WFP KHORS; режим Kill Switch — «Выключен».</summary>
+    KillSwitch,
+
+    /// <summary>Оставшийся адаптер KHORS (в том числе отключённый или битый).</summary>
+    Adapter,
+}
+
+public enum IpcResetOutcome
+{
+    /// <summary>Было что снимать — снято.</summary>
+    Done,
+
+    /// <summary>Снимать было нечего.</summary>
+    NothingToDo,
+
+    Failed,
+}
+
+/// <param name="Error">Текст ошибки для журнала (без секретов) при <see cref="IpcResetOutcome.Failed"/>.</param>
+public sealed record IpcResetItem(IpcResetStep Step, IpcResetOutcome Outcome, string? Error = null);
+
+/// <summary>
+/// «Сбросить сетевые настройки KHORS» (ROADMAP 4.4): выключить TUN, снять все фильтры WFP KHORS и перевести Kill Switch
+/// в «Выключен», удалить оставшийся адаптер KHORS. Что именно снимать, решает служба.
+/// </summary>
+public sealed record ResetNetworkRequest : IpcPayload;
+
+public sealed record NetworkResetResponse(IReadOnlyList<IpcResetItem> Items) : IpcPayload;

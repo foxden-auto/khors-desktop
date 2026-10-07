@@ -244,4 +244,78 @@ public sealed class KillSwitchControllerTests : IDisposable
         Assert.Equal("KHORS", _wfp.Current?.TunnelInterface);
         Assert.Equal(tunIpv6, _wfp.Current?.TunnelIpv6);
     }
+
+    [Fact]
+    public void ResetTurnsOffAndRemovesFiltersForGood()
+    {
+        var controller = Controller(IpcKillSwitchMode.Always);
+        controller.Initialize();
+
+        Assert.True(controller.Reset());
+
+        Assert.Equal("remove", _wfp.Calls[^1]);
+        Assert.Equal(IpcKillSwitchMode.Off, controller.Status().Mode);
+        Assert.False(controller.Status().Active);
+        var restarted = new KillSwitchController(_wfp, SettingsFile, [], NullLogger<KillSwitchController>.Instance);
+        Assert.Equal(IpcKillSwitchMode.Off, restarted.Status().Mode);
+    }
+
+    [Fact]
+    public void ResetWithoutFiltersStillCleansUp()
+    {
+        var controller = Controller();
+
+        Assert.Null(controller.Reset());
+        Assert.Equal(["remove"], _wfp.Calls);
+    }
+
+    [Fact]
+    public async Task NetworkResetStopsTunThenFiltersThenAdapter()
+    {
+        var controller = Controller(IpcKillSwitchMode.WhileConnected);
+        var starter = new FakeTunStarter();
+        await using var tun = new TunController(starter, NullLogger<TunController>.Instance, controller);
+        var profile = ShareLinkParser.Parse("hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com").Profile!;
+        Assert.IsType<TunStartedResponse>(await tun.StartAsync(new object(), profile, "warning", DnsPresets.Default.Server, new RoutingSettings(), _ => { }, TestContext.Current.CancellationToken));
+        var adapters = new FakeAdapters(() => Assert.False(tun.IsRunning)) { Count = 1 };
+
+        var result = await new NetworkReset(tun, controller, adapters).RunAsync();
+
+        Assert.Equal(
+            [
+                new IpcResetItem(IpcResetStep.Tunnel, IpcResetOutcome.Done),
+                new IpcResetItem(IpcResetStep.KillSwitch, IpcResetOutcome.Done),
+                new IpcResetItem(IpcResetStep.Adapter, IpcResetOutcome.Done),
+            ],
+            result.Items);
+        Assert.Equal("KHORS", adapters.Name);
+        Assert.False(tun.IsRunning);
+    }
+
+    [Fact]
+    public async Task NetworkResetReportsFailedStepAndContinues()
+    {
+        var controller = Controller();
+        _wfp.Fail = true;
+        var adapters = new FakeAdapters(() => throw new Win32Exception(5, "DiUninstallDevice failed."));
+
+        var result = await new NetworkReset(null, controller, adapters).RunAsync();
+
+        Assert.Equal(IpcResetOutcome.NothingToDo, result.Items[0].Outcome);
+        Assert.Equal(new IpcResetItem(IpcResetStep.Adapter, IpcResetOutcome.Failed, "DiUninstallDevice failed."), result.Items[1]);
+    }
+
+    private sealed class FakeAdapters(Action onRemove) : ITunAdapterCleanup
+    {
+        public int Count { get; init; }
+
+        public string? Name { get; private set; }
+
+        public int RemoveAdapters(string name)
+        {
+            Name = name;
+            onRemove();
+            return Count;
+        }
+    }
 }

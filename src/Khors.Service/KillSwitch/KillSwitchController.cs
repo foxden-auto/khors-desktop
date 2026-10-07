@@ -117,6 +117,47 @@ public sealed partial class KillSwitchController
         return Status();
     }
 
+    /// <summary>
+    /// «Сбросить сетевые настройки KHORS» (ROADMAP 4.4): режим — «Выключен» (иначе «Постоянно» вернуло бы блокировку
+    /// при следующем запуске службы), все фильтры и объекты WFP KHORS снимаются, в том числе оставшиеся от прошлых запусков.
+    /// </summary>
+    /// <returns><c>null</c> — фильтров не было; иначе — сняты ли они.</returns>
+    public bool? Reset()
+    {
+        lock (_lock)
+        {
+            _settings = _settings with { Mode = IpcKillSwitchMode.Off };
+            try
+            {
+                Save(_settingsFile, _settings);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _error = ex.Message;
+                LogFailed(ex.Message);
+            }
+
+            _engaged = false;
+            _tunnelUp = false;
+            if (_killSwitch is null)
+            {
+                return null;
+            }
+
+            var hadFilters = _active || Try(_killSwitch.HasPersistentFilters);
+
+            // Снимаем всегда: временные фильтры прошлого процесса службы WFP уже убрал, а свои объекты — нет.
+            if (!Try(_killSwitch.Remove))
+            {
+                return false;
+            }
+
+            _active = false;
+            LogRemoved();
+            return hadFilters ? true : null;
+        }
+    }
+
     /// <summary>До запуска ядер TUN: блокировка (адаптера ещё нет). <c>false</c> — фильтры не поставились, запускать нельзя.</summary>
     public bool TunStarting()
     {

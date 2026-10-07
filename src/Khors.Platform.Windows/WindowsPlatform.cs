@@ -6,6 +6,7 @@ using Khors.Platform.Windows.Processes;
 using Khors.Platform.Windows.Proxy;
 using Khors.Platform.Windows.Screen;
 using Khors.Platform.Windows.Service;
+using Khors.Platform.Windows.Tun;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -36,11 +37,18 @@ public static class WindowsPlatform
         return services;
     }
 
-    /// <summary>Kill Switch на WFP — только для процессов с правами (служба и её установка/удаление).</summary>
+    /// <summary>
+    /// Kill Switch на WFP и удаление адаптера туннеля — только для процессов с правами (служба и её установка, удаление
+    /// и сброс сетевых настроек).
+    /// </summary>
     public static IServiceCollection AddWindowsKillSwitch(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
         services.AddSingleton<IKillSwitch, WfpKillSwitch>();
+        services.AddSingleton<ITunAdapterCleanup, WintunAdapterCleanup>();
+
+        // Каталог данных службы без его создания (создаёт и защищает его хост службы — AddWindowsServiceHost).
+        services.AddSingleton(new ServicePaths(ServiceDataDirectory.DefaultPath));
         return services;
     }
 

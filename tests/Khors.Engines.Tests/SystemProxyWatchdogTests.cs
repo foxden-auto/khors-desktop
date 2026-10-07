@@ -94,5 +94,7 @@ public class SystemProxyWatchdogTests
             Recoveries++;
             return SystemProxyRecovery.Restored;
         }
+
+        public SystemProxyReset Reset(int localPort) => SystemProxyReset.NothingToDo;
     }
 }

@@ -97,6 +97,12 @@ public class IpcProtocolTests
         new OkResponse(),
         new TunLogEvent("line"),
         new TunExitedEvent(1, []),
+        new ResetNetworkRequest(),
+        new NetworkResetResponse([
+            new IpcResetItem(IpcResetStep.Tunnel, IpcResetOutcome.Done),
+            new IpcResetItem(IpcResetStep.KillSwitch, IpcResetOutcome.NothingToDo),
+            new IpcResetItem(IpcResetStep.Adapter, IpcResetOutcome.Failed, "DiUninstallDevice failed."),
+        ]),
     };
 
     /// <summary>Каждое сообщение протокола проходит сериализацию и разбор, в том числе с пустыми необязательными полями.</summary>

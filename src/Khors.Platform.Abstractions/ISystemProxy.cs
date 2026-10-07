@@ -19,6 +19,25 @@ public interface ISystemProxy
     /// прежние настройки, но только если прокси всё ещё указывает на KHORS.
     /// </summary>
     SystemProxyRecovery RecoverAfterCrash();
+
+    /// <summary>
+    /// «Сбросить сетевые настройки KHORS» (ROADMAP 4.4): есть журнал — прежние настройки из него. Журнала нет, но прокси
+    /// указывает на локальный вход KHORS (<c>127.0.0.1:<paramref name="localPort"/></c>) — ручной прокси выключается,
+    /// автоматическая настройка (PAC, автоопределение) остаётся. Чужой прокси не трогается.
+    /// </summary>
+    SystemProxyReset Reset(int localPort);
+}
+
+public enum SystemProxyReset
+{
+    /// <summary>Прокси не указывал на KHORS — ничего не менялось.</summary>
+    NothingToDo,
+
+    /// <summary>Прежние настройки восстановлены из журнала.</summary>
+    Restored,
+
+    /// <summary>Журнала не было, ручной прокси на KHORS выключен.</summary>
+    Disabled,
 }
 
 /// <param name="Host">Адрес локального HTTP-входа (loopback).</param>

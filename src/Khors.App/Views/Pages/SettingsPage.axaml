@@ -161,6 +161,26 @@
         </StackPanel>
       </Border>
 
+      <!-- Сброс сетевых настроек KHORS (ROADMAP 4.4): подтверждение со списком действий, затем итог по пунктам. -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{x:Static res:Strings.SettingsResetHeader}" Classes="section" />
+          <TextBlock Text="{x:Static res:Strings.SettingsResetHint}" Classes="muted" TextWrapping="Wrap" />
+          <Button Classes="secondary" HorizontalAlignment="Left" IsVisible="{Binding !IsResetConfirming}"
+                  Command="{Binding AskResetNetworkCommand}" Content="{x:Static res:Strings.ButtonResetNetwork}" />
+          <StackPanel Spacing="10" IsVisible="{Binding IsResetConfirming}">
+            <TextBlock Text="{x:Static res:Strings.ResetConfirm}" Classes="warning" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Classes="secondary" Command="{Binding ResetNetworkCommand}" Content="{x:Static res:Strings.ButtonResetConfirm}" />
+              <Button Classes="secondary" Command="{Binding CancelResetNetworkCommand}" Content="{x:Static res:Strings.ButtonCancel}" />
+            </StackPanel>
+          </StackPanel>
+          <TextBlock Text="{x:Static res:Strings.ResetInProgress}" Classes="muted" IsVisible="{Binding IsResetting}" />
+          <SelectableTextBlock Text="{Binding ResetResult}" TextWrapping="Wrap"
+                               IsVisible="{Binding ResetResult, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+      </Border>
+
       <Border Classes="card">
         <StackPanel Spacing="10">
           <TextBlock Text="{x:Static res:Strings.SettingsProfilesHeader}" Classes="section" />

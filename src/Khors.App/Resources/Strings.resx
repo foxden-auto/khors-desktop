@@ -20,6 +20,7 @@
   <data name="AutoWaitingShort" xml:space="preserve"><value>No server responds right now</value></data>
   <data name="ButtonAdd" xml:space="preserve"><value>Add</value></data>
   <data name="ButtonAddRule" xml:space="preserve"><value>Add rule</value></data>
+  <data name="ButtonCancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="ButtonClose" xml:space="preserve"><value>Close</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Connect</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Copy the whole log</value></data>
@@ -30,6 +31,8 @@
   <data name="ButtonInstallService" xml:space="preserve"><value>Install</value></data>
   <data name="ButtonReconnect" xml:space="preserve"><value>Reconnect</value></data>
   <data name="ButtonReleaseKillSwitch" xml:space="preserve"><value>Lift the block</value></data>
+  <data name="ButtonResetConfirm" xml:space="preserve"><value>Reset</value></data>
+  <data name="ButtonResetNetwork" xml:space="preserve"><value>Reset KHORS network settings</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Latency</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Update</value></data>
   <data name="ButtonUpdateGeo" xml:space="preserve"><value>Update now</value></data>
@@ -216,6 +219,19 @@
   <data name="ReconnectAttemptFormat" xml:space="preserve"><value>Attempt {0}…</value></data>
   <data name="ReconnectRetryFormat" xml:space="preserve"><value>Connection lost. Attempt {0} in {1} s.</value></data>
   <data name="ReconnectWaitingForNetwork" xml:space="preserve"><value>No network — KHORS will reconnect when it is back.</value></data>
+  <data name="ResetConfirm" xml:space="preserve"><value>KHORS will disconnect, restore the previous system proxy, turn TUN off, remove the Kill Switch filters and set it to Off, and delete the KHORS adapter. Without the service, Windows will ask for administrator rights. Reset?</value></data>
+  <data name="ResetDone" xml:space="preserve"><value>KHORS network settings are reset:</value></data>
+  <data name="ResetInProgress" xml:space="preserve"><value>Resetting…</value></data>
+  <data name="ResetNothingToDo" xml:space="preserve"><value>KHORS network settings are reset: there was nothing to change.</value></data>
+  <data name="ResetProxy_Disabled" xml:space="preserve"><value>the KHORS manual proxy is turned off;</value></data>
+  <data name="ResetProxy_Restored" xml:space="preserve"><value>the system proxy is back to its previous settings;</value></data>
+  <data name="ResetStepFailedFormat" xml:space="preserve"><value>{0}: failed ({1});</value></data>
+  <data name="ResetStepName_Adapter" xml:space="preserve"><value>the KHORS adapter</value></data>
+  <data name="ResetStepName_KillSwitch" xml:space="preserve"><value>Kill Switch filters</value></data>
+  <data name="ResetStepName_Tunnel" xml:space="preserve"><value>TUN mode</value></data>
+  <data name="ResetStep_Adapter" xml:space="preserve"><value>the KHORS adapter is deleted;</value></data>
+  <data name="ResetStep_KillSwitch" xml:space="preserve"><value>Kill Switch filters are removed, Kill Switch is off;</value></data>
+  <data name="ResetStep_Tunnel" xml:space="preserve"><value>TUN mode is off;</value></data>
   <data name="RoutingBypassLan" xml:space="preserve"><value>Local network direct (router, printers, shared folders)</value></data>
   <data name="RoutingError_Duplicate" xml:space="preserve"><value>This rule already exists.</value></data>
   <data name="RoutingError_InvalidAddress" xml:space="preserve"><value>Enter an IP address or a subnet whose address has no bits beyond the mask, for example 203.0.113.0/24.</value></data>
@@ -270,6 +286,8 @@
   <data name="ServiceSetup_Cancelled" xml:space="preserve"><value>Cancelled: administrator rights were not granted.</value></data>
   <data name="ServiceSetup_Install_Failed" xml:space="preserve"><value>Failed to install the service. To see the reason, run “khors-service.exe install” in an administrator command prompt.</value></data>
   <data name="ServiceSetup_Install_Succeeded" xml:space="preserve"><value>The KHORS service is installed and running.</value></data>
+  <data name="ServiceSetup_ResetNetwork_Failed" xml:space="preserve"><value>Failed to remove the WFP filters or the KHORS adapter. To see the reason, run “khors-service.exe reset” in an administrator command prompt.</value></data>
+  <data name="ServiceSetup_ResetNetwork_Succeeded" xml:space="preserve"><value>KHORS WFP filters and the KHORS adapter are removed (with administrator rights), Kill Switch is off.</value></data>
   <data name="ServiceSetup_SetupNotFound" xml:space="preserve"><value>khors-service.exe is missing next to KHORS — the full KHORS build is required.</value></data>
   <data name="ServiceSetup_Uninstall_Failed" xml:space="preserve"><value>Failed to remove the service. To see the reason, run “khors-service.exe uninstall” in an administrator command prompt.</value></data>
   <data name="ServiceSetup_Uninstall_Succeeded" xml:space="preserve"><value>The KHORS service is removed.</value></data>
@@ -303,6 +321,8 @@
   <data name="SettingsModeHeader" xml:space="preserve"><value>Connection mode</value></data>
   <data name="SettingsModeHint" xml:space="preserve"><value>The mode can be changed while connected too — KHORS reconnects in the new mode. TUN requires the KHORS service.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Server list</value></data>
+  <data name="SettingsResetHeader" xml:space="preserve"><value>Reset network settings</value></data>
+  <data name="SettingsResetHint" xml:space="preserve"><value>If the internet does not work after KHORS: removes everything KHORS changed in the system — the system proxy, TUN mode and its adapter, Kill Switch filters. Other programs and your own network settings are not touched.</value></data>
   <data name="SettingsRoutingHeader" xml:space="preserve"><value>Routing</value></data>
   <data name="SettingsRoutingHint" xml:space="preserve"><value>What goes through the server and what goes direct. Works in both modes; changes apply from the next connection.</value></data>
   <data name="SettingsServiceHeader" xml:space="preserve"><value>KHORS service</value></data>

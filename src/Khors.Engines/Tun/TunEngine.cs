@@ -64,6 +64,12 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
     // Ожидание короче убивало бы ядро молча: в логе пусто, а прерванное создание может оставить битый адаптер.
     private static readonly TimeSpan s_tunReadyTimeout = TimeSpan.FromSeconds(30);
 
+    /// <summary>
+    /// Удаление битого адаптера KHORS перед повторным запуском (служба с правами); <c>null</c> — повтор без удаления.
+    /// Возвращает число удалённых адаптеров.
+    /// </summary>
+    public Func<int>? RemoveStaleAdapter { get; init; }
+
     /// <summary>Разрешение имени сервера (для тестов — подмена).</summary>
     public Func<string, CancellationToken, Task<IPAddress[]>> Resolve { get; init; } = Dns.GetHostAddressesAsync;
 
@@ -119,8 +125,9 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
     /// <summary>
     /// sing-box с адаптером TUN. Если в системе остался битый адаптер KHORS (создать нельзя — «уже существует»,
     /// открыть тоже нельзя), первая попытка падает через ~15 с, а повторная проходит: неудачная попытка
-    /// его убирает (живые проверки 2026-10-06). Поэтому при этой ошибке — один повтор. Откуда берётся битый
-    /// адаптер, не установлено (ROADMAP, «Известные проблемы»).
+    /// его убирает (живые проверки 2026-10-06). Поэтому при этой ошибке — один повтор, перед ним адаптер удаляется
+    /// (<see cref="RemoveStaleAdapter"/>), если служба это умеет. Откуда берётся битый адаптер, не установлено
+    /// (ROADMAP, «Известные проблемы»).
     /// </summary>
     private async Task<CoreSession> StartSingBoxAsync(Profile profile, CoreStartOptions options, CancellationToken cancellationToken)
     {
@@ -130,6 +137,15 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
         }
         catch (CoreStartException ex) when (IsStaleAdapter(ex.LogTail))
         {
+            try
+            {
+                RemoveStaleAdapter?.Invoke();
+            }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                // Не удалили — повтор всё равно может пройти (так было и до удаления).
+            }
+
             return await CoreLauncher.StartAsync(CoreKind.SingBox, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);
         }
     }

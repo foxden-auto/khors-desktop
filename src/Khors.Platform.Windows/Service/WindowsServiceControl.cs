@@ -146,6 +146,11 @@ public sealed partial class WindowsServiceControl : IServiceControl
             executable = Path.Combine(Path.GetTempPath(), "khors-service-uninstall.exe");
             File.Copy(Path.Combine(InstallDirectory, ExecutableName), executable, overwrite: true);
         }
+        else if (!File.Exists(executable) && action == ServiceSetupAction.ResetNetwork)
+        {
+            // Сброс умеет и установленная копия службы (каталог, куда пишет только администратор).
+            executable = Path.Combine(InstallDirectory, ExecutableName);
+        }
 
         if (!File.Exists(executable))
         {
@@ -156,7 +161,12 @@ public sealed partial class WindowsServiceControl : IServiceControl
         {
             UseShellExecute = true,
             Verb = "runas",
-            Arguments = action == ServiceSetupAction.Install ? "install" : "uninstall",
+            Arguments = action switch
+            {
+                ServiceSetupAction.Install => "install",
+                ServiceSetupAction.ResetNetwork => "reset",
+                _ => "uninstall",
+            },
             WindowStyle = ProcessWindowStyle.Hidden,
         };
 

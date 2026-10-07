@@ -373,5 +373,8 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
         }
 
         public SystemProxyRecovery RecoverAfterCrash() => SystemProxyRecovery.NothingToRecover;
+
+
+        public SystemProxyReset Reset(int localPort) => SystemProxyReset.NothingToDo;
     }
 }

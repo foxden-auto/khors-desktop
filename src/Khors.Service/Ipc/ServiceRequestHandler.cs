@@ -18,7 +18,14 @@ public sealed record ServiceInfo(string Version, DateTimeOffset StartedAt);
 /// </summary>
 /// <param name="geo">Гео-базы службы; <c>null</c> — команды гео-баз недоступны (тесты протокола).</param>
 /// <param name="killSwitch">Kill Switch службы; <c>null</c> — команды Kill Switch недоступны (тесты протокола).</param>
-public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, Action<IpcPayload> sendEvent, ServiceGeo? geo = null, KillSwitchController? killSwitch = null) : IAsyncDisposable
+/// <param name="reset">Сброс сетевых настроек; <c>null</c> — команда недоступна (тесты протокола).</param>
+public sealed class ServiceRequestHandler(
+    ServiceInfo info,
+    TunController tun,
+    Action<IpcPayload> sendEvent,
+    ServiceGeo? geo = null,
+    KillSwitchController? killSwitch = null,
+    NetworkReset? reset = null) : IAsyncDisposable
 {
     private static readonly HashSet<string> s_logLevels = ["debug", "info", "warning", "error", "none"];
 
@@ -66,6 +73,8 @@ public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, A
                 return new ErrorResponse(IpcErrorCode.BadRequest);
             case ReleaseKillSwitchRequest when killSwitch is not null:
                 return killSwitch.Release();
+            case ResetNetworkRequest when reset is not null:
+                return await reset.RunAsync().ConfigureAwait(false);
             default:
                 // Ответы и события службы клиент присылать не должен.
                 return new ErrorResponse(IpcErrorCode.UnknownCommand);

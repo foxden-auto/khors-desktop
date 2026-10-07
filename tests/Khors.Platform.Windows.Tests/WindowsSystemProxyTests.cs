@@ -122,6 +122,44 @@ public sealed class WindowsSystemProxyTests : IDisposable
         Assert.False(File.Exists(JournalPath));
     }
 
+    [Fact]
+    public void ResetRestoresFromJournal()
+    {
+        CreateProxy().Enable(SystemProxySettings.ForLocalHttp(10809));
+
+        Assert.Equal(SystemProxyReset.Restored, CreateProxy().Reset(10809));
+        Assert.Equal(s_userProxyWithPac, _wininet.State);
+        Assert.False(File.Exists(JournalPath));
+    }
+
+    [Fact]
+    public void ResetWithoutJournalTurnsOffKhorsProxyButKeepsAutoConfig()
+    {
+        _wininet.State = new WinInetProxyState(
+            WinInetProxyState.ProxyTypeDirect | WinInetProxyState.ProxyTypeProxy | WinInetProxyState.ProxyTypeAutoDetect,
+            "127.0.0.1:10809",
+            "<local>",
+            "http://wpad.example.com/proxy.pac");
+
+        Assert.Equal(SystemProxyReset.Disabled, CreateProxy().Reset(10809));
+        Assert.False(_wininet.State.UsesProxyServer);
+        Assert.Equal(WinInetProxyState.ProxyTypeDirect | WinInetProxyState.ProxyTypeAutoDetect, _wininet.State.Flags);
+        Assert.Equal("http://wpad.example.com/proxy.pac", _wininet.State.AutoConfigUrl);
+    }
+
+    [Theory]
+    [InlineData("127.0.0.1:2080")]
+    [InlineData("corp-proxy.example.com:3128")]
+    public void ResetLeavesOtherProxiesAlone(string server)
+    {
+        _wininet.State = s_userProxyWithPac with { ProxyServer = server };
+        var before = _wininet.State;
+
+        Assert.Equal(SystemProxyReset.NothingToDo, CreateProxy().Reset(10809));
+        Assert.Equal(before, _wininet.State);
+        Assert.Equal(0, _wininet.Writes);
+    }
+
     private sealed class FakeWinInet(WinInetProxyState initial) : IWinInetProxySettings
     {
         public WinInetProxyState State { get; set; } = initial;

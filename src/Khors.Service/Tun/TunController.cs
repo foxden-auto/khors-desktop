@@ -120,6 +120,22 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
         }
     }
 
+    /// <summary>«Сбросить сетевые настройки KHORS»: выключает TUN, чей бы он ни был. <c>true</c> — был включён.</summary>
+    public async Task<bool> ResetAsync()
+    {
+        await _gate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            var running = _run is not null;
+            await StopCurrentAsync().ConfigureAwait(false);
+            return running;
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
     public async ValueTask DisposeAsync()
     {
         await _gate.WaitAsync().ConfigureAwait(false);

@@ -35,6 +35,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     private readonly IServiceControl _service;
     private readonly IIpcClientTransport _serviceTransport;
     private readonly GeoManager _geo;
+    private readonly ISystemProxy? _systemProxy;
+    private readonly IServiceNetworkResetClient _networkReset;
     private readonly DispatcherTimer _sessionTimer;
     private readonly Dictionary<Guid, LatencyResult> _latency = [];
     private Khors.Engines.Processes.CoreLogBuffer? _liveLog;
@@ -54,8 +56,11 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         AutoConnector auto,
         IServiceControl service,
         IIpcClientTransport serviceTransport,
-        GeoManager geo)
+        GeoManager geo,
+        ISystemProxy? systemProxy = null)
     {
+        _systemProxy = systemProxy;
+        _networkReset = new ServiceNetworkResetClient(serviceTransport, AppVersion);
         _auto = auto;
         _geo = geo;
         _service = service;

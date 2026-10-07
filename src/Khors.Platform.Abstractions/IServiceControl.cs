@@ -16,6 +16,9 @@ public enum ServiceSetupAction
 {
     Install,
     Uninstall,
+
+    /// <summary>«Сбросить сетевые настройки KHORS» без службы (ROADMAP 4.4): фильтры WFP и адаптер KHORS.</summary>
+    ResetNetwork,
 }
 
 public enum ServiceSetupResult
@@ -52,6 +55,6 @@ public interface IServiceControl
     /// <summary>Остановка, удаление регистрации и файлов службы. Требует прав администратора.</summary>
     void Uninstall();
 
-    /// <summary>Из UI без прав администратора: запуск установки или удаления с запросом повышения прав.</summary>
+    /// <summary>Из UI без прав администратора: запуск установки, удаления или сброса с запросом повышения прав.</summary>
     Task<ServiceSetupResult> RunElevatedSetupAsync(ServiceSetupAction action, CancellationToken cancellationToken);
 }

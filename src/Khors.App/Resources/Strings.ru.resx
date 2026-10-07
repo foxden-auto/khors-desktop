@@ -20,6 +20,7 @@
   <data name="AutoWaitingShort" xml:space="preserve"><value>Ни один сервер сейчас не отвечает</value></data>
   <data name="ButtonAdd" xml:space="preserve"><value>Добавить</value></data>
   <data name="ButtonAddRule" xml:space="preserve"><value>Добавить правило</value></data>
+  <data name="ButtonCancel" xml:space="preserve"><value>Отмена</value></data>
   <data name="ButtonClose" xml:space="preserve"><value>Закрыть</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Подключить</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Копировать весь лог</value></data>
@@ -30,6 +31,8 @@
   <data name="ButtonInstallService" xml:space="preserve"><value>Установить</value></data>
   <data name="ButtonReconnect" xml:space="preserve"><value>Переподключить</value></data>
   <data name="ButtonReleaseKillSwitch" xml:space="preserve"><value>Снять блокировку</value></data>
+  <data name="ButtonResetConfirm" xml:space="preserve"><value>Сбросить</value></data>
+  <data name="ButtonResetNetwork" xml:space="preserve"><value>Сбросить сетевые настройки KHORS</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Задержка</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Обновить</value></data>
   <data name="ButtonUpdateGeo" xml:space="preserve"><value>Обновить сейчас</value></data>
@@ -216,6 +219,19 @@
   <data name="ReconnectAttemptFormat" xml:space="preserve"><value>Попытка {0}…</value></data>
   <data name="ReconnectRetryFormat" xml:space="preserve"><value>Подключение оборвалось. Попытка {0} через {1} с.</value></data>
   <data name="ReconnectWaitingForNetwork" xml:space="preserve"><value>Нет сети — KHORS подключится, когда она появится.</value></data>
+  <data name="ResetConfirm" xml:space="preserve"><value>KHORS отключится, вернёт прежний системный прокси, выключит TUN, снимет фильтры Kill Switch и переведёт его в «Выключен», удалит адаптер KHORS. Без службы Windows спросит права администратора. Сбросить?</value></data>
+  <data name="ResetDone" xml:space="preserve"><value>Сетевые настройки KHORS сброшены:</value></data>
+  <data name="ResetInProgress" xml:space="preserve"><value>Сброс…</value></data>
+  <data name="ResetNothingToDo" xml:space="preserve"><value>Сетевые настройки KHORS сброшены: менять было нечего.</value></data>
+  <data name="ResetProxy_Disabled" xml:space="preserve"><value>ручной прокси KHORS выключен;</value></data>
+  <data name="ResetProxy_Restored" xml:space="preserve"><value>системный прокси возвращён к прежним настройкам;</value></data>
+  <data name="ResetStepFailedFormat" xml:space="preserve"><value>{0}: не удалось ({1});</value></data>
+  <data name="ResetStepName_Adapter" xml:space="preserve"><value>адаптер KHORS</value></data>
+  <data name="ResetStepName_KillSwitch" xml:space="preserve"><value>фильтры Kill Switch</value></data>
+  <data name="ResetStepName_Tunnel" xml:space="preserve"><value>режим TUN</value></data>
+  <data name="ResetStep_Adapter" xml:space="preserve"><value>адаптер KHORS удалён;</value></data>
+  <data name="ResetStep_KillSwitch" xml:space="preserve"><value>фильтры Kill Switch сняты, Kill Switch выключен;</value></data>
+  <data name="ResetStep_Tunnel" xml:space="preserve"><value>режим TUN выключен;</value></data>
   <data name="RoutingBypassLan" xml:space="preserve"><value>Локальная сеть напрямую (роутер, принтеры, общие папки)</value></data>
   <data name="RoutingError_Duplicate" xml:space="preserve"><value>Такое правило уже есть.</value></data>
   <data name="RoutingError_InvalidAddress" xml:space="preserve"><value>Нужен IP-адрес или подсеть с маской без лишних битов, например 203.0.113.0/24.</value></data>
@@ -270,6 +286,8 @@
   <data name="ServiceSetup_Cancelled" xml:space="preserve"><value>Отменено: права администратора не выданы.</value></data>
   <data name="ServiceSetup_Install_Failed" xml:space="preserve"><value>Не удалось установить службу. Чтобы увидеть причину, выполните «khors-service.exe install» в командной строке от имени администратора.</value></data>
   <data name="ServiceSetup_Install_Succeeded" xml:space="preserve"><value>Служба KHORS установлена и запущена.</value></data>
+  <data name="ServiceSetup_ResetNetwork_Failed" xml:space="preserve"><value>Не удалось снять фильтры WFP или адаптер KHORS. Чтобы увидеть причину, выполните «khors-service.exe reset» в командной строке от имени администратора.</value></data>
+  <data name="ServiceSetup_ResetNetwork_Succeeded" xml:space="preserve"><value>Фильтры WFP KHORS и адаптер KHORS сняты (с правами администратора), Kill Switch выключен.</value></data>
   <data name="ServiceSetup_SetupNotFound" xml:space="preserve"><value>Рядом с KHORS нет файла khors-service.exe — нужна полная сборка KHORS.</value></data>
   <data name="ServiceSetup_Uninstall_Failed" xml:space="preserve"><value>Не удалось удалить службу. Чтобы увидеть причину, выполните «khors-service.exe uninstall» в командной строке от имени администратора.</value></data>
   <data name="ServiceSetup_Uninstall_Succeeded" xml:space="preserve"><value>Служба KHORS удалена.</value></data>
@@ -303,6 +321,8 @@
   <data name="SettingsModeHeader" xml:space="preserve"><value>Режим подключения</value></data>
   <data name="SettingsModeHint" xml:space="preserve"><value>Режим можно сменить и во время подключения — KHORS переподключится в новом режиме. Для TUN нужна служба KHORS.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Список серверов</value></data>
+  <data name="SettingsResetHeader" xml:space="preserve"><value>Сброс сетевых настроек</value></data>
+  <data name="SettingsResetHint" xml:space="preserve"><value>Если после KHORS не работает интернет: снимает всё, что KHORS менял в системе, — системный прокси, режим TUN и его адаптер, фильтры Kill Switch. Другие программы и ваши настройки сети не затрагиваются.</value></data>
   <data name="SettingsRoutingHeader" xml:space="preserve"><value>Маршрутизация</value></data>
   <data name="SettingsRoutingHint" xml:space="preserve"><value>Что идёт через сервер, а что напрямую. Действует в обоих режимах; изменения — со следующего подключения.</value></data>
   <data name="SettingsServiceHeader" xml:space="preserve"><value>Служба KHORS</value></data>

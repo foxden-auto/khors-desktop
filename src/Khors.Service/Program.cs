@@ -23,13 +23,22 @@ var version = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformatio
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddServicePlatform();
 builder.Services.AddSingleton(new ServiceInfo(version, DateTimeOffset.UtcNow));
-builder.Services.AddSingleton<ITunStarter>(sp => new TunEngine(new SecretMasker(), sp.GetService<IChildProcessGuard>(), sp.GetRequiredService<ServicePaths>().GeoDirectory));
+builder.Services.AddSingleton<ITunStarter>(sp =>
+{
+    var adapters = sp.GetService<ITunAdapterCleanup>();
+    return new TunEngine(new SecretMasker(), sp.GetService<IChildProcessGuard>(), sp.GetRequiredService<ServicePaths>().GeoDirectory)
+    {
+        // Битый адаптер KHORS мешает sing-box создать новый — убираем его перед повтором (ROADMAP 4.4).
+        RemoveStaleAdapter = adapters is null ? null : () => adapters.RemoveAdapters(KillSwitchController.TunnelInterface),
+    };
+});
 builder.Services.AddSingleton(sp => new KillSwitchController(
     sp.GetService<IKillSwitch>(),
     Path.Combine(sp.GetRequiredService<ServicePaths>().DataDirectory, "killswitch.json"),
     [.. new[] { CoreKind.SingBox, CoreKind.Xray }.Select(k => CoreLocator.Find(k)).OfType<string>()],
     sp.GetRequiredService<ILogger<KillSwitchController>>()));
 builder.Services.AddSingleton<TunController>();
+builder.Services.AddSingleton(sp => new NetworkReset(sp.GetRequiredService<TunController>(), sp.GetRequiredService<KillSwitchController>(), sp.GetService<ITunAdapterCleanup>()));
 builder.Services.AddSingleton(sp => new GeoDatabaseUpdater(sp.GetRequiredService<ServicePaths>().GeoDirectory));
 builder.Services.AddSingleton<ServiceGeo>();
 builder.Services.AddHostedService<IpcServer>();

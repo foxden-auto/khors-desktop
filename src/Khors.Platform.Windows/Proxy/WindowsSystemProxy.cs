@@ -95,6 +95,34 @@ public sealed class WindowsSystemProxy : ISystemProxy
         }
     }
 
+    public SystemProxyReset Reset(int localPort)
+    {
+        lock (_lock)
+        {
+            var journal = ReadJournal(out var corrupted);
+            if (journal is not null)
+            {
+                _settings.Write(journal.Previous);
+                File.Delete(_journalPath);
+                return SystemProxyReset.Restored;
+            }
+
+            if (corrupted)
+            {
+                File.Delete(_journalPath);
+            }
+
+            var current = _settings.Read();
+            if (!current.UsesProxyServer || !string.Equals(current.ProxyServer, $"127.0.0.1:{localPort}", StringComparison.OrdinalIgnoreCase))
+            {
+                return SystemProxyReset.NothingToDo;
+            }
+
+            _settings.Write(current with { Flags = (current.Flags & ~WinInetProxyState.ProxyTypeProxy) | WinInetProxyState.ProxyTypeDirect, ProxyServer = null, ProxyBypass = null });
+            return SystemProxyReset.Disabled;
+        }
+    }
+
     private SystemProxyJournal? ReadJournal(out bool corrupted)
     {
         corrupted = false;
