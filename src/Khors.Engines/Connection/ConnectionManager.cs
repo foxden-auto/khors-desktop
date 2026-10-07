@@ -67,20 +67,35 @@ public sealed class ConnectionManager : IAsyncDisposable
             ? session.ReadTrafficAsync(cancellationToken)
             : Task.FromResult<Traffic.TrafficCounters?>(null);
 
-    /// <summary>Подключает профиль; если уже подключён другой — сначала отключает его.</summary>
+    /// <summary>
+    /// Подключает профиль; если уже подключён другой — сначала отключает его. Смена сервера в режиме TUN (из TUN в TUN) —
+    /// без промежутка: новое подключение поднимается раньше, чем закрывается старое, и служба заменяет TUN, не снимая
+    /// блокировку Kill Switch (ROADMAP 4.5) — иначе между отключением и подключением трафик ушёл бы напрямую.
+    /// </summary>
     public async Task ConnectAsync(Profile profile, CoreStartPreferences preferences, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(profile);
         ArgumentNullException.ThrowIfNull(preferences);
 
         await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        ICoreSession? replaced = null;
         try
         {
             CancelReconnect();
             _lastAttempt = 0;
-            await DisconnectCoreAsync().ConfigureAwait(false);
+            var issue = ProfileValidator.Validate(profile).FirstOrDefault(i => i.Severity == ProfileIssueSeverity.Error);
+            if (issue is null && _session is { } current && _preferences?.Mode == ConnectionMode.Tun && preferences.Mode == ConnectionMode.Tun)
+            {
+                Volatile.Write(ref _session, null);
+                StopWatchingProblems(current);
+                replaced = current;
+            }
+            else
+            {
+                await DisconnectCoreAsync().ConfigureAwait(false);
+            }
 
-            if (ProfileValidator.Validate(profile).FirstOrDefault(i => i.Severity == ProfileIssueSeverity.Error) is { } issue)
+            if (issue is not null)
             {
                 SetStatus(new ConnectionStatus(ConnectionState.Failed, profile, Failure: new ConnectionFailure(ConnectionFailureKind.ProfileInvalid, Issue: issue.Code)));
                 return;
@@ -106,6 +121,12 @@ public sealed class ConnectionManager : IAsyncDisposable
         }
         finally
         {
+            // Прежняя сессия TUN — после запуска новой: служба уже заменила TUN, её команда остановки ничего не снимет.
+            if (replaced is not null)
+            {
+                await replaced.DisposeAsync().ConfigureAwait(false);
+            }
+
             _gate.Release();
         }
     }

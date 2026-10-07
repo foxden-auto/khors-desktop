@@ -78,6 +78,43 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
     private static readonly CoreStartPreferences s_tun = s_preferences with { Mode = Khors.Core.Storage.ConnectionMode.Tun };
 
     [Fact]
+    public async Task ServerChangeInTunStartsNewSessionBeforeClosingOld()
+    {
+        await _manager.ConnectAsync(ValidProfile("first"), s_tun, TestContext.Current.CancellationToken);
+        _events.Clear();
+
+        await _manager.ConnectAsync(ValidProfile("second"), s_tun, TestContext.Current.CancellationToken);
+
+        Assert.Equal(["start:Tun", "core-dispose"], _events);
+        Assert.Equal("second", _manager.Status.Profile?.Name);
+        Assert.Equal(ConnectionState.Connected, _manager.Status.State);
+    }
+
+    [Fact]
+    public async Task FailedServerChangeInTunStillClosesOldSession()
+    {
+        await _manager.ConnectAsync(ValidProfile("first"), s_tun, TestContext.Current.CancellationToken);
+        _launcher.FailWith = new CoreStartException(CoreStartFailure.ExitedDuringStart, "exited", 1, []);
+        _events.Clear();
+
+        await _manager.ConnectAsync(ValidProfile("second"), s_tun, TestContext.Current.CancellationToken);
+
+        Assert.Equal(["start:Tun", "core-dispose"], _events);
+        Assert.Equal(ConnectionState.Failed, _manager.Status.State);
+    }
+
+    [Fact]
+    public async Task ServerChangeInProxyModeStopsOldFirst()
+    {
+        await _manager.ConnectAsync(ValidProfile("first"), s_preferences, TestContext.Current.CancellationToken);
+        _events.Clear();
+
+        await _manager.ConnectAsync(ValidProfile("second"), s_preferences, TestContext.Current.CancellationToken);
+
+        Assert.Equal(["proxy-restore", "core-dispose", "start:SystemProxy", "watchdog", "proxy-on:2001"], _events);
+    }
+
+    [Fact]
     public async Task SwitchToTunRestoresProxyBeforeStartingTun()
     {
         var profile = ValidProfile();

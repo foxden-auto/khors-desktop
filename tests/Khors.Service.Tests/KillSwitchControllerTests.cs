@@ -305,6 +305,28 @@ public sealed class KillSwitchControllerTests : IDisposable
         Assert.Equal(new IpcResetItem(IpcResetStep.Adapter, IpcResetOutcome.Failed, "DiUninstallDevice failed."), result.Items[1]);
     }
 
+    [Fact]
+    public async Task ServerChangeKeepsBlockingWithoutGap()
+    {
+        var controller = Controller(IpcKillSwitchMode.WhileConnected);
+        await using var tun = new TunController(new FakeTunStarter(), NullLogger<TunController>.Instance, controller);
+        var profile = ShareLinkParser.Parse("hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com").Profile!;
+        var ct = TestContext.Current.CancellationToken;
+        var oldOwner = new object();
+        var newOwner = new object();
+        Assert.IsType<TunStartedResponse>(await tun.StartAsync(oldOwner, profile, "warning", DnsPresets.Default.Server, new RoutingSettings(), _ => { }, ct));
+        _wfp.Calls.Clear();
+
+        // Окно поднимает новое подключение раньше, чем закрывает старое (ConnectionManager, ROADMAP 4.5).
+        Assert.IsType<TunStartedResponse>(await tun.StartAsync(newOwner, profile, "warning", DnsPresets.Default.Server, new RoutingSettings(), _ => { }, ct));
+        await tun.StopAsync(oldOwner, byUser: true);
+
+        Assert.DoesNotContain("remove", _wfp.Calls);
+        Assert.True(tun.IsRunning);
+        Assert.True(controller.Status().Active);
+        Assert.False(controller.Status().Blocking);
+    }
+
     private sealed class FakeAdapters(Action onRemove) : ITunAdapterCleanup
     {
         public int Count { get; init; }
