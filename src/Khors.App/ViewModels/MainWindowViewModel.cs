@@ -1112,7 +1112,8 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         Interlocked.Exchange(ref _liveLogRefreshQueued, 0);
         if (_liveLog is { } log)
         {
-            var tail = log.Tail(30);
+            // Весь буфер (до 1000 строк): журнал заполняет страницу и прокручивается.
+            var tail = log.Tail(int.MaxValue);
             LogTail = tail.Count > 0 ? string.Join(Environment.NewLine, tail) : null;
         }
     }

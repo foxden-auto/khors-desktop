@@ -13,7 +13,7 @@
     <TextBlock DockPanel.Dock="Bottom" Text="{x:Static res:Strings.LogMaskedNote}" Classes="caption" Margin="4,10,0,0" />
     <Border Classes="card">
       <Panel>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsVisible="{Binding HasLogTail}">
+        <ScrollViewer x:Name="LogScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsVisible="{Binding HasLogTail}">
           <SelectableTextBlock Text="{Binding LogTail}" Classes="log" />
         </ScrollViewer>
         <TextBlock Text="{x:Static res:Strings.LogEmpty}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center"
