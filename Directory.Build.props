@@ -13,6 +13,8 @@
     <Company>KHORS contributors</Company>
     <Product>KHORS Desktop</Product>
     <Copyright>Copyright 2026 KHORS contributors</Copyright>
+    <!-- Версия KHORS Desktop — единственное место: сборки, рукопожатие со службой, установщик и имя ZIP (tools/installer). -->
+    <Version>1.0.0</Version>
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>

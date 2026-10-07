@@ -29,7 +29,6 @@ public sealed class ConnectionManager : IAsyncDisposable
     private CancellationTokenSource? _reconnect;
     private TaskCompletionSource _wake = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private int _lastAttempt;
-    private DateTimeOffset? _reconnectedAt;
     private EventHandler<CoreLogLine>? _problemWatch;
     private ConnectionStatus _status = ConnectionStatus.Disconnected;
     private int _disposed;

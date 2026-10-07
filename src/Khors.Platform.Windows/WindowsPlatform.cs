@@ -67,14 +67,25 @@ public static class WindowsPlatform
         return services;
     }
 
+    /// <summary>Файл-признак переносимой версии (ZIP) рядом с <c>khors-desktop.exe</c>: данные — в <c>data\</c> рядом с ним.</summary>
+    public const string PortableMarker = "khors.portable";
+
     /// <summary>
-    /// Данные пользователя: <c>%APPDATA%\KHORS</c> (профили, настройки). Переменная окружения <c>KHORS_DATA_DIR</c>
-    /// переносит все данные и журналы отката в другой каталог — для тестов и переносимого режима.
+    /// Данные пользователя: <c>%APPDATA%\KHORS</c> (профили, настройки). Переносимая версия (рядом с exe лежит
+    /// <see cref="PortableMarker"/>) — каталог <c>data</c> рядом с exe. Переменная окружения <c>KHORS_DATA_DIR</c>
+    /// переносит все данные и журналы отката в другой каталог — для тестов; она важнее признака.
     /// </summary>
-    public static string DataDirectory { get; } =
-        Environment.GetEnvironmentVariable("KHORS_DATA_DIR") is { Length: > 0 } overridden
+    public static string DataDirectory { get; } = ResolveDataDirectory(
+        Environment.GetEnvironmentVariable("KHORS_DATA_DIR"),
+        AppContext.BaseDirectory,
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+
+    internal static string ResolveDataDirectory(string? overridden, string appDirectory, string roamingAppData) =>
+        overridden is { Length: > 0 }
             ? Path.GetFullPath(overridden)
-            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "KHORS");
+            : File.Exists(Path.Combine(appDirectory, PortableMarker))
+                ? Path.Combine(appDirectory, "data")
+                : Path.Combine(roamingAppData, "KHORS");
 
     /// <summary>Состояние для отката изменений системы: <c>%APPDATA%\KHORS\state</c>.</summary>
     public static string StateDirectory { get; } = Path.Combine(DataDirectory, "state");

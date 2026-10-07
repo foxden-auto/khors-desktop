@@ -9,6 +9,13 @@ internal static class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        // Удаление программы (установщик, от имени пользователя): вернуть системный прокси, если KHORS не успел сам.
+        if (args is ["--restore-proxy"])
+        {
+            PlatformComposition.CreateSystemProxy()?.RecoverAfterCrash();
+            return 0;
+        }
+
         // Роль сторожа системного прокси — до любого UI. Синхронное ожидание допустимо: UI-поток ещё не запущен.
         if (SystemProxyWatchdog.TryRunAsync(args, PlatformComposition.CreateSystemProxy).GetAwaiter().GetResult() is { } watchdogExitCode)
         {

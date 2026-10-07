@@ -54,6 +54,22 @@ System.Diagnostics.EventLog      MIT            https://github.com/dotnet/runtim
 System.ServiceProcess            MIT            https://github.com/dotnet/runtime
   .ServiceController 10.0.12
 
+-------------------------------------------------------------------------------
+Installer
+-------------------------------------------------------------------------------
+
+The Windows installer (khors-desktop-<version>-win-x64-setup.exe) is built with
+Inno Setup 6.7.3 (https://jrsoftware.org/isinfo.php), whose setup and
+uninstall runtime is included in the installer:
+
+  Inno Setup
+  Copyright (C) 1997-2026 Jordan Russell. All rights reserved.
+  Portions Copyright (C) 2000-2026 Martijn Laan. All rights reserved.
+  Distributed under the Inno Setup License
+  (https://jrsoftware.org/files/is/license.txt).
+
+-------------------------------------------------------------------------------
+
 Build-time only (not shipped): Avalonia.BuildServices 11.3.2 (MIT); its
 build telemetry is disabled in Directory.Build.targets.
 Tests only (not shipped): xunit.v3 4.0.1 (Apache-2.0) and its dependencies.
