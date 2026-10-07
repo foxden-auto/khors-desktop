@@ -1,6 +1,8 @@
 using Khors.Core.Profiles;
 using Khors.Core.Subscriptions;
 
+using Khors.Core.Routing;
+
 namespace Khors.Core.Storage;
 
 /// <summary>Файл профилей (<c>profiles.json</c>). Версия схемы — в корне (docs/SPEC.md, 4.2).</summary>
@@ -66,4 +68,17 @@ public sealed record AppSettings(
 
     /// <summary>Совпадает с <see cref="Dns.DnsPresets.Default"/> (проверяется тестом).</summary>
     public const string DefaultRemoteDns = "https://1.1.1.1/dns-query";
+
+    private static readonly RoutingSettings s_defaultRouting = new();
+
+    private readonly RoutingSettings? _routing;
+
+    /// <summary>Маршрутизация, общая для всех профилей (ROADMAP 3.5).</summary>
+    /// <remarks>Генератор System.Text.Json присваивает отсутствующему в файле полю <c>null</c> — тогда действует значение по умолчанию.</remarks>
+    public RoutingSettings Routing
+    {
+        get => _routing ?? s_defaultRouting;
+        // Значение по умолчанию хранится как null: равенство записей не зависит от того, откуда оно взялось.
+        init => _routing = value == s_defaultRouting ? null : value;
+    }
 }

@@ -93,6 +93,7 @@ public static class Localizer
     private static string DescribeUnsupported(CoreConfigError? error) => error switch
     {
         { Code: CoreConfigErrorCode.WrongCore } => Get("Unsupported_core"),
+        { Code: CoreConfigErrorCode.GeoCategoryMissing, Field: { } category } => Format("GeoCategoryMissingFormat", category),
         { Field: { } field } => DescribeUnsupported(field),
         _ => Get("Unsupported_Other"),
     };

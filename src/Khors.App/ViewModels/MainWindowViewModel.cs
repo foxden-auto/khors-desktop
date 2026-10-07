@@ -71,6 +71,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
         IsTunMode = settings.Current.ConnectionMode == ConnectionMode.Tun;
         LoadDnsSetting();
+        LoadRoutingSetting();
         InitGeo();
 
         // «Авто» — до загрузки списка, чтобы загрузка не выбрала первый профиль поверх сохранённого выбора.
@@ -947,6 +948,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             _ => null,
         };
 
+        ApplyRoutingStatus(status);
         ProblemHint = status switch
         {
             { State: ConnectionState.Connected, Problem: { } problem } => Localizer.Format("ConnectionProblemFormat", Localizer.Describe(problem)),

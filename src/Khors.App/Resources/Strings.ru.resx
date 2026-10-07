@@ -19,6 +19,7 @@
   <data name="AutoWaiting" xml:space="preserve"><value>Ни один сервер сейчас не отвечает — «Авто» повторит подбор при следующей проверке.</value></data>
   <data name="AutoWaitingShort" xml:space="preserve"><value>Ни один сервер сейчас не отвечает</value></data>
   <data name="ButtonAdd" xml:space="preserve"><value>Добавить</value></data>
+  <data name="ButtonAddRule" xml:space="preserve"><value>Добавить правило</value></data>
   <data name="ButtonClose" xml:space="preserve"><value>Закрыть</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Подключить</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Копировать весь лог</value></data>
@@ -27,6 +28,7 @@
   <data name="ButtonDisconnect" xml:space="preserve"><value>Отключить</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Вставить из буфера</value></data>
   <data name="ButtonInstallService" xml:space="preserve"><value>Установить</value></data>
+  <data name="ButtonReconnect" xml:space="preserve"><value>Переподключить</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Задержка</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Обновить</value></data>
   <data name="ButtonUpdateGeo" xml:space="preserve"><value>Обновить сейчас</value></data>
@@ -77,6 +79,7 @@
   <data name="FileTooLarge" xml:space="preserve"><value>Файл больше 5 МБ — это не конфиг и не картинка с QR-кодом.</value></data>
   <data name="FileTypeImportable" xml:space="preserve"><value>Картинки с QR-кодом, ссылки и конфиги</value></data>
   <data name="GeoAutoUpdateOption" xml:space="preserve"><value>Проверять обновления раз в сутки</value></data>
+  <data name="GeoCategoryMissingFormat" xml:space="preserve"><value>в гео-базе нет категории {0}</value></data>
   <data name="GeoError_ChecksumMismatch" xml:space="preserve"><value>Файл не совпал с контрольной суммой — не установлен, остался прежний.</value></data>
   <data name="GeoError_HttpError" xml:space="preserve"><value>Не удалось загрузить: сервер вернул ошибку.</value></data>
   <data name="GeoError_Invalid" xml:space="preserve"><value>Файл повреждён или неполный — не установлен, остался прежний.</value></data>
@@ -195,6 +198,46 @@
   <data name="QrWindowTitle" xml:space="preserve"><value>QR-код профиля</value></data>
   <data name="RateKbFormat" xml:space="preserve"><value>{0:0} КБ/с</value></data>
   <data name="RateMbFormat" xml:space="preserve"><value>{0:0.#} МБ/с</value></data>
+  <data name="RoutingBypassLan" xml:space="preserve"><value>Локальная сеть напрямую (роутер, принтеры, общие папки)</value></data>
+  <data name="RoutingError_Duplicate" xml:space="preserve"><value>Такое правило уже есть.</value></data>
+  <data name="RoutingError_InvalidAddress" xml:space="preserve"><value>Нужен IP-адрес или подсеть с маской без лишних битов, например 203.0.113.0/24.</value></data>
+  <data name="RoutingError_InvalidDomain" xml:space="preserve"><value>Это не имя сайта. Введите имя без https:// и пути, например example.com.</value></data>
+  <data name="RoutingError_InvalidGeoCode" xml:space="preserve"><value>Код категории — латиница, цифры и дефис, без «geosite:»/«geoip:», например category-ru.</value></data>
+  <data name="RoutingError_InvalidKeyword" xml:space="preserve"><value>Слово — без пробелов и кавычек: буквы, цифры, точка, дефис.</value></data>
+  <data name="RoutingError_InvalidProcess" xml:space="preserve"><value>Нужно имя файла программы (firefox.exe) или полный путь к нему, без кавычек и масок.</value></data>
+  <data name="RoutingError_UnknownCategoryFormat" xml:space="preserve"><value>В загруженной гео-базе нет категории «{0}».</value></data>
+  <data name="RoutingMissingGeoFormat" xml:space="preserve"><value>Часть правил маршрутизации не действует: в гео-базе нет {0}. Обновите гео-базы в настройках.</value></data>
+  <data name="RoutingNoGeoWarning" xml:space="preserve"><value>Гео-базы ещё не загружены — правило заработает после их загрузки.</value></data>
+  <data name="RoutingPresetAll" xml:space="preserve"><value>Весь трафик через VPN</value></data>
+  <data name="RoutingPresetAllHint" xml:space="preserve"><value>Напрямую — только локальная сеть (если включено ниже) и ваши правила.</value></data>
+  <data name="RoutingPresetApps" xml:space="preserve"><value>Только выбранные приложения</value></data>
+  <data name="RoutingPresetAppsHint" xml:space="preserve"><value>Только в режиме TUN: через сервер идут программы из правил «Процесс → Через сервер», остальное — напрямую. В режиме «Системный прокси» действует как «Весь трафик через VPN».</value></data>
+  <data name="RoutingPresetRussia" xml:space="preserve"><value>Обход для России</value></data>
+  <data name="RoutingPresetRussiaHint" xml:space="preserve"><value>Российские сайты (зоны .ru, .su, .рф и список category-ru от v2fly) и российские IP-адреса — напрямую, остальное — через сервер. Нужны гео-базы (раздел «Гео-базы» ниже).</value></data>
+  <data name="RoutingReconnectHint" xml:space="preserve"><value>Маршрутизация изменена — она вступит в силу после переподключения.</value></data>
+  <data name="RoutingRulesEmpty" xml:space="preserve"><value>Своих правил нет.</value></data>
+  <data name="RoutingRulesHeader" xml:space="preserve"><value>Свои правила</value></data>
+  <data name="RoutingRulesHint" xml:space="preserve"><value>Проверяются сверху вниз раньше пресета; срабатывает первое подходящее.</value></data>
+  <data name="RuleAction_Block" xml:space="preserve"><value>Блокировать</value></data>
+  <data name="RuleAction_Direct" xml:space="preserve"><value>Напрямую</value></data>
+  <data name="RuleAction_Proxy" xml:space="preserve"><value>Через сервер</value></data>
+  <data name="RuleMatch_Domain" xml:space="preserve"><value>Домен</value></data>
+  <data name="RuleMatch_DomainKeyword" xml:space="preserve"><value>Слово в имени</value></data>
+  <data name="RuleMatch_DomainSuffix" xml:space="preserve"><value>Домен и поддомены</value></data>
+  <data name="RuleMatch_GeoIp" xml:space="preserve"><value>Страна IP (geoip)</value></data>
+  <data name="RuleMatch_GeoSite" xml:space="preserve"><value>Категория сайтов (geosite)</value></data>
+  <data name="RuleMatch_IpCidr" xml:space="preserve"><value>IP или подсеть</value></data>
+  <data name="RuleMatch_Process" xml:space="preserve"><value>Процесс (только TUN)</value></data>
+  <data name="RuleMoveDown" xml:space="preserve"><value>Ниже</value></data>
+  <data name="RuleMoveUp" xml:space="preserve"><value>Выше</value></data>
+  <data name="RulePlaceholder_Domain" xml:space="preserve"><value>www.example.com</value></data>
+  <data name="RulePlaceholder_DomainKeyword" xml:space="preserve"><value>например, ads</value></data>
+  <data name="RulePlaceholder_DomainSuffix" xml:space="preserve"><value>example.com</value></data>
+  <data name="RulePlaceholder_GeoIp" xml:space="preserve"><value>ru, private, !ru</value></data>
+  <data name="RulePlaceholder_GeoSite" xml:space="preserve"><value>category-ru, google, google@cn</value></data>
+  <data name="RulePlaceholder_IpCidr" xml:space="preserve"><value>203.0.113.0/24 или 2001:db8::/32</value></data>
+  <data name="RulePlaceholder_Process" xml:space="preserve"><value>firefox.exe или полный путь к программе</value></data>
+  <data name="RuleRemove" xml:space="preserve"><value>Удалить правило</value></data>
   <data name="ScreenCaptureFailed" xml:space="preserve"><value>Не удалось сделать снимок экрана.</value></data>
   <data name="ScreenNoQr" xml:space="preserve"><value>На экране не найден QR-код. Откройте картинку с кодом поверх других окон и повторите.</value></data>
   <data name="SearchNoResults" xml:space="preserve"><value>Ничего не найдено</value></data>
@@ -236,6 +279,8 @@
   <data name="SettingsModeHeader" xml:space="preserve"><value>Режим подключения</value></data>
   <data name="SettingsModeHint" xml:space="preserve"><value>Режим меняется, пока нет подключения. Для TUN нужна служба KHORS.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Список серверов</value></data>
+  <data name="SettingsRoutingHeader" xml:space="preserve"><value>Маршрутизация</value></data>
+  <data name="SettingsRoutingHint" xml:space="preserve"><value>Что идёт через сервер, а что напрямую. Действует в обоих режимах; изменения — со следующего подключения.</value></data>
   <data name="SettingsServiceHeader" xml:space="preserve"><value>Служба KHORS</value></data>
   <data name="SettingsServiceHint" xml:space="preserve"><value>Нужна только для режима TUN: создаёт сетевой адаптер и маршруты. Устанавливается один раз, Windows спросит права администратора.</value></data>
   <data name="ShowLogLink" xml:space="preserve"><value>Подробности — в журнале</value></data>

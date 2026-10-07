@@ -3,7 +3,9 @@ using System.Net.Sockets;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Khors.Core.Dns;
 using Khors.Core.Profiles;
+using Khors.Core.Routing;
 
 namespace Khors.Core.Generators.Xray;
 
@@ -20,13 +22,17 @@ public static class XrayConfigGenerator
     public const string SocksInboundTag = "socks-in";
     public const string HttpInboundTag = "http-in";
     public const string MetricsTag = "metrics";
+    public const string DnsTag = "dns-internal";
 
-    // Локальные и служебные сети — напрямую. CIDR вместо geoip:private: гео-базы не поставляются до ROADMAP 3.6.
+    // Локальные и служебные сети — напрямую. CIDR вместо geoip:private: так правило не зависит от гео-баз.
     private static readonly string[] s_privateNetworks =
     [
         "127.0.0.0/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "169.254.0.0/16",
         "::1/128", "fc00::/7", "fe80::/10",
     ];
+
+    // Без обхода локальной сети напрямую остаётся только сам компьютер.
+    private static readonly string[] s_loopbackNetworks = ["127.0.0.0/8", "::1/128"];
 
     private static readonly JsonSerializerOptions s_jsonOptions = new()
     {
@@ -63,8 +69,13 @@ public static class XrayConfigGenerator
                 BuildProxyOutbound(profile),
                 new JsonObject { ["tag"] = DirectTag, ["protocol"] = "freedom" },
                 new JsonObject { ["tag"] = BlockTag, ["protocol"] = "blackhole" }),
-            ["routing"] = BuildRouting(),
+            ["routing"] = BuildRouting(options.Routing, options.RemoteDns),
         };
+
+        if (options.Routing.HasAddressRules)
+        {
+            config["dns"] = BuildDns(options.RemoteDns);
+        }
 
         // Счётчики выхода proxy: отправлено и получено через сервер (локальные сети идут через direct и не считаются).
         if (options.MetricsPort is { } metricsPort)
@@ -187,23 +198,102 @@ public static class XrayConfigGenerator
         ];
     }
 
-    private static JsonObject BuildRouting() => new()
+    /// <summary>
+    /// Правила плана по порядку; не совпавшее — в первый выход (<c>proxy</c>) или по <see cref="RoutingPlan.Final"/>.
+    /// Есть правила по адресу — соединение по имени, не совпавшее с правилами по имени, Xray разрешает своим DNS
+    /// (<c>IPIfNonMatch</c>, <see cref="BuildDns"/>) и проверяет адрес. Гео-категории Xray читает из
+    /// <c>geosite.dat</c>/<c>geoip.dat</c> (каталог — <c>XRAY_LOCATION_ASSET</c>).
+    /// </summary>
+    private static JsonObject BuildRouting(RoutingPlan plan, DnsServer remoteDns)
     {
-        ["domainStrategy"] = "AsIs",
-        ["rules"] = new JsonArray(
-            new JsonObject
+        var rules = new JsonArray();
+        if (plan.HasAddressRules)
+        {
+            rules.Add(new JsonObject
             {
                 ["type"] = "field",
-                ["ip"] = ToArray(s_privateNetworks),
-                ["outboundTag"] = DirectTag,
-            },
-            new JsonObject
+                ["inboundTag"] = new JsonArray(DnsTag),
+                ["outboundTag"] = remoteDns.IsLocalNetwork ? DirectTag : ProxyTag,
+            });
+        }
+
+        rules.Add(new JsonObject
+        {
+            ["type"] = "field",
+            ["ip"] = ToArray(plan.BypassLan ? s_privateNetworks : s_loopbackNetworks),
+            ["outboundTag"] = DirectTag,
+        });
+        rules.Add(new JsonObject
+        {
+            ["type"] = "field",
+            ["domain"] = new JsonArray("full:localhost"),
+            ["outboundTag"] = DirectTag,
+        });
+
+        foreach (var rule in plan.Rules)
+        {
+            var (field, value) = rule.Match switch
+            {
+                RuleMatch.Domain => ("domain", "full:" + rule.Value),
+                RuleMatch.DomainSuffix => ("domain", "domain:" + rule.Value),
+                RuleMatch.DomainKeyword => ("domain", "keyword:" + rule.Value),
+                RuleMatch.GeoSite => ("domain", "geosite:" + rule.Value),
+                RuleMatch.IpCidr => ("ip", rule.Value),
+                RuleMatch.GeoIp => ("ip", "geoip:" + rule.Value),
+
+                // Процесс в режиме «Системный прокси» не узнать; RoutingPlan.Build такие правила не пропускает.
+                _ => throw new ArgumentException($"Правило {rule.Match} не поддерживается Xray", nameof(plan)),
+            };
+            rules.Add(new JsonObject
             {
                 ["type"] = "field",
-                ["domain"] = new JsonArray("full:localhost"),
-                ["outboundTag"] = DirectTag,
-            }),
+                [field] = new JsonArray(value),
+                ["outboundTag"] = OutboundTag(rule.Action),
+            });
+        }
+
+        if (plan.Final != RuleAction.Proxy)
+        {
+            rules.Add(new JsonObject { ["type"] = "field", ["network"] = "tcp,udp", ["outboundTag"] = OutboundTag(plan.Final) });
+        }
+
+        return new JsonObject
+        {
+            ["domainStrategy"] = plan.HasAddressRules ? "IPIfNonMatch" : "AsIs",
+            ["rules"] = rules,
+        };
+    }
+
+    private static string OutboundTag(RuleAction action) => action switch
+    {
+        RuleAction.Direct => DirectTag,
+        RuleAction.Block => BlockTag,
+        _ => ProxyTag,
     };
+
+    /// <summary>
+    /// DNS Xray — только для правил по адресу: удалённый DNS из настроек через сервер (правило по <see cref="DnsTag"/>),
+    /// чтобы провайдер не видел имён (адрес в локальной сети — напрямую). Сайты по-прежнему открывает сервер по имени. DoT Xray не поддерживает —
+    /// тот же сервер по TCP: запрос всё равно идёт внутри туннеля.
+    /// </summary>
+    private static JsonObject BuildDns(DnsServer server)
+    {
+        var host = server.Host.Contains(':', StringComparison.Ordinal) ? $"[{server.Host}]" : server.Host;
+        var address = server.Type switch
+        {
+            DnsServerType.Https => server.ToString(),
+            DnsServerType.Udp => $"udp://{host}:{server.Port ?? DnsServer.DefaultPort(DnsServerType.Udp)}",
+            DnsServerType.Tcp => $"tcp://{host}:{server.Port ?? DnsServer.DefaultPort(DnsServerType.Tcp)}",
+            _ => $"tcp://{host}:{DnsServer.DefaultPort(DnsServerType.Tcp)}",
+        };
+
+        return new JsonObject
+        {
+            ["servers"] = new JsonArray(address),
+            ["queryStrategy"] = "UseIPv4",
+            ["tag"] = DnsTag,
+        };
+    }
 
     private static JsonObject BuildProxyOutbound(Profile profile)
     {

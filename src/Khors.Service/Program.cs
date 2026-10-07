@@ -20,7 +20,7 @@ var version = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformatio
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddServicePlatform();
 builder.Services.AddSingleton(new ServiceInfo(version, DateTimeOffset.UtcNow));
-builder.Services.AddSingleton<ITunStarter>(sp => new TunEngine(new SecretMasker(), sp.GetService<IChildProcessGuard>()));
+builder.Services.AddSingleton<ITunStarter>(sp => new TunEngine(new SecretMasker(), sp.GetService<IChildProcessGuard>(), sp.GetRequiredService<ServicePaths>().GeoDirectory));
 builder.Services.AddSingleton<TunController>();
 builder.Services.AddSingleton(sp => new GeoDatabaseUpdater(sp.GetRequiredService<ServicePaths>().GeoDirectory));
 builder.Services.AddSingleton<ServiceGeo>();

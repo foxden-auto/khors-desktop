@@ -7,7 +7,9 @@ using Khors.Core.Generators;
 using Khors.Core.Generators.SingBox;
 using Khors.Core.Generators.Xray;
 using Khors.Core.Profiles;
+using Khors.Core.Routing;
 using Khors.Engines.Diagnostics;
+using Khors.Engines.Geo;
 using Khors.Engines.Processes;
 using Khors.Engines.Traffic;
 using Khors.Platform;
@@ -38,11 +40,20 @@ public sealed record CoreStartOptions
     /// <summary>sing-box в цепочке: выход — SOCKS-вход Xray на этом порту (ROADMAP 3.3).</summary>
     public int? UpstreamSocksPort { get; init; }
 
-    /// <summary>Удалённый DNS sing-box (TUN, WireGuard); Xray его не использует — имена сайтов разрешает сервер.</summary>
+    /// <summary>
+    /// Удалённый DNS: sing-box — для TUN и WireGuard; оба ядра — для правил по адресу (<see cref="RoutingPlan.HasAddressRules"/>).
+    /// Остальные имена сайтов разрешает сервер.
+    /// </summary>
     public DnsServer RemoteDns { get; init; } = DnsPresets.Default.Server;
 
-    /// <summary>Каталог гео-баз (<c>geosite.dat</c>, <c>geoip.dat</c>) для Xray; <c>null</c> — рядом с ядром.</summary>
+    /// <summary>
+    /// Каталог гео-баз (<c>geosite.dat</c>, <c>geoip.dat</c>): Xray читает его сам (<c>XRAY_LOCATION_ASSET</c>),
+    /// для sing-box категории читает <see cref="GeoRuleLoader"/>. <c>null</c> — баз нет, гео-правила не действуют.
+    /// </summary>
     public string? GeoDirectory { get; init; }
+
+    /// <summary>Маршрутизация (ROADMAP 3.5); у временных ядер теста задержки и у Xray в цепочке TUN — по умолчанию.</summary>
+    public RoutingPlan Routing { get; init; } = RoutingPlan.Default;
 }
 
 /// <summary>
@@ -81,6 +92,7 @@ public static class CoreLauncher
             : null;
 
         var log = CoreLogLevels.Plan(kind, options.LogLevel);
+        var routing = GeoRuleLoader.Prepare(options.Routing, options.GeoDirectory);
         var config = kind switch
         {
             CoreKind.Xray => XrayConfigGenerator.Generate(profile, new XrayConfigOptions
@@ -89,6 +101,8 @@ public static class CoreLauncher
                 HttpPort = ports[1],
                 MetricsPort = traffic?.Port,
                 LogLevel = log.Level,
+                Routing = routing.Plan,
+                RemoteDns = options.RemoteDns,
             }),
             CoreKind.SingBox => SingBoxConfigGenerator.Generate(profile, new SingBoxConfigOptions
             {
@@ -98,6 +112,8 @@ public static class CoreLauncher
                 Tun = options.Tun,
                 UpstreamSocksPort = options.UpstreamSocksPort,
                 RemoteDns = options.RemoteDns,
+                Routing = routing.Plan,
+                Geo = routing.Geo,
                 ClashApi = traffic is { Secret: { } secret } ? new ClashApiOptions(traffic.Port, secret) : null,
             }),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
@@ -126,7 +142,7 @@ public static class CoreLauncher
         try
         {
             var process = await CoreProcess.StartAsync(launch, new CoreLogBuffer(masker), guard, cancellationToken).ConfigureAwait(false);
-            return new CoreSession(kind, process, ports[0], ports[1], traffic);
+            return new CoreSession(kind, process, ports[0], ports[1], traffic) { MissingGeo = routing.Missing };
         }
         catch (CoreStartException ex) when (ex.Core is null)
         {
@@ -180,6 +196,9 @@ public sealed class CoreSession(CoreKind core, CoreProcess process, int socksPor
 
     /// <summary>Где читать счётчики трафика; <c>null</c> — запущено без них.</summary>
     public TrafficEndpoint? Traffic { get; } = traffic;
+
+    /// <summary>Категории гео-баз из правил, которых нет в базе: правила с ними не действуют (<see cref="PreparedRouting.Missing"/>).</summary>
+    public IReadOnlyList<string> MissingGeo { get; init; } = [];
 
     /// <summary>Счётчики с запуска ядра; <c>null</c> — выключены или ядро не ответило.</summary>
     public Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) =>

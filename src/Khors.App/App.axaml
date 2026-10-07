@@ -164,6 +164,12 @@
     <Style Selector="Button.icon-button:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource KhorsAccentBrush}" />
     </Style>
+    <Style Selector="Button.icon-button:disabled /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.icon-button:disabled Path.icon">
+      <Setter Property="Opacity" Value="0.3" />
+    </Style>
 
     <!-- Боковое меню -->
     <Style Selector="Button.nav">

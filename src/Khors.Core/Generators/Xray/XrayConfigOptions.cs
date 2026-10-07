@@ -1,3 +1,6 @@
+using Khors.Core.Dns;
+using Khors.Core.Routing;
+
 namespace Khors.Core.Generators.Xray;
 
 /// <summary>Параметры запуска, не относящиеся к профилю. Порты выбирает Khors.Engines (ROADMAP 1.4).</summary>
@@ -17,4 +20,13 @@ public sealed record XrayConfigOptions
     /// Порт счётчиков трафика (<c>metrics</c>: HTTP <c>/debug/vars</c> на loopback, без gRPC); <c>null</c> — выключены.
     /// </summary>
     public int? MetricsPort { get; init; }
+
+    /// <summary>
+    /// Маршрутизация (ROADMAP 3.5). В цепочке TUN → Xray и у временных ядер теста задержки — <see cref="RoutingPlan.Default"/>:
+    /// маршрутизирует sing-box, а замер идёт через сервер.
+    /// </summary>
+    public RoutingPlan Routing { get; init; } = RoutingPlan.Default;
+
+    /// <summary>DNS для правил по адресу (<see cref="RoutingPlan.HasAddressRules"/>): запросы идут через сервер.</summary>
+    public DnsServer RemoteDns { get; init; } = DnsPresets.Default.Server;
 }

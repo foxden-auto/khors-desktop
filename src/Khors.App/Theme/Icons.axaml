@@ -16,4 +16,6 @@
   <StreamGeometry x:Key="IconStar">M12 3 L14.7 8.6 L20.8 9.5 L16.4 13.8 L17.4 19.9 L12 17 L6.6 19.9 L7.6 13.8 L3.2 9.5 L9.3 8.6 Z</StreamGeometry>
   <StreamGeometry x:Key="IconSearch">M11 4 A7 7 0 1 1 11 18 A7 7 0 1 1 11 4 Z M20 20 L16 16</StreamGeometry>
   <StreamGeometry x:Key="IconClose">M6 6 L18 18 M18 6 L6 18</StreamGeometry>
+  <StreamGeometry x:Key="IconChevronUp">M6 15 L12 9 L18 15</StreamGeometry>
+  <StreamGeometry x:Key="IconChevronDown">M6 9 L12 15 L18 9</StreamGeometry>
 </ResourceDictionary>

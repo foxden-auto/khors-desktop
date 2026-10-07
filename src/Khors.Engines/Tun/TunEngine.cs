@@ -5,6 +5,7 @@ using Khors.Core.Dns;
 using Khors.Core.Generators;
 using Khors.Core.Generators.SingBox;
 using Khors.Core.Profiles;
+using Khors.Core.Routing;
 using Khors.Engines.Connection;
 using Khors.Engines.Diagnostics;
 using Khors.Engines.Processes;
@@ -34,13 +35,16 @@ public interface ITunRun : IAsyncDisposable
 
     /// <summary>Трафик через сервер: у цепочки — счётчики Xray, иначе — sing-box.</summary>
     Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) => Task.FromResult<TrafficCounters?>(null);
+
+    /// <summary>Категории гео-баз из правил, которых нет в базе службы: правила с ними не действуют.</summary>
+    IReadOnlyList<string> MissingGeo => [];
 }
 
 /// <summary>Запуск режима TUN (для тестов службы — подмена).</summary>
 public interface ITunStarter
 {
     /// <exception cref="CoreStartException">Ядро не запустилось или профиль не поддерживается.</exception>
-    Task<ITunRun> StartAsync(Profile profile, string logLevel, DnsServer remoteDns, CancellationToken cancellationToken);
+    Task<ITunRun> StartAsync(Profile profile, string logLevel, DnsServer remoteDns, RoutingSettings routing, CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -49,8 +53,10 @@ public interface ITunStarter
 /// чей выход — этот вход. Адрес сервера разрешается до подъёма TUN и подставляется в профиль Xray как IP
 /// (<see cref="ProfileAddress.WithResolvedHost"/>), а сам IP исключается из туннеля — иначе соединения Xray
 /// с сервером снова попали бы в TUN. Исполняемые файлы ядер — только из каталога службы (CLAUDE.md, правило 8).
+/// Маршрутизацию выполняет sing-box (у него адаптер TUN), Xray в цепочке просто ведёт трафик на сервер; гео-категории —
+/// из копии баз службы (<paramref name="geoDirectory"/>).
 /// </summary>
-public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : ITunStarter
+public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, string? geoDirectory = null) : ITunStarter
 {
     private static readonly TimeSpan s_resolveTimeout = TimeSpan.FromSeconds(10);
 
@@ -61,10 +67,11 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
     /// <summary>Разрешение имени сервера (для тестов — подмена).</summary>
     public Func<string, CancellationToken, Task<IPAddress[]>> Resolve { get; init; } = Dns.GetHostAddressesAsync;
 
-    public async Task<ITunRun> StartAsync(Profile profile, string logLevel, DnsServer remoteDns, CancellationToken cancellationToken)
+    public async Task<ITunRun> StartAsync(Profile profile, string logLevel, DnsServer remoteDns, RoutingSettings routing, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(profile);
         ArgumentNullException.ThrowIfNull(remoteDns);
+        ArgumentNullException.ThrowIfNull(routing);
         var choice = CoreSelection.Select(profile);
         if (choice.Unsupported is { } field)
         {
@@ -76,9 +83,13 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
         }
 
         var options = new CoreStartOptions { PreferredSocksPort = null, PreferredHttpPort = null, LogLevel = logLevel, RemoteDns = remoteDns };
+        var plan = RoutingPlan.Build(routing, tun: true);
         if (choice.Core == CoreKind.SingBox)
         {
-            var singBox = await StartSingBoxAsync(profile, options with { Tun = new SingBoxTunOptions(), TrafficStats = true, ReadyTimeout = s_tunReadyTimeout }, cancellationToken).ConfigureAwait(false);
+            var singBox = await StartSingBoxAsync(
+                profile,
+                options with { Tun = new SingBoxTunOptions(), TrafficStats = true, ReadyTimeout = s_tunReadyTimeout, Routing = plan, GeoDirectory = geoDirectory },
+                cancellationToken).ConfigureAwait(false);
             return new TunRun(CoreKind.SingBox, singBox, chained: null);
         }
 
@@ -92,6 +103,8 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
                 Tun = new SingBoxTunOptions { ExcludeAddresses = [server.ToString()] },
                 UpstreamSocksPort = xray.SocksPort,
                 ReadyTimeout = s_tunReadyTimeout,
+                Routing = plan,
+                GeoDirectory = geoDirectory,
             };
             var singBox = await StartSingBoxAsync(resolved, tunOptions, cancellationToken).ConfigureAwait(false);
             return new TunRun(CoreKind.Xray, singBox, xray);
@@ -187,6 +200,8 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard) : 
 
         public Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) =>
             (_chained ?? _singBox).ReadTrafficAsync(cancellationToken);
+
+        public IReadOnlyList<string> MissingGeo => _singBox.MissingGeo;
 
         public IReadOnlyList<string> Tail(int count) =>
             [.. Sessions.SelectMany(s => s.Process.Log.Snapshot()).OrderBy(l => l.Time).TakeLast(count).Select(l => l.Text)];

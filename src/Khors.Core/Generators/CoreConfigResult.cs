@@ -41,4 +41,7 @@ public enum CoreConfigErrorCode
 
     /// <summary>Возможность профиля не поддерживается этим ядром.</summary>
     UnsupportedFeature,
+
+    /// <summary>Категории правила маршрутизации нет в гео-базе (поле — <c>geosite:код</c> или <c>geoip:код</c>).</summary>
+    GeoCategoryMissing,
 }

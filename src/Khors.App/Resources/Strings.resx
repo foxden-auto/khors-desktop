@@ -19,6 +19,7 @@
   <data name="AutoWaiting" xml:space="preserve"><value>No server responds right now — Auto will try again at the next check.</value></data>
   <data name="AutoWaitingShort" xml:space="preserve"><value>No server responds right now</value></data>
   <data name="ButtonAdd" xml:space="preserve"><value>Add</value></data>
+  <data name="ButtonAddRule" xml:space="preserve"><value>Add rule</value></data>
   <data name="ButtonClose" xml:space="preserve"><value>Close</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Connect</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Copy the whole log</value></data>
@@ -27,6 +28,7 @@
   <data name="ButtonDisconnect" xml:space="preserve"><value>Disconnect</value></data>
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Paste from clipboard</value></data>
   <data name="ButtonInstallService" xml:space="preserve"><value>Install</value></data>
+  <data name="ButtonReconnect" xml:space="preserve"><value>Reconnect</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Latency</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Update</value></data>
   <data name="ButtonUpdateGeo" xml:space="preserve"><value>Update now</value></data>
@@ -77,6 +79,7 @@
   <data name="FileTooLarge" xml:space="preserve"><value>The file is larger than 5 MB — it is not a config or a QR code image.</value></data>
   <data name="FileTypeImportable" xml:space="preserve"><value>QR code images, links and configs</value></data>
   <data name="GeoAutoUpdateOption" xml:space="preserve"><value>Check for updates once a day</value></data>
+  <data name="GeoCategoryMissingFormat" xml:space="preserve"><value>the geo database has no category {0}</value></data>
   <data name="GeoError_ChecksumMismatch" xml:space="preserve"><value>The file did not match its checksum and was not installed; the previous one is kept.</value></data>
   <data name="GeoError_HttpError" xml:space="preserve"><value>Download failed: the server returned an error.</value></data>
   <data name="GeoError_Invalid" xml:space="preserve"><value>The file is damaged or incomplete and was not installed; the previous one is kept.</value></data>
@@ -195,6 +198,46 @@
   <data name="QrWindowTitle" xml:space="preserve"><value>Profile QR code</value></data>
   <data name="RateKbFormat" xml:space="preserve"><value>{0:0} KB/s</value></data>
   <data name="RateMbFormat" xml:space="preserve"><value>{0:0.#} MB/s</value></data>
+  <data name="RoutingBypassLan" xml:space="preserve"><value>Local network direct (router, printers, shared folders)</value></data>
+  <data name="RoutingError_Duplicate" xml:space="preserve"><value>This rule already exists.</value></data>
+  <data name="RoutingError_InvalidAddress" xml:space="preserve"><value>Enter an IP address or a subnet whose address has no bits beyond the mask, for example 203.0.113.0/24.</value></data>
+  <data name="RoutingError_InvalidDomain" xml:space="preserve"><value>This is not a site name. Enter a name without https:// and a path, for example example.com.</value></data>
+  <data name="RoutingError_InvalidGeoCode" xml:space="preserve"><value>A category code is Latin letters, digits and hyphens without “geosite:”/“geoip:”, for example category-ru.</value></data>
+  <data name="RoutingError_InvalidKeyword" xml:space="preserve"><value>A keyword has no spaces or quotes: letters, digits, dot, hyphen.</value></data>
+  <data name="RoutingError_InvalidProcess" xml:space="preserve"><value>Enter the program file name (firefox.exe) or its full path, without quotes or wildcards.</value></data>
+  <data name="RoutingError_UnknownCategoryFormat" xml:space="preserve"><value>The downloaded geo database has no category “{0}”.</value></data>
+  <data name="RoutingMissingGeoFormat" xml:space="preserve"><value>Some routing rules are not in effect: the geo database has no {0}. Update the geo databases in Settings.</value></data>
+  <data name="RoutingNoGeoWarning" xml:space="preserve"><value>The geo databases are not downloaded yet — the rule will work once they are.</value></data>
+  <data name="RoutingPresetAll" xml:space="preserve"><value>All traffic through VPN</value></data>
+  <data name="RoutingPresetAllHint" xml:space="preserve"><value>Only the local network (if enabled below) and your rules go direct.</value></data>
+  <data name="RoutingPresetApps" xml:space="preserve"><value>Selected apps only</value></data>
+  <data name="RoutingPresetAppsHint" xml:space="preserve"><value>TUN mode only: programs from “Process → Through server” rules go through the server, everything else direct. In system proxy mode it works as “All traffic through VPN”.</value></data>
+  <data name="RoutingPresetRussia" xml:space="preserve"><value>Bypass for Russia</value></data>
+  <data name="RoutingPresetRussiaHint" xml:space="preserve"><value>Russian sites (the .ru, .su and .рф zones and the v2fly category-ru list) and Russian IP addresses go direct, everything else through the server. Needs the geo databases (the Geo databases section below).</value></data>
+  <data name="RoutingReconnectHint" xml:space="preserve"><value>Routing has changed — it takes effect after reconnecting.</value></data>
+  <data name="RoutingRulesEmpty" xml:space="preserve"><value>No rules yet.</value></data>
+  <data name="RoutingRulesHeader" xml:space="preserve"><value>Your rules</value></data>
+  <data name="RoutingRulesHint" xml:space="preserve"><value>Checked top to bottom before the preset; the first match wins.</value></data>
+  <data name="RuleAction_Block" xml:space="preserve"><value>Block</value></data>
+  <data name="RuleAction_Direct" xml:space="preserve"><value>Direct</value></data>
+  <data name="RuleAction_Proxy" xml:space="preserve"><value>Through server</value></data>
+  <data name="RuleMatch_Domain" xml:space="preserve"><value>Domain</value></data>
+  <data name="RuleMatch_DomainKeyword" xml:space="preserve"><value>Keyword in name</value></data>
+  <data name="RuleMatch_DomainSuffix" xml:space="preserve"><value>Domain and subdomains</value></data>
+  <data name="RuleMatch_GeoIp" xml:space="preserve"><value>IP country (geoip)</value></data>
+  <data name="RuleMatch_GeoSite" xml:space="preserve"><value>Site category (geosite)</value></data>
+  <data name="RuleMatch_IpCidr" xml:space="preserve"><value>IP or subnet</value></data>
+  <data name="RuleMatch_Process" xml:space="preserve"><value>Process (TUN only)</value></data>
+  <data name="RuleMoveDown" xml:space="preserve"><value>Move down</value></data>
+  <data name="RuleMoveUp" xml:space="preserve"><value>Move up</value></data>
+  <data name="RulePlaceholder_Domain" xml:space="preserve"><value>www.example.com</value></data>
+  <data name="RulePlaceholder_DomainKeyword" xml:space="preserve"><value>for example, ads</value></data>
+  <data name="RulePlaceholder_DomainSuffix" xml:space="preserve"><value>example.com</value></data>
+  <data name="RulePlaceholder_GeoIp" xml:space="preserve"><value>ru, private, !ru</value></data>
+  <data name="RulePlaceholder_GeoSite" xml:space="preserve"><value>category-ru, google, google@cn</value></data>
+  <data name="RulePlaceholder_IpCidr" xml:space="preserve"><value>203.0.113.0/24 or 2001:db8::/32</value></data>
+  <data name="RulePlaceholder_Process" xml:space="preserve"><value>firefox.exe or the full path to the program</value></data>
+  <data name="RuleRemove" xml:space="preserve"><value>Remove rule</value></data>
   <data name="ScreenCaptureFailed" xml:space="preserve"><value>Could not capture the screen.</value></data>
   <data name="ScreenNoQr" xml:space="preserve"><value>No QR code was found on the screen. Open the image with the code on top of other windows and try again.</value></data>
   <data name="SearchNoResults" xml:space="preserve"><value>Nothing found</value></data>
@@ -236,6 +279,8 @@
   <data name="SettingsModeHeader" xml:space="preserve"><value>Connection mode</value></data>
   <data name="SettingsModeHint" xml:space="preserve"><value>The mode can be changed while disconnected. TUN requires the KHORS service.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Server list</value></data>
+  <data name="SettingsRoutingHeader" xml:space="preserve"><value>Routing</value></data>
+  <data name="SettingsRoutingHint" xml:space="preserve"><value>What goes through the server and what goes direct. Works in both modes; changes apply from the next connection.</value></data>
   <data name="SettingsServiceHeader" xml:space="preserve"><value>KHORS service</value></data>
   <data name="SettingsServiceHint" xml:space="preserve"><value>Needed only for TUN mode: it creates the network adapter and routes. Installed once; Windows will ask for administrator rights.</value></data>
   <data name="ShowLogLink" xml:space="preserve"><value>Details in the log</value></data>

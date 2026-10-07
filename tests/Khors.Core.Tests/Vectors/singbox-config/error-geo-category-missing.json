@@ -1,0 +1,50 @@
+{
+  "description": "Категории правила нет в гео-базе — конфиг не строится",
+  "link": "hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com",
+  "options": {
+    "socksPort": 20808,
+    "httpPort": 20809
+  },
+  "routing": {
+    "rules": [
+      {
+        "match": "GeoSite",
+        "value": "no-such-category",
+        "action": "Direct"
+      }
+    ]
+  },
+  "geo": {
+    "sites": {
+      "category-ru": [
+        "domain:ru",
+        "domain:su",
+        "domain:xn--p1ai",
+        "full:www.example.ru",
+        "keyword:exampleru",
+        "regexp:^.+\\.example\\.su$"
+      ],
+      "example": [
+        "domain:example.com@ads",
+        "full:cdn.example.com@cn,ads",
+        "domain:example.net"
+      ]
+    },
+    "ips": {
+      "ru": [
+        "203.0.113.0/24",
+        "2001:db8::/32"
+      ],
+      "!not-ru": [
+        "198.51.100.0/24"
+      ],
+      "private": [
+        "10.0.0.0/8"
+      ]
+    }
+  },
+  "error": {
+    "code": "GeoCategoryMissing",
+    "field": "geosite:no-such-category"
+  }
+}

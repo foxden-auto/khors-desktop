@@ -5,11 +5,11 @@ namespace Khors.Ipc;
 
 /// <summary>
 /// Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений (2 — команды TUN, 3 — счётчики трафика TUN,
-/// 4 — удалённый DNS, 5 — гео-базы службы).
+/// 4 — удалённый DNS, 5 — гео-базы службы, 6 — маршрутизация).
 /// </summary>
 public static class IpcProtocol
 {
-    public const int Version = 5;
+    public const int Version = 6;
 }
 
 /// <summary>
@@ -77,7 +77,9 @@ public sealed record OkResponse : IpcPayload;
 /// <param name="LogLevel">Уровень лога ядер: debug, info, warning, error, none.</param>
 /// <param name="RemoteDns">Удалённый DNS в текстовой форме <c>DnsServer</c> (служба разбирает и проверяет сама);
 /// <c>null</c> — по умолчанию.</param>
-public sealed record StartTunRequest(string Profile, string LogLevel, string? RemoteDns = null) : IpcPayload
+/// <param name="Routing">Маршрутизация — JSON модели (<c>StorageJson.SerializeRouting</c>); служба разбирает её сама и берёт
+/// категории из своей копии гео-баз. <c>null</c> — по умолчанию.</param>
+public sealed record StartTunRequest(string Profile, string LogLevel, string? RemoteDns = null, string? Routing = null) : IpcPayload
 {
     // Профиль содержит ключи доступа — в журнал не выводим.
     public override string ToString() => $"StartTunRequest {{ LogLevel = {LogLevel}, RemoteDns = {RemoteDns} }}";
@@ -91,7 +93,8 @@ public enum IpcCore
 
 /// <param name="Core">Ядро профиля (Xray — цепочка TUN → Xray).</param>
 /// <param name="SocksPort">Локальные входы sing-box на 127.0.0.1 — для теста задержки.</param>
-public sealed record TunStartedResponse(IpcCore Core, int SocksPort, int HttpPort) : IpcPayload;
+/// <param name="MissingGeo">Категории гео-баз из правил, которых нет в базе службы (<c>geosite:код</c>, <c>geoip:код</c>).</param>
+public sealed record TunStartedResponse(IpcCore Core, int SocksPort, int HttpPort, IReadOnlyList<string>? MissingGeo = null) : IpcPayload;
 
 public enum IpcTunFailure
 {

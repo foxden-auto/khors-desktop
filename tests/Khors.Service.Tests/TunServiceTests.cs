@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using Khors.Core.Dns;
 using Khors.Core.Generators;
 using Khors.Core.Profiles;
+using Khors.Core.Routing;
 using Khors.Core.Storage;
 using Khors.Engines;
 using Khors.Engines.Connection;
@@ -27,15 +28,21 @@ internal sealed class FakeTunStarter : ITunStarter
 
     public DnsServer? LastRemoteDns { get; private set; }
 
-    public Task<ITunRun> StartAsync(Profile profile, string logLevel, DnsServer remoteDns, CancellationToken cancellationToken)
+    public RoutingSettings? LastRouting { get; private set; }
+
+    /// <summary>Что вернёт <see cref="FakeTunRun.MissingGeo"/> следующего запуска.</summary>
+    public IReadOnlyList<string> MissingGeo { get; set; } = [];
+
+    public Task<ITunRun> StartAsync(Profile profile, string logLevel, DnsServer remoteDns, RoutingSettings routing, CancellationToken cancellationToken)
     {
         LastRemoteDns = remoteDns;
+        LastRouting = routing;
         if (FailWith is not null)
         {
             throw FailWith;
         }
 
-        var run = new FakeTunRun(CoreSelection.For(profile));
+        var run = new FakeTunRun(CoreSelection.For(profile)) { MissingGeo = MissingGeo };
         Runs.Enqueue(run);
         return Task.FromResult<ITunRun>(run);
     }
@@ -59,6 +66,8 @@ internal sealed class FakeTunRun(CoreKind core) : ITunRun
     public bool Disposed { get; private set; }
 
     public TrafficCounters? Traffic { get; set; }
+
+    public IReadOnlyList<string> MissingGeo { get; init; } = [];
 
     public Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) => Task.FromResult(Traffic);
 
@@ -139,6 +148,48 @@ public sealed class TunServiceTests : IAsyncDisposable
         Assert.IsType<TunStartedResponse>(await client.RequestAsync(new StartTunRequest(Hysteria2Json(), "warning", remoteDns), Ct));
 
         Assert.Equal(expected, _starter.LastRemoteDns?.ToString());
+    }
+
+    [Fact]
+    public async Task RoutingReachesStarterAndMissingGeoComesBack()
+    {
+        var routing = new RoutingSettings(
+            RoutingPreset.BypassRussia,
+            BypassLan: false,
+            new([new RoutingRule(RuleMatch.Process, "firefox.exe", RuleAction.Proxy)]));
+        _starter.MissingGeo = ["geosite:category-ru", "geoip:ru"];
+        var (client, _) = await ConnectAsync();
+
+        var answer = await client.RequestAsync(new StartTunRequest(Hysteria2Json(), "warning", Routing: StorageJson.SerializeRouting(routing)), Ct);
+
+        Assert.Equal(routing, _starter.LastRouting);
+        Assert.Equal(["geosite:category-ru", "geoip:ru"], Assert.IsType<TunStartedResponse>(answer).MissingGeo);
+    }
+
+    [Fact]
+    public async Task WithoutRoutingDefaultIsUsed()
+    {
+        var (client, _) = await ConnectAsync();
+
+        var answer = Assert.IsType<TunStartedResponse>(await client.RequestAsync(new StartTunRequest(Hysteria2Json(), "warning"), Ct));
+
+        Assert.Equal(new RoutingSettings(), _starter.LastRouting);
+        Assert.Null(answer.MissingGeo);
+    }
+
+    [Theory]
+    [InlineData("not json")]
+    [InlineData("[]")]
+    [InlineData("""{"preset": "Everything"}""")]
+    [InlineData("""{"rules": [{"match": "Shell", "value": "calc.exe", "action": "Direct"}]}""")]
+    public async Task BadRoutingIsRejected(string routing)
+    {
+        var (client, _) = await ConnectAsync();
+
+        var answer = await client.RequestAsync(new StartTunRequest(Hysteria2Json(), "warning", Routing: routing), Ct);
+
+        Assert.Equal(new ErrorResponse(IpcErrorCode.BadRequest), answer);
+        Assert.Empty(_starter.Runs);
     }
 
     [Theory]

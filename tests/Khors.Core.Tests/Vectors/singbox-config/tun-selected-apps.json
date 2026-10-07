@@ -1,0 +1,141 @@
+{
+  "description": "Только выбранные приложения (TUN): остальное напрямую, процессы по имени и по пути, без обхода локальной сети",
+  "link": "tuic://5e8d1a3c-2b4f-4c6d-8e9f-0a1b2c3d4e5f:TuicPa55@tuic.example.com:443?congestion_control=bbr&alpn=h3&sni=tuic.example.com#TUIC",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809,
+    "tun": {}
+  },
+  "routing": {
+    "preset": "SelectedApps",
+    "bypassLan": false,
+    "rules": [
+      {
+        "match": "Process",
+        "value": "firefox.exe",
+        "action": "Proxy"
+      },
+      {
+        "match": "Process",
+        "value": "C:\\Program Files\\Example\\example.exe",
+        "action": "Proxy"
+      },
+      {
+        "match": "Domain",
+        "value": "update.example.com",
+        "action": "Block"
+      }
+    ]
+  },
+  "expected": {
+    "log": {
+      "level": "warn",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        },
+        {
+          "type": "https",
+          "tag": "remote",
+          "server": "1.1.1.1",
+          "detour": "proxy"
+        }
+      ],
+      "strategy": "ipv4_only",
+      "final": "remote"
+    },
+    "inbounds": [
+      {
+        "type": "tun",
+        "tag": "tun-in",
+        "interface_name": "KHORS",
+        "address": [
+          "198.19.75.1/30",
+          "fd4b:6873:72b5::1/126"
+        ],
+        "mtu": 9000,
+        "auto_route": true,
+        "strict_route": true
+      },
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "tuic",
+        "tag": "proxy",
+        "server": "tuic.example.com",
+        "server_port": 443,
+        "uuid": "5e8d1a3c-2b4f-4c6d-8e9f-0a1b2c3d4e5f",
+        "password": "TuicPa55",
+        "congestion_control": "bbr",
+        "udp_relay_mode": "native",
+        "tls": {
+          "enabled": true,
+          "server_name": "tuic.example.com",
+          "alpn": [
+            "h3"
+          ]
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "protocol": "dns",
+          "action": "hijack-dns"
+        },
+        {
+          "ip_cidr": [
+            "127.0.0.0/8",
+            "::1/128"
+          ],
+          "outbound": "direct"
+        },
+        {
+          "process_name": [
+            "firefox.exe"
+          ],
+          "outbound": "proxy"
+        },
+        {
+          "process_path": [
+            "C:\\Program Files\\Example\\example.exe"
+          ],
+          "outbound": "proxy"
+        },
+        {
+          "domain": [
+            "update.example.com"
+          ],
+          "action": "reject"
+        }
+      ],
+      "find_process": true,
+      "final": "direct",
+      "default_domain_resolver": "local",
+      "auto_detect_interface": true
+    }
+  }
+}

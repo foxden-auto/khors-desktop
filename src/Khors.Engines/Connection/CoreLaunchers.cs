@@ -3,6 +3,7 @@ using Khors.Core.Dns;
 using Khors.Core.Generators.SingBox;
 using Khors.Core.Generators.Xray;
 using Khors.Core.Profiles;
+using Khors.Core.Routing;
 using Khors.Core.Storage;
 using Khors.Engines.Processes;
 using Khors.Engines.Traffic;
@@ -77,6 +78,7 @@ public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildP
             TrafficStats = preferences.TrafficStats,
             RemoteDns = DnsPresets.ServerOrDefault(preferences.RemoteDns),
             GeoDirectory = geoDirectory,
+            Routing = preferences.Routing is { } routing ? RoutingPlan.Build(routing, tun: false) : RoutingPlan.Default,
         };
 
         var session = await CoreLauncher.StartAsync(kind, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);
@@ -98,6 +100,8 @@ public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildP
         public Task StopAsync(CancellationToken cancellationToken = default) => session.StopAsync(cancellationToken);
 
         public Task<TrafficCounters?> ReadTrafficAsync(CancellationToken cancellationToken = default) => session.ReadTrafficAsync(cancellationToken);
+
+        public IReadOnlyList<string> MissingGeo => session.MissingGeo;
 
         public ValueTask DisposeAsync() => session.DisposeAsync();
     }

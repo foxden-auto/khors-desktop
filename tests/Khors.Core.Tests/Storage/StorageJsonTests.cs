@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Khors.Core.Profiles;
+using Khors.Core.Routing;
 using Khors.Core.Storage;
 using Khors.Core.Tests.Profiles;
 using Xunit;
@@ -117,6 +118,27 @@ public partial class StorageJsonTests
         var settings = new AppSettings(SelectedProfileId: Guid.Parse("0f8e7d6c-5b4a-4392-8170-6f5e4d3c2b1a"), HttpPort: 20809, Language: "en");
 
         Assert.Equal(settings, StorageJson.ParseSettings(StorageJson.SerializeSettings(settings)).Value);
+    }
+
+    [Fact]
+    public void RoutingSettingsRoundTrip()
+    {
+        var settings = new AppSettings
+        {
+            Routing = new RoutingSettings(
+                RoutingPreset.BypassRussia,
+                BypassLan: false,
+                new([
+                    new RoutingRule(RuleMatch.DomainSuffix, "example.org", RuleAction.Proxy),
+                    new RoutingRule(RuleMatch.Process, @"C:\Program Files\Example\app.exe", RuleAction.Direct),
+                ])),
+        };
+
+        var json = StorageJson.SerializeSettings(settings);
+
+        Assert.Contains("\"preset\": \"BypassRussia\"", json, StringComparison.Ordinal);
+        Assert.Contains("\"match\": \"DomainSuffix\"", json, StringComparison.Ordinal);
+        Assert.Equal(settings, StorageJson.ParseSettings(json).Value);
     }
 
     [Fact]

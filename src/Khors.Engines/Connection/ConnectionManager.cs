@@ -91,7 +91,8 @@ public sealed class ConnectionManager : IAsyncDisposable
                 if (_systemProxy is not null && preferences.Mode == ConnectionMode.SystemProxy)
                 {
                     _ensureWatchdog?.Invoke();
-                    _systemProxy.Enable(SystemProxySettings.ForLocalHttp(session.HttpPort));
+                    // Снятый «Обход локальной сети» — частные сети тоже идут в ядро, иначе Windows отправила бы их мимо прокси.
+                    _systemProxy.Enable(SystemProxySettings.ForLocalHttp(session.HttpPort, preferences.Routing?.BypassLan ?? true));
                 }
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
@@ -103,7 +104,7 @@ public sealed class ConnectionManager : IAsyncDisposable
             }
 
             Volatile.Write(ref _session, session);
-            SetStatus(new ConnectionStatus(ConnectionState.Connected, profile, session.SocksPort, session.HttpPort, _time.GetUtcNow(), Core: session.Core));
+            SetStatus(new ConnectionStatus(ConnectionState.Connected, profile, session.SocksPort, session.HttpPort, _time.GetUtcNow(), Core: session.Core, MissingGeo: new EquatableArray<string>(session.MissingGeo)));
             WatchForProblems(session);
             _ = WatchForCrashAsync(session);
         }

@@ -5,6 +5,7 @@ using System.Text;
 using Khors.Core.Diagnostics;
 using Khors.Core.Dns;
 using Khors.Core.Profiles;
+using Khors.Core.Routing;
 using Khors.Engines.Diagnostics;
 using Khors.Engines.Processes;
 using Khors.Engines.Tun;
@@ -59,7 +60,7 @@ public class TunEngineTests
         RequireUnprivilegedWithCores();
         var engine = new TunEngine(s_masker, guard: null);
 
-        var error = await Assert.ThrowsAsync<CoreStartException>(() => engine.StartAsync(Hysteria2(), "warning", DnsPresets.Default.Server, Ct));
+        var error = await Assert.ThrowsAsync<CoreStartException>(() => engine.StartAsync(Hysteria2(), "warning", DnsPresets.Default.Server, new RoutingSettings(), Ct));
 
         Assert.Equal(CoreStartFailure.ExitedDuringStart, error.Failure);
         Assert.Equal(CoreKind.SingBox, error.Core);
@@ -76,7 +77,7 @@ public class TunEngineTests
             Resolve = (_, _) => Task.FromResult(new[] { IPAddress.Parse("203.0.113.10") }),
         };
 
-        var error = await Assert.ThrowsAsync<CoreStartException>(() => engine.StartAsync(VlessReality(), "warning", DnsPresets.Default.Server, Ct));
+        var error = await Assert.ThrowsAsync<CoreStartException>(() => engine.StartAsync(VlessReality(), "warning", DnsPresets.Default.Server, new RoutingSettings(), Ct));
 
         Assert.Equal(CoreKind.SingBox, error.Core);
         Assert.Equal(2, guard.ProcessIds.Count);
@@ -93,7 +94,7 @@ public class TunEngineTests
             Resolve = (_, _) => Task.FromException<IPAddress[]>(new System.Net.Sockets.SocketException(11001)),
         };
 
-        var error = await Assert.ThrowsAsync<CoreStartException>(() => engine.StartAsync(VlessReality(), "warning", DnsPresets.Default.Server, Ct));
+        var error = await Assert.ThrowsAsync<CoreStartException>(() => engine.StartAsync(VlessReality(), "warning", DnsPresets.Default.Server, new RoutingSettings(), Ct));
 
         Assert.Equal(new CoreDiagnosis(CoreProblem.ServerNotFound, CoreKind.Xray), error.Diagnosis);
     }

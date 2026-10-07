@@ -1,0 +1,263 @@
+{
+  "description": "TUN → Xray с обходом для России: прямой DNS по DHCP для имён «напрямую», правила DNS повторяют маршрут; geoip с обратной записью и отрицанием",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@203.0.113.10:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.example.org&fp=firefox&pbk=Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM&sid=6ba85179e30d4fc2&spx=%2F&type=tcp&headerType=none#Routing",
+  "core": "xray",
+  "options": {
+    "socksPort": 10808,
+    "httpPort": 10809,
+    "upstreamSocksPort": 20808,
+    "tun": {
+      "excludeAddresses": [
+        "203.0.113.10"
+      ]
+    }
+  },
+  "routing": {
+    "preset": "BypassRussia",
+    "rules": [
+      {
+        "match": "DomainSuffix",
+        "value": "news.example.ru",
+        "action": "Proxy"
+      },
+      {
+        "match": "GeoIp",
+        "value": "not-ru",
+        "action": "Proxy"
+      },
+      {
+        "match": "GeoIp",
+        "value": "!private",
+        "action": "Proxy"
+      }
+    ]
+  },
+  "geo": {
+    "sites": {
+      "category-ru": [
+        "domain:ru",
+        "domain:su",
+        "domain:xn--p1ai",
+        "full:www.example.ru",
+        "keyword:exampleru",
+        "regexp:^.+\\.example\\.su$"
+      ],
+      "example": [
+        "domain:example.com@ads",
+        "full:cdn.example.com@cn,ads",
+        "domain:example.net"
+      ]
+    },
+    "ips": {
+      "ru": [
+        "203.0.113.0/24",
+        "2001:db8::/32"
+      ],
+      "!not-ru": [
+        "198.51.100.0/24"
+      ],
+      "private": [
+        "10.0.0.0/8"
+      ]
+    }
+  },
+  "expected": {
+    "log": {
+      "level": "warn",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        },
+        {
+          "type": "https",
+          "tag": "remote",
+          "server": "1.1.1.1",
+          "detour": "proxy"
+        },
+        {
+          "type": "dhcp",
+          "tag": "direct-dns"
+        }
+      ],
+      "final": "remote",
+      "strategy": "ipv4_only",
+      "rules": [
+        {
+          "domain_suffix": [
+            "news.example.ru"
+          ],
+          "server": "remote"
+        },
+        {
+          "rule_set": [
+            "geosite-category-ru"
+          ],
+          "server": "direct-dns"
+        }
+      ]
+    },
+    "inbounds": [
+      {
+        "type": "tun",
+        "tag": "tun-in",
+        "interface_name": "KHORS",
+        "address": [
+          "198.19.75.1/30",
+          "fd4b:6873:72b5::1/126"
+        ],
+        "mtu": 9000,
+        "auto_route": true,
+        "strict_route": true,
+        "route_exclude_address": [
+          "203.0.113.10/32"
+        ]
+      },
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 10809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "socks",
+        "tag": "proxy",
+        "server": "127.0.0.1",
+        "server_port": 20808,
+        "version": "5"
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "protocol": "dns",
+          "action": "hijack-dns"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        },
+        {
+          "domain_suffix": [
+            "news.example.ru"
+          ],
+          "outbound": "proxy"
+        },
+        {
+          "inbound": [
+            "socks-in",
+            "http-in"
+          ],
+          "action": "resolve",
+          "server": "remote",
+          "strategy": "ipv4_only"
+        },
+        {
+          "rule_set": [
+            "geoip-not-ru"
+          ],
+          "outbound": "proxy"
+        },
+        {
+          "rule_set": [
+            "geoip-!private"
+          ],
+          "outbound": "proxy"
+        },
+        {
+          "rule_set": [
+            "geosite-category-ru"
+          ],
+          "outbound": "direct"
+        },
+        {
+          "rule_set": [
+            "geoip-ru"
+          ],
+          "outbound": "direct"
+        }
+      ],
+      "rule_set": [
+        {
+          "type": "inline",
+          "tag": "geoip-not-ru",
+          "rules": [
+            {
+              "ip_cidr": [
+                "198.51.100.0/24"
+              ],
+              "invert": true
+            }
+          ]
+        },
+        {
+          "type": "inline",
+          "tag": "geoip-!private",
+          "rules": [
+            {
+              "ip_cidr": [
+                "10.0.0.0/8"
+              ],
+              "invert": true
+            }
+          ]
+        },
+        {
+          "type": "inline",
+          "tag": "geosite-category-ru",
+          "rules": [
+            {
+              "domain": [
+                "www.example.ru"
+              ],
+              "domain_suffix": [
+                "ru",
+                "su",
+                "xn--p1ai"
+              ],
+              "domain_keyword": [
+                "exampleru"
+              ],
+              "domain_regex": [
+                "^.+\\.example\\.su$"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "inline",
+          "tag": "geoip-ru",
+          "rules": [
+            {
+              "ip_cidr": [
+                "203.0.113.0/24",
+                "2001:db8::/32"
+              ]
+            }
+          ]
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local",
+      "auto_detect_interface": true
+    }
+  }
+}

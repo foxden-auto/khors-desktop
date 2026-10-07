@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using Khors.Core.Geo;
 using Xunit;
+using static Khors.Core.Tests.Geo.GeoFiles;
 
 namespace Khors.Core.Tests.Geo;
 
@@ -103,38 +104,5 @@ public class GeoDatabaseTests
             _ = GeoIpDatabase.ReadCategory(data, "ru");
             _ = GeoSiteDatabase.ReadCategory(data, "ru");
         });
-    }
-
-    // Сборка файлов в формате protobuf (только то, что нужно тестам).
-    private static byte[] GeoSiteFile(params byte[][] sites) => [.. sites.SelectMany(s => Field(1, s))];
-
-    private static byte[] Site(string code, params byte[][] domains) => [.. Field(1, Encoding.UTF8.GetBytes(code)), .. domains.SelectMany(d => Field(2, d))];
-
-    private static byte[] Domain(int type, string value, params string[] attributes) =>
-        [.. Varint(1, (ulong)type), .. Field(2, Encoding.UTF8.GetBytes(value)), .. attributes.SelectMany(a => Field(3, [.. Field(1, Encoding.UTF8.GetBytes(a)), .. Varint(2, 1)]))];
-
-    private static byte[] GeoIpFile(params byte[][] entries) => [.. entries.SelectMany(e => Field(1, e))];
-
-    private static byte[] Ip(string code, bool reverse, params byte[][] cidrs) =>
-        [.. Field(1, Encoding.UTF8.GetBytes(code)), .. cidrs.SelectMany(c => Field(2, c)), .. (reverse ? Varint(3, 1) : [])];
-
-    private static byte[] Cidr(byte[] ip, int prefix) => [.. Field(1, ip), .. Varint(2, (ulong)prefix)];
-
-    private static byte[] Field(int number, byte[] payload) => [.. VarintBytes((ulong)(number << 3 | 2)), .. VarintBytes((ulong)payload.Length), .. payload];
-
-    private static byte[] Varint(int number, ulong value) => [.. VarintBytes((ulong)(number << 3)), .. VarintBytes(value)];
-
-    private static byte[] VarintBytes(ulong value)
-    {
-        var bytes = new List<byte>();
-        do
-        {
-            var b = (byte)(value & 0x7F);
-            value >>= 7;
-            bytes.Add(value == 0 ? b : (byte)(b | 0x80));
-        }
-        while (value != 0);
-
-        return [.. bytes];
     }
 }

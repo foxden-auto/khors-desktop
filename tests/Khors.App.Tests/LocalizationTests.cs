@@ -95,6 +95,22 @@ public class LocalizationTests
                 keys.Add($"DnsKind_{type}");
             }
 
+            foreach (var match in Enum.GetNames<Khors.Core.Routing.RuleMatch>())
+            {
+                keys.Add($"RuleMatch_{match}");
+                keys.Add($"RulePlaceholder_{match}");
+            }
+
+            foreach (var action in Enum.GetNames<Khors.Core.Routing.RuleAction>())
+            {
+                keys.Add($"RuleAction_{action}");
+            }
+
+            foreach (var error in Enum.GetNames<Khors.Core.Routing.RoutingRuleError>().Where(e => e != "Empty"))
+            {
+                keys.Add($"RoutingError_{error}");
+            }
+
             keys.Add("ServiceSetup_Cancelled");
             keys.Add("ServiceSetup_SetupNotFound");
             keys.Add("Problem_RealityRejected_SingBox");

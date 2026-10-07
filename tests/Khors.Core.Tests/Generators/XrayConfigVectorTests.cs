@@ -3,18 +3,21 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Nodes;
 using Khors.Core.Diagnostics;
+using Khors.Core.Dns;
 using Khors.Core.Generators;
 using Khors.Core.Generators.Xray;
 using Khors.Core.Import;
 using Khors.Core.Profiles;
+using Khors.Core.Tests.Geo;
 using Xunit;
 
 namespace Khors.Core.Tests.Generators;
 
 /// <summary>
 /// Снапшоты конфигов Xray: <c>Vectors/xray/*.json</c> — ссылка (+ <c>core</c>, <c>mux</c>), параметры запуска
-/// и ожидаемый конфиг (<c>expected</c>) или ошибка (<c>error</c>). Каждый ожидаемый конфиг дополнительно
-/// проверяется настоящим Xray (<c>xray run -test</c>), если ядро скачано в <c>cores/</c>.
+/// (<c>remoteDns</c>), маршрутизация (<c>routing</c>, <see cref="RoutingVector"/>) с гео-базами (<c>geo</c>,
+/// <see cref="GeoFiles.FromVector"/>) и ожидаемый конфиг (<c>expected</c>) или ошибка (<c>error</c>). Каждый ожидаемый
+/// конфиг дополнительно проверяется настоящим Xray (<c>xray run -test</c>, базы — из вектора), если ядро скачано в <c>cores/</c>.
 /// </summary>
 public class XrayConfigVectorTests
 {
@@ -65,8 +68,13 @@ public class XrayConfigVectorTests
         var xray = FindXray();
         Assert.SkipWhen(xray is null, "Xray не скачан: dotnet run tools/cores/fetch-cores.cs");
 
-        var configPath = Path.Combine(Path.GetTempPath(), $"khors-xray-test-{name}-{Guid.NewGuid():N}.json");
-        await File.WriteAllTextAsync(configPath, Generate(Load(name)).Json, TestContext.Current.CancellationToken);
+        var vector = Load(name);
+        var assets = Directory.CreateTempSubdirectory("khors-xray-test-");
+        var configPath = Path.Combine(assets.FullName, "config.json");
+        await File.WriteAllTextAsync(configPath, Generate(vector).Json, TestContext.Current.CancellationToken);
+        var (site, ip) = GeoFiles.FromVector(vector["geo"]);
+        await File.WriteAllBytesAsync(Path.Combine(assets.FullName, "geosite.dat"), site, TestContext.Current.CancellationToken);
+        await File.WriteAllBytesAsync(Path.Combine(assets.FullName, "geoip.dat"), ip, TestContext.Current.CancellationToken);
         try
         {
             var startInfo = new ProcessStartInfo(xray!)
@@ -75,6 +83,7 @@ public class XrayConfigVectorTests
                 RedirectStandardError = true,
                 UseShellExecute = false,
             };
+            startInfo.Environment["XRAY_LOCATION_ASSET"] = assets.FullName;
             startInfo.ArgumentList.Add("run");
             startInfo.ArgumentList.Add("-test");
             startInfo.ArgumentList.Add("-c");
@@ -91,7 +100,7 @@ public class XrayConfigVectorTests
         }
         finally
         {
-            File.Delete(configPath);
+            assets.Delete(recursive: true);
         }
     }
 
@@ -104,6 +113,10 @@ public class XrayConfigVectorTests
             HttpPort = options["httpPort"]!.GetValue<int>(),
             MetricsPort = options["metricsPort"]?.GetValue<int>(),
             LogLevel = options["logLevel"]?.GetValue<string>() ?? "warning",
+            Routing = RoutingVector.Plan(vector, tun: false),
+            RemoteDns = options["remoteDns"] is { } remoteDns
+                ? DnsServer.Parse(remoteDns.GetValue<string>()).Server ?? throw new InvalidOperationException("remoteDns вектора не разбирается")
+                : DnsPresets.Default.Server,
         });
     }
 

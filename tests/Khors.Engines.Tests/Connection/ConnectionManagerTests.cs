@@ -53,6 +53,29 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
     }
 
     [Fact]
+    public async Task MissingGeoCategoriesAreReportedInStatus()
+    {
+        _launcher.MissingGeo = ["geosite:category-ru", "geoip:ru"];
+
+        await _manager.ConnectAsync(ValidProfile(), s_preferences, TestContext.Current.CancellationToken);
+
+        Assert.Equal(ConnectionState.Connected, _manager.Status.State);
+        Assert.Equal(["geosite:category-ru", "geoip:ru"], _manager.Status.MissingGeo);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ProxyBypassFollowsLocalNetworkSetting(bool bypassLan)
+    {
+        var preferences = s_preferences with { Routing = new Khors.Core.Routing.RoutingSettings(BypassLan: bypassLan) };
+
+        await _manager.ConnectAsync(ValidProfile(), preferences, TestContext.Current.CancellationToken);
+
+        Assert.Equal(bypassLan ? SystemProxySettings.DefaultBypass : SystemProxySettings.LoopbackBypass, _proxy.Last?.Bypass);
+    }
+
+    [Fact]
     public async Task DisconnectRestoresProxyBeforeStoppingCore()
     {
         await _manager.ConnectAsync(ValidProfile(), s_preferences, TestContext.Current.CancellationToken);
@@ -219,6 +242,8 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
     {
         public CoreStartException? FailWith { get; set; }
 
+        public IReadOnlyList<string> MissingGeo { get; set; } = [];
+
         public FakeSession? Last { get; private set; }
 
         public Task<ICoreSession> StartAsync(Profile profile, CoreStartPreferences preferences, CancellationToken cancellationToken)
@@ -229,7 +254,7 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
                 throw FailWith;
             }
 
-            Last = new FakeSession(events);
+            Last = new FakeSession(events) { MissingGeo = MissingGeo };
             return Task.FromResult<ICoreSession>(Last);
         }
     }
@@ -247,6 +272,8 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
         public CoreLogBuffer Log { get; } = new(new SecretMasker(Encoding.UTF8.GetBytes("t")));
 
         public Task<CoreExit> Completion => _completion.Task;
+
+        public IReadOnlyList<string> MissingGeo { get; init; } = [];
 
         public void Exit(CoreExit exit) => _completion.TrySetResult(exit);
 
@@ -268,6 +295,8 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
     {
         public bool FailEnable { get; set; }
 
+        public SystemProxySettings? Last { get; private set; }
+
         public void Enable(SystemProxySettings settings)
         {
             if (FailEnable)
@@ -275,6 +304,7 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
                 throw new InvalidOperationException("WinINet failed");
             }
 
+            Last = settings;
             events.Add($"proxy-on:{settings.Port}");
         }
 

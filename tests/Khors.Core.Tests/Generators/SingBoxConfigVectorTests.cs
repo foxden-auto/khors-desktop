@@ -8,13 +8,15 @@ using Khors.Core.Generators;
 using Khors.Core.Generators.SingBox;
 using Khors.Core.Import;
 using Khors.Core.Profiles;
+using Khors.Core.Tests.Geo;
 using Xunit;
 
 namespace Khors.Core.Tests.Generators;
 
 /// <summary>
 /// Снапшоты конфигов sing-box: <c>Vectors/singbox-config/*.json</c> — ссылка (+ <c>core</c>), параметры (порты, уровень лога,
-/// <c>tun</c> с <c>excludeAddresses</c>, <c>upstreamSocksPort</c> для цепочки через Xray, <c>remoteDns</c>) и ожидаемый конфиг или ошибка. Каждый ожидаемый конфиг проверяется настоящим sing-box (<c>sing-box check</c>), если он скачан.
+/// <c>tun</c> с <c>excludeAddresses</c>, <c>upstreamSocksPort</c> для цепочки через Xray, <c>remoteDns</c>), маршрутизация (<c>routing</c>, <see cref="RoutingVector"/>; в TUN — с процессами) с гео-базами
+/// (<c>geo</c>, <see cref="GeoFiles.FromVector"/>) и ожидаемый конфиг или ошибка. Каждый ожидаемый конфиг проверяется настоящим sing-box (<c>sing-box check</c>), если он скачан.
 /// </summary>
 public class SingBoxConfigVectorTests
 {
@@ -90,8 +92,11 @@ public class SingBoxConfigVectorTests
     private static CoreConfigResult Generate(JsonObject vector)
     {
         var options = vector["options"]!;
+        var plan = RoutingVector.Plan(vector, tun: options["tun"] is not null);
         return SingBoxConfigGenerator.Generate(BuildProfile(vector), new SingBoxConfigOptions
         {
+            Routing = plan,
+            Geo = GeoFiles.RuleData(plan, GeoFiles.FromVector(vector["geo"])),
             SocksPort = options["socksPort"]!.GetValue<int>(),
             HttpPort = options["httpPort"]!.GetValue<int>(),
             LogLevel = options["logLevel"]?.GetValue<string>() ?? "warning",

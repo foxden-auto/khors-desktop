@@ -3,7 +3,9 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Khors.Core.Dns;
+using Khors.Core.Geo;
 using Khors.Core.Profiles;
+using Khors.Core.Routing;
 
 namespace Khors.Core.Generators.SingBox;
 
@@ -39,6 +41,12 @@ public sealed record SingBoxConfigOptions
     /// клиент). Запросы идут через сервер прокси, к адресу в локальной сети — напрямую (ROADMAP 3.4).
     /// </summary>
     public DnsServer RemoteDns { get; init; } = DnsPresets.Default.Server;
+
+    /// <summary>Маршрутизация (ROADMAP 3.5); у временных ядер теста задержки — <see cref="RoutingPlan.Default"/>.</summary>
+    public RoutingPlan Routing { get; init; } = RoutingPlan.Default;
+
+    /// <summary>Категории гео-баз для правил <see cref="Routing"/>: sing-box не читает <c>.dat</c>.</summary>
+    public GeoRuleData Geo { get; init; } = GeoRuleData.Empty;
 }
 
 /// <param name="Secret">Случайный на каждый запуск; конфиг уходит ядру через stdin и на диск не пишется.</param>
@@ -141,19 +149,17 @@ public static class SingBoxConfigGenerator
             config["outbounds"] = new JsonArray(ProxyOutbound(profile), new JsonObject { ["type"] = "direct", ["tag"] = DirectTag });
         }
 
-        config["route"] = new JsonObject
+        if (options.Geo.FindMissing(options.Routing) is { } missing)
         {
-            ["rules"] = new JsonArray(
-                new JsonObject { ["action"] = "sniff" },
-                new JsonObject { ["ip_is_private"] = true, ["outbound"] = DirectTag }),
-            ["final"] = ProxyTag,
-            // Адрес сервера-домена разрешается системным резолвером.
-            ["default_domain_resolver"] = "local",
-        };
+            return CoreConfigResult.Failure(CoreConfigErrorCode.GeoCategoryMissing, missing);
+        }
+
+        AddRoute(config, options);
 
         if (options.Tun is { } tun)
         {
             AddTun(config, tun, options.RemoteDns);
+            AddDirectDns(config, options.Routing);
         }
 
         if (options.ClashApi is { } clashApi)
@@ -173,6 +179,212 @@ public static class SingBoxConfigGenerator
 
     private const string TunTag = "tun-in";
     private const string RemoteDnsTag = "remote";
+    private const string DirectDnsTag = "direct-dns";
+
+    /// <summary>
+    /// Маршрут: распознавание протокола, локальные сети, правила плана по порядку и выход для остального
+    /// (<see cref="RoutingPlan.Final"/>). Соединение с локальных входов приходит с именем — перед первым правилом
+    /// по адресу имя разрешается удалённым DNS через сервер (<c>resolve</c>); в TUN адрес уже есть.
+    /// Гео-категории — встроенные наборы правил из <see cref="GeoRuleData"/>.
+    /// </summary>
+    private static void AddRoute(JsonObject config, SingBoxConfigOptions options)
+    {
+        var plan = options.Routing;
+        var rules = new JsonArray(
+            new JsonObject { ["action"] = "sniff" },
+            plan.BypassLan
+                ? new JsonObject { ["ip_is_private"] = true, ["outbound"] = DirectTag }
+                : new JsonObject { ["ip_cidr"] = new JsonArray("127.0.0.0/8", "::1/128"), ["outbound"] = DirectTag });
+
+        var ruleSets = new JsonArray();
+        var resolved = false;
+        foreach (var rule in plan.Rules)
+        {
+            if (rule.Match is RuleMatch.IpCidr or RuleMatch.GeoIp && !resolved)
+            {
+                if (config["dns"]!["final"] is null)
+                {
+                    AddRemoteDns(config, options.RemoteDns);
+                }
+
+                rules.Add(new JsonObject
+                {
+                    ["inbound"] = new JsonArray("socks-in", "http-in"),
+                    ["action"] = "resolve",
+                    ["server"] = RemoteDnsTag,
+                    ["strategy"] = "ipv4_only",
+                });
+                resolved = true;
+            }
+
+            if (Condition(rule, options.Geo, ruleSets) is not { } node)
+            {
+                continue;
+            }
+
+            if (rule.Action == RuleAction.Block)
+            {
+                node["action"] = "reject";
+            }
+            else
+            {
+                node["outbound"] = rule.Action == RuleAction.Direct ? DirectTag : ProxyTag;
+            }
+
+            rules.Add(node);
+        }
+
+        var route = new JsonObject { ["rules"] = rules };
+        if (ruleSets.Count > 0)
+        {
+            route["rule_set"] = ruleSets;
+        }
+
+        if (plan.Rules.Any(r => r.Match == RuleMatch.Process))
+        {
+            route["find_process"] = true;
+        }
+
+        if (plan.Final == RuleAction.Block)
+        {
+            rules.Add(new JsonObject { ["action"] = "reject" });
+        }
+
+        route["final"] = plan.Final == RuleAction.Direct ? DirectTag : ProxyTag;
+
+        // Адрес сервера-домена разрешается системным резолвером.
+        route["default_domain_resolver"] = "local";
+        config["route"] = route;
+    }
+
+    /// <summary>
+    /// Условие правила; гео-категория добавляет свой набор правил в <paramref name="ruleSets"/> (один раз).
+    /// Пустая категория (например, атрибут, которого нет ни у одного домена) — <c>null</c>: правило ни с чем не совпадёт.
+    /// </summary>
+    private static JsonObject? Condition(RoutingRule rule, GeoRuleData geo, JsonArray ruleSets)
+    {
+        switch (rule.Match)
+        {
+            case RuleMatch.Domain:
+                return new JsonObject { ["domain"] = new JsonArray(rule.Value) };
+            case RuleMatch.DomainSuffix:
+                return new JsonObject { ["domain_suffix"] = new JsonArray(rule.Value) };
+            case RuleMatch.DomainKeyword:
+                return new JsonObject { ["domain_keyword"] = new JsonArray(rule.Value) };
+            case RuleMatch.IpCidr:
+                return new JsonObject { ["ip_cidr"] = new JsonArray(rule.Value) };
+            case RuleMatch.Process:
+                return new JsonObject
+                {
+                    [RoutingRuleValidator.IsProcessPath(rule.Value) ? "process_path" : "process_name"] = new JsonArray(rule.Value),
+                };
+        }
+
+        var tag = (rule.Match == RuleMatch.GeoSite ? "geosite-" : "geoip-") + rule.Value;
+        if (!ruleSets.Any(r => (string?)r!["tag"] == tag))
+        {
+            var headless = rule.Match == RuleMatch.GeoSite ? GeoSiteRule(geo, rule.Value) : GeoIpRule(geo, rule.Value);
+            if (headless is null)
+            {
+                return null;
+            }
+
+            ruleSets.Add(new JsonObject { ["type"] = "inline", ["tag"] = tag, ["rules"] = new JsonArray(headless) });
+        }
+
+        return new JsonObject { ["rule_set"] = new JsonArray(tag) };
+    }
+
+    /// <summary>Домены категории; <c>имя@атрибут</c> — только с атрибутом, <c>имя@!атрибут</c> — без него (как в Xray).</summary>
+    private static JsonObject? GeoSiteRule(GeoRuleData geo, string value)
+    {
+        var category = geo.Sites[RoutingRuleValidator.GeoSiteBaseCode(value)];
+        IEnumerable<GeoDomain> domains = category.Domains;
+        if (value.IndexOf('@', StringComparison.Ordinal) is var at and >= 0)
+        {
+            var attribute = value[(at + 1)..];
+            domains = attribute.StartsWith('!')
+                ? domains.Where(d => !d.Attributes.Contains(attribute[1..]))
+                : domains.Where(d => d.Attributes.Contains(attribute));
+        }
+
+        var rule = new JsonObject();
+        foreach (var (type, field) in new[]
+        {
+            (GeoDomainType.Full, "domain"),
+            (GeoDomainType.Domain, "domain_suffix"),
+            (GeoDomainType.Keyword, "domain_keyword"),
+            (GeoDomainType.Regex, "domain_regex"),
+        })
+        {
+            var values = domains.Where(d => d.Type == type).Select(d => d.Value).Distinct(StringComparer.Ordinal).ToArray();
+            if (values.Length > 0)
+            {
+                rule[field] = ToArray(values);
+            }
+        }
+
+        return rule.Count > 0 ? rule : null;
+    }
+
+    /// <summary>Подсети кода; <c>!код</c> и обратные записи базы — через <c>invert</c>.</summary>
+    private static JsonObject? GeoIpRule(GeoRuleData geo, string value)
+    {
+        var negate = value.StartsWith('!');
+        var category = geo.Ips[negate ? value[1..] : value];
+        if (category.Networks.Count == 0)
+        {
+            return null;
+        }
+
+        var rule = new JsonObject { ["ip_cidr"] = ToArray(category.Networks.Select(n => n.ToString())) };
+        if (negate != category.ReverseMatch)
+        {
+            rule["invert"] = true;
+        }
+
+        return rule;
+    }
+
+    /// <summary>
+    /// Прямой DNS (TUN): имена из правил «напрямую» разрешает DNS провайдера, полученный по DHCP физического
+    /// адаптера, — так обходные сайты получают адреса ближайших к пользователю узлов. Правила по имени повторяют
+    /// маршрут по порядку, чтобы более раннее правило «через сервер» оставляло имя удалённому DNS.
+    /// </summary>
+    private static void AddDirectDns(JsonObject config, RoutingPlan plan)
+    {
+        if (!plan.Rules.Any(r => r.Action == RuleAction.Direct && IsNameRule(r)))
+        {
+            return;
+        }
+
+        var route = config["route"]!.AsObject();
+        var dnsRules = new JsonArray();
+        foreach (var rule in route["rules"]!.AsArray().OfType<JsonObject>())
+        {
+            var outbound = (string?)rule["outbound"];
+            var byName = rule.Any(p => p.Key is "domain" or "domain_suffix" or "domain_keyword")
+                || (rule["rule_set"] is JsonArray sets && sets.Any(t => ((string?)t)!.StartsWith("geosite-", StringComparison.Ordinal)));
+            if (!byName || outbound is null)
+            {
+                continue;
+            }
+
+            var dnsRule = rule.DeepClone().AsObject();
+            dnsRule.Remove("outbound");
+            dnsRule["server"] = outbound == DirectTag ? DirectDnsTag : RemoteDnsTag;
+            dnsRules.Add(dnsRule);
+        }
+
+        var dns = config["dns"]!.AsObject();
+        dns["servers"]!.AsArray().Add(new JsonObject { ["type"] = "dhcp", ["tag"] = DirectDnsTag });
+        dns["rules"] = dnsRules;
+    }
+
+    private static bool IsNameRule(RoutingRule rule) =>
+        rule.Match is RuleMatch.Domain or RuleMatch.DomainSuffix or RuleMatch.DomainKeyword or RuleMatch.GeoSite;
+
+    private static JsonArray ToArray(IEnumerable<string> values) => new([.. values.Select(v => (JsonNode)JsonValue.Create(v))]);
 
     /// <summary>
     /// TUN: весь трафик системы — в sing-box. Сам sing-box выходит в сеть через физический интерфейс

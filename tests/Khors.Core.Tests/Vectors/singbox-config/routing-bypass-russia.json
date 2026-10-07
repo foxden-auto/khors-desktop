@@ -1,0 +1,208 @@
+{
+  "description": "Обход для России в режиме «Системный прокси» (ROADMAP 3.5): категории — встроенные наборы правил, атрибут geosite, перед правилом по адресу имя разрешается удалённым DNS через сервер",
+  "link": "hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com",
+  "options": {
+    "socksPort": 20808,
+    "httpPort": 20809
+  },
+  "routing": {
+    "preset": "BypassRussia",
+    "rules": [
+      {
+        "match": "Domain",
+        "value": "news.example.ru",
+        "action": "Proxy"
+      },
+      {
+        "match": "GeoSite",
+        "value": "example@!ads",
+        "action": "Direct"
+      },
+      {
+        "match": "DomainKeyword",
+        "value": "tracker",
+        "action": "Block"
+      }
+    ]
+  },
+  "geo": {
+    "sites": {
+      "category-ru": [
+        "domain:ru",
+        "domain:su",
+        "domain:xn--p1ai",
+        "full:www.example.ru",
+        "keyword:exampleru",
+        "regexp:^.+\\.example\\.su$"
+      ],
+      "example": [
+        "domain:example.com@ads",
+        "full:cdn.example.com@cn,ads",
+        "domain:example.net"
+      ]
+    },
+    "ips": {
+      "ru": [
+        "203.0.113.0/24",
+        "2001:db8::/32"
+      ],
+      "!not-ru": [
+        "198.51.100.0/24"
+      ],
+      "private": [
+        "10.0.0.0/8"
+      ]
+    }
+  },
+  "expected": {
+    "log": {
+      "level": "warn",
+      "timestamp": true
+    },
+    "dns": {
+      "servers": [
+        {
+          "type": "local",
+          "tag": "local"
+        },
+        {
+          "type": "https",
+          "tag": "remote",
+          "server": "1.1.1.1",
+          "detour": "proxy"
+        }
+      ],
+      "final": "remote"
+    },
+    "inbounds": [
+      {
+        "type": "socks",
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "listen_port": 20808
+      },
+      {
+        "type": "http",
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "listen_port": 20809
+      }
+    ],
+    "outbounds": [
+      {
+        "type": "hysteria2",
+        "tag": "proxy",
+        "server": "hy.example.com",
+        "server_port": 443,
+        "password": "Hy2Pa55",
+        "tls": {
+          "enabled": true,
+          "server_name": "hy.example.com"
+        }
+      },
+      {
+        "type": "direct",
+        "tag": "direct"
+      }
+    ],
+    "route": {
+      "rules": [
+        {
+          "action": "sniff"
+        },
+        {
+          "ip_is_private": true,
+          "outbound": "direct"
+        },
+        {
+          "domain": [
+            "news.example.ru"
+          ],
+          "outbound": "proxy"
+        },
+        {
+          "rule_set": [
+            "geosite-example@!ads"
+          ],
+          "outbound": "direct"
+        },
+        {
+          "domain_keyword": [
+            "tracker"
+          ],
+          "action": "reject"
+        },
+        {
+          "rule_set": [
+            "geosite-category-ru"
+          ],
+          "outbound": "direct"
+        },
+        {
+          "inbound": [
+            "socks-in",
+            "http-in"
+          ],
+          "action": "resolve",
+          "server": "remote",
+          "strategy": "ipv4_only"
+        },
+        {
+          "rule_set": [
+            "geoip-ru"
+          ],
+          "outbound": "direct"
+        }
+      ],
+      "rule_set": [
+        {
+          "type": "inline",
+          "tag": "geosite-example@!ads",
+          "rules": [
+            {
+              "domain_suffix": [
+                "example.net"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "inline",
+          "tag": "geosite-category-ru",
+          "rules": [
+            {
+              "domain": [
+                "www.example.ru"
+              ],
+              "domain_suffix": [
+                "ru",
+                "su",
+                "xn--p1ai"
+              ],
+              "domain_keyword": [
+                "exampleru"
+              ],
+              "domain_regex": [
+                "^.+\\.example\\.su$"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "inline",
+          "tag": "geoip-ru",
+          "rules": [
+            {
+              "ip_cidr": [
+                "203.0.113.0/24",
+                "2001:db8::/32"
+              ]
+            }
+          ]
+        }
+      ],
+      "final": "proxy",
+      "default_domain_resolver": "local"
+    }
+  }
+}

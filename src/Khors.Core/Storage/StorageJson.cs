@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Khors.Core.Profiles;
+using Khors.Core.Routing;
 using Khors.Core.Subscriptions;
 
 namespace Khors.Core.Storage;
@@ -44,6 +45,24 @@ public static class StorageJson
         }
     }
 
+    /// <summary>Маршрутизация — для передачи службе (режим TUN). Тот же формат, что в <c>settings.json</c>.</summary>
+    public static string SerializeRouting(RoutingSettings routing) =>
+        JsonSerializer.Serialize(routing, StorageJsonContext.Default.RoutingSettings);
+
+    /// <summary>Маршрутизация из <see cref="SerializeRouting"/>; <c>null</c> — текст не разбирается.</summary>
+    public static RoutingSettings? ParseRouting(string json)
+    {
+        ArgumentNullException.ThrowIfNull(json);
+        try
+        {
+            return JsonSerializer.Deserialize(json, StorageJsonContext.Default.RoutingSettings);
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            return null;
+        }
+    }
+
     public static string SerializeSettings(AppSettings settings) =>
         JsonSerializer.Serialize(settings, StorageJsonContext.Default.AppSettings);
 
@@ -62,9 +81,11 @@ public static class StorageJson
 [JsonSerializable(typeof(ProfileDocument))]
 [JsonSerializable(typeof(AppSettings))]
 [JsonSerializable(typeof(Profile))]
+[JsonSerializable(typeof(RoutingSettings))]
 [JsonSerializable(typeof(Profile[]))]
 [JsonSerializable(typeof(Subscription[]))]
 [JsonSerializable(typeof(UnknownParam[]))]
+[JsonSerializable(typeof(RoutingRule[]))]
 [JsonSerializable(typeof(string[]))]
 [JsonSerializable(typeof(int[]))]
 internal sealed partial class StorageJsonContext : JsonSerializerContext;

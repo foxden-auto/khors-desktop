@@ -20,6 +20,8 @@
                        IsVisible="{Binding StatusDetail, Converter={x:Static ObjectConverters.IsNotNull}}" />
             <TextBlock Text="{Binding ProblemHint}" Classes="warning" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
                        IsVisible="{Binding ProblemHint, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBlock Text="{Binding RoutingWarning}" Classes="warning" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
+                       IsVisible="{Binding RoutingWarning, Converter={x:Static ObjectConverters.IsNotNull}}" />
             <Button Classes="link" HorizontalAlignment="Center" IsVisible="{Binding ShowsLogLink}"
                     Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:AppPage.Log}"
                     Content="{x:Static res:Strings.ShowLogLink}" />

@@ -1,0 +1,214 @@
+{
+  "description": "Обход для России (ROADMAP 3.5): свои правила раньше пресета, geosite/geoip из баз; есть правила по адресу — IPIfNonMatch и DNS Xray через сервер",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@vpn.example.com:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.example.org&fp=firefox&pbk=Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM&sid=6ba85179e30d4fc2&spx=%2F&type=tcp&headerType=none#Routing",
+  "options": {
+    "socksPort": 20808,
+    "httpPort": 20809
+  },
+  "routing": {
+    "preset": "BypassRussia",
+    "rules": [
+      {
+        "match": "Domain",
+        "value": "news.example.ru",
+        "action": "Proxy"
+      },
+      {
+        "match": "DomainKeyword",
+        "value": "tracker",
+        "action": "Block"
+      },
+      {
+        "match": "GeoSite",
+        "value": "example@ads",
+        "action": "Block"
+      }
+    ]
+  },
+  "geo": {
+    "sites": {
+      "category-ru": [
+        "domain:ru",
+        "domain:su",
+        "domain:xn--p1ai",
+        "full:www.example.ru",
+        "keyword:exampleru",
+        "regexp:^.+\\.example\\.su$"
+      ],
+      "example": [
+        "domain:example.com@ads",
+        "full:cdn.example.com@cn,ads",
+        "domain:example.net"
+      ]
+    },
+    "ips": {
+      "ru": [
+        "203.0.113.0/24",
+        "2001:db8::/32"
+      ],
+      "!not-ru": [
+        "198.51.100.0/24"
+      ],
+      "private": [
+        "10.0.0.0/8"
+      ]
+    }
+  },
+  "expected": {
+    "log": {
+      "loglevel": "warning",
+      "access": "none"
+    },
+    "inbounds": [
+      {
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "port": 20808,
+        "protocol": "socks",
+        "settings": {
+          "auth": "noauth",
+          "udp": true
+        },
+        "sniffing": {
+          "enabled": true,
+          "destOverride": [
+            "http",
+            "tls",
+            "quic"
+          ],
+          "routeOnly": true
+        }
+      },
+      {
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "port": 20809,
+        "protocol": "http",
+        "sniffing": {
+          "enabled": true,
+          "destOverride": [
+            "http",
+            "tls",
+            "quic"
+          ],
+          "routeOnly": true
+        }
+      }
+    ],
+    "outbounds": [
+      {
+        "tag": "proxy",
+        "protocol": "vless",
+        "settings": {
+          "vnext": [
+            {
+              "address": "vpn.example.com",
+              "port": 443,
+              "users": [
+                {
+                  "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+                  "encryption": "none",
+                  "flow": "xtls-rprx-vision"
+                }
+              ]
+            }
+          ]
+        },
+        "streamSettings": {
+          "network": "raw",
+          "security": "reality",
+          "realitySettings": {
+            "serverName": "www.example.org",
+            "fingerprint": "firefox",
+            "publicKey": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM",
+            "shortId": "6ba85179e30d4fc2",
+            "spiderX": "/"
+          }
+        }
+      },
+      {
+        "tag": "direct",
+        "protocol": "freedom"
+      },
+      {
+        "tag": "block",
+        "protocol": "blackhole"
+      }
+    ],
+    "routing": {
+      "domainStrategy": "IPIfNonMatch",
+      "rules": [
+        {
+          "type": "field",
+          "inboundTag": [
+            "dns-internal"
+          ],
+          "outboundTag": "proxy"
+        },
+        {
+          "type": "field",
+          "ip": [
+            "127.0.0.0/8",
+            "10.0.0.0/8",
+            "172.16.0.0/12",
+            "192.168.0.0/16",
+            "169.254.0.0/16",
+            "::1/128",
+            "fc00::/7",
+            "fe80::/10"
+          ],
+          "outboundTag": "direct"
+        },
+        {
+          "type": "field",
+          "domain": [
+            "full:localhost"
+          ],
+          "outboundTag": "direct"
+        },
+        {
+          "type": "field",
+          "domain": [
+            "full:news.example.ru"
+          ],
+          "outboundTag": "proxy"
+        },
+        {
+          "type": "field",
+          "domain": [
+            "keyword:tracker"
+          ],
+          "outboundTag": "block"
+        },
+        {
+          "type": "field",
+          "domain": [
+            "geosite:example@ads"
+          ],
+          "outboundTag": "block"
+        },
+        {
+          "type": "field",
+          "domain": [
+            "geosite:category-ru"
+          ],
+          "outboundTag": "direct"
+        },
+        {
+          "type": "field",
+          "ip": [
+            "geoip:ru"
+          ],
+          "outboundTag": "direct"
+        }
+      ]
+    },
+    "dns": {
+      "servers": [
+        "https://1.1.1.1/dns-query"
+      ],
+      "queryStrategy": "UseIPv4",
+      "tag": "dns-internal"
+    }
+  }
+}

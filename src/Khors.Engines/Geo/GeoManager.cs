@@ -74,6 +74,9 @@ public sealed class GeoManager : IAsyncDisposable
 
     public void Start() => _loop ??= RunAsync(_stop.Token);
 
+    /// <summary>Коды категорий базы окна — подсказки для правил маршрутизации.</summary>
+    public IReadOnlyList<string> ListCategories(GeoDatabaseKind kind) => GeoRuleLoader.ListCategories(_local.Directory, kind);
+
     /// <summary>Обновляет окно и службу. Если обновление уже идёт — ждёт его и возвращает <c>false</c>.</summary>
     public async Task<bool> UpdateNowAsync(CancellationToken cancellationToken = default)
     {

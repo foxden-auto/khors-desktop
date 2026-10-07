@@ -5,6 +5,8 @@ using System.Text;
 using Khors.Core.Diagnostics;
 using Khors.Core.Generators;
 using Khors.Core.Profiles;
+using Khors.Core.Routing;
+using Khors.Engines.Tests.Geo;
 using Khors.Engines.Processes;
 using Khors.Engines.Xray;
 using Xunit;
@@ -128,6 +130,44 @@ public class XrayLauncherTests
             XrayLauncher.StartAsync(LocalProfile(), options, s_masker, guard: null, TestContext.Current.CancellationToken));
 
         Assert.Equal(CoreStartFailure.ExecutableNotFound, error.Failure);
+    }
+
+    /// <summary>
+    /// Обход для России (ROADMAP 3.5): с базами Xray запускается с правилами geosite/geoip и IPIfNonMatch; без баз —
+    /// запускается без этих правил, а категории попадают в <see cref="CoreSession.MissingGeo"/>.
+    /// </summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task XrayStartsWithRussiaBypass(bool withDatabases)
+    {
+        RequireXray();
+        var ct = TestContext.Current.CancellationToken;
+        var geo = Directory.CreateTempSubdirectory("khors-xray-geo-");
+        try
+        {
+            if (withDatabases)
+            {
+                await File.WriteAllBytesAsync(Path.Combine(geo.FullName, "geosite.dat"), GeoFiles.Site(("CATEGORY-RU", "example.ru")), ct);
+                await File.WriteAllBytesAsync(Path.Combine(geo.FullName, "geoip.dat"), GeoFiles.Ip(("RU", [203, 0, 113, 0])), ct);
+            }
+
+            await using var echo = new EchoServer();
+            var options = s_anyPorts with
+            {
+                GeoDirectory = geo.FullName,
+                Routing = RoutingPlan.Build(new RoutingSettings(RoutingPreset.BypassRussia), tun: false),
+            };
+
+            await using var session = await XrayLauncher.StartAsync(LocalProfile(), options, s_masker, guard: null, ct);
+
+            Assert.Equal("ping", await ProxyClient.EchoViaSocks5Async(session.SocksPort, echo.Port, "ping", ct));
+            Assert.Equal(withDatabases ? [] : ["geosite:category-ru", "geoip:ru"], session.MissingGeo);
+        }
+        finally
+        {
+            geo.Delete(recursive: true);
+        }
     }
 
     [Fact]

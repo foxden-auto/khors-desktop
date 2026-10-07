@@ -21,6 +21,9 @@ public enum ConnectionState
 /// Подключено, но соединения с сервером не устанавливаются: последняя причина из лога ядра
 /// (<see cref="CoreErrorClassifier"/>). Сбрасывается переподключением и <see cref="ConnectionManager.ClearProblem"/>.
 /// </param>
+/// <param name="MissingGeo">
+/// Подключено, но правила маршрутизации с этими категориями не действуют: их нет в гео-базе (<see cref="ICoreSession.MissingGeo"/>).
+/// </param>
 public sealed record ConnectionStatus(
     ConnectionState State,
     Profile? Profile = null,
@@ -29,7 +32,8 @@ public sealed record ConnectionStatus(
     DateTimeOffset? ConnectedAt = null,
     ConnectionFailure? Failure = null,
     CoreKind? Core = null,
-    CoreDiagnosis? Problem = null)
+    CoreDiagnosis? Problem = null,
+    EquatableArray<string> MissingGeo = default)
 {
     public static ConnectionStatus Disconnected { get; } = new(ConnectionState.Disconnected);
 }

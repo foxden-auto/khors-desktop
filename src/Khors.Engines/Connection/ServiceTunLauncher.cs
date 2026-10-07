@@ -39,7 +39,12 @@ public sealed class ServiceTunLauncher(IIpcClientTransport transport, string cli
         var session = new Session(client, masker);
         try
         {
-            var answer = await client.RequestAsync(new StartTunRequest(StorageJson.SerializeProfile(profile), preferences.LogLevel, DnsPresets.ServerOrDefault(preferences.RemoteDns).ToString()), cancellationToken).ConfigureAwait(false);
+            var request = new StartTunRequest(
+                StorageJson.SerializeProfile(profile),
+                preferences.LogLevel,
+                DnsPresets.ServerOrDefault(preferences.RemoteDns).ToString(),
+                preferences.Routing is { } routing ? StorageJson.SerializeRouting(routing) : null);
+            var answer = await client.RequestAsync(request, cancellationToken).ConfigureAwait(false);
             switch (answer)
             {
                 case TunStartedResponse started:
@@ -116,11 +121,14 @@ public sealed class ServiceTunLauncher(IIpcClientTransport transport, string cli
 
         public Task<CoreExit> Completion => _completion.Task;
 
+        public IReadOnlyList<string> MissingGeo { get; private set; } = [];
+
         public void Started(TunStartedResponse started)
         {
             Core = ToCore(started.Core);
             SocksPort = started.SocksPort;
             HttpPort = started.HttpPort;
+            MissingGeo = started.MissingGeo ?? [];
         }
 
         public async Task StopAsync(CancellationToken cancellationToken = default)

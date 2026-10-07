@@ -36,6 +36,71 @@
         </StackPanel>
       </Border>
 
+      <!-- Маршрутизация (ROADMAP 3.5): пресет, локальная сеть, свои правила сверху вниз. Сохраняется сразу. -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{x:Static res:Strings.SettingsRoutingHeader}" Classes="section" />
+          <TextBlock Text="{x:Static res:Strings.SettingsRoutingHint}" Classes="muted" TextWrapping="Wrap" />
+          <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding RoutingNeedsReconnect}">
+            <TextBlock Text="{x:Static res:Strings.RoutingReconnectHint}" Classes="warning" TextWrapping="Wrap" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Classes="secondary" Margin="12,0,0,0" Command="{Binding ReconnectCommand}"
+                    Content="{x:Static res:Strings.ButtonReconnect}" />
+          </Grid>
+
+          <RadioButton GroupName="routingPreset" IsChecked="{Binding IsRoutingAll}" Content="{x:Static res:Strings.RoutingPresetAll}" />
+          <TextBlock Text="{x:Static res:Strings.RoutingPresetAllHint}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
+          <RadioButton GroupName="routingPreset" IsChecked="{Binding IsRoutingRussia}" Content="{x:Static res:Strings.RoutingPresetRussia}" />
+          <TextBlock Text="{x:Static res:Strings.RoutingPresetRussiaHint}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
+          <RadioButton GroupName="routingPreset" IsChecked="{Binding IsRoutingApps}" Content="{x:Static res:Strings.RoutingPresetApps}" />
+          <TextBlock Text="{x:Static res:Strings.RoutingPresetAppsHint}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
+          <CheckBox IsChecked="{Binding RoutingBypassLan}" Content="{x:Static res:Strings.RoutingBypassLan}" />
+
+          <TextBlock Text="{x:Static res:Strings.RoutingRulesHeader}" FontWeight="SemiBold" Margin="0,8,0,0" />
+          <TextBlock Text="{x:Static res:Strings.RoutingRulesHint}" Classes="caption" TextWrapping="Wrap" />
+          <TextBlock Text="{x:Static res:Strings.RoutingRulesEmpty}" Classes="muted" IsVisible="{Binding !HasRoutingRules}" />
+          <ItemsControl ItemsSource="{Binding RoutingRules}" IsVisible="{Binding HasRoutingRules}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:RoutingRuleItem">
+                <Grid ColumnDefinitions="180,*,130,Auto,Auto,Auto" Margin="0,2">
+                  <TextBlock Text="{Binding MatchText}" Classes="muted" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Grid.Column="1" Text="{Binding Rule.Value}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                             ToolTip.Tip="{Binding Rule.Value}" Margin="8,0" />
+                  <TextBlock Grid.Column="2" Text="{Binding ActionText}" VerticalAlignment="Center" />
+                  <Button Grid.Column="3" Classes="icon-button" Width="32" Height="32" IsEnabled="{Binding CanMoveUp}"
+                          Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).MoveRuleUpCommand}" CommandParameter="{Binding}"
+                          ToolTip.Tip="{x:Static res:Strings.RuleMoveUp}" AutomationProperties.Name="{x:Static res:Strings.RuleMoveUp}">
+                    <Path Classes="icon small" Data="{StaticResource IconChevronUp}" />
+                  </Button>
+                  <Button Grid.Column="4" Classes="icon-button" Width="32" Height="32" IsEnabled="{Binding CanMoveDown}"
+                          Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).MoveRuleDownCommand}" CommandParameter="{Binding}"
+                          ToolTip.Tip="{x:Static res:Strings.RuleMoveDown}" AutomationProperties.Name="{x:Static res:Strings.RuleMoveDown}">
+                    <Path Classes="icon small" Data="{StaticResource IconChevronDown}" />
+                  </Button>
+                  <Button Grid.Column="5" Classes="icon-button" Width="32" Height="32"
+                          Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).RemoveRuleCommand}" CommandParameter="{Binding}"
+                          ToolTip.Tip="{x:Static res:Strings.RuleRemove}" AutomationProperties.Name="{x:Static res:Strings.RuleRemove}">
+                    <Path Classes="icon small" Data="{StaticResource IconClose}" />
+                  </Button>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <!-- Новое правило: вид, значение (для гео-категорий — подсказки из базы окна), действие. -->
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,4,0,0">
+            <ComboBox ItemsSource="{Binding RuleMatchOptions}" SelectedItem="{Binding NewRuleMatch}" MinWidth="200" VerticalAlignment="Center" />
+            <AutoCompleteBox Grid.Column="1" Margin="8,0" Text="{Binding NewRuleValue}" ItemsSource="{Binding GeoSuggestions}"
+                             FilterMode="Contains" MinimumPrefixLength="0" Watermark="{Binding NewRulePlaceholder}" VerticalAlignment="Center" />
+            <ComboBox Grid.Column="2" ItemsSource="{Binding RuleActionOptions}" SelectedItem="{Binding NewRuleAction}" MinWidth="150" VerticalAlignment="Center" />
+            <Button Grid.Column="3" Classes="secondary" Margin="8,0,0,0" Command="{Binding AddRuleCommand}" Content="{x:Static res:Strings.ButtonAddRule}" />
+          </Grid>
+          <TextBlock Text="{Binding NewRuleError}" Classes="error" TextWrapping="Wrap"
+                     IsVisible="{Binding NewRuleError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+          <TextBlock Text="{Binding NewRuleWarning}" Classes="warning" TextWrapping="Wrap"
+                     IsVisible="{Binding NewRuleWarning, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+      </Border>
+
       <!-- Гео-базы: файлы окна и копия службы, ручное и автоматическое обновление. -->
       <Border Classes="card">
         <StackPanel Spacing="10">

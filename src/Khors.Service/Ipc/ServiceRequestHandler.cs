@@ -1,4 +1,5 @@
 using Khors.Core.Dns;
+using Khors.Core.Routing;
 using Khors.Core.Storage;
 using Khors.Ipc;
 using Khors.Service.Geo;
@@ -37,12 +38,15 @@ public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, A
                 return new ServiceStatusResponse(info.Version, info.StartedAt);
             case StartTunRequest start:
                 var remoteDns = start.RemoteDns is null ? DnsPresets.Default.Server : DnsServer.Parse(start.RemoteDns).Server;
-                if (!s_logLevels.Contains(start.LogLevel) || remoteDns is null || StorageJson.ParseProfile(start.Profile) is not { } profile)
+
+                // Неверные отдельные правила план пропускает сам (RoutingPlan.Build); здесь — только разбор модели.
+                var routing = start.Routing is null ? new RoutingSettings() : StorageJson.ParseRouting(start.Routing);
+                if (!s_logLevels.Contains(start.LogLevel) || remoteDns is null || routing is null || StorageJson.ParseProfile(start.Profile) is not { } profile)
                 {
                     return new ErrorResponse(IpcErrorCode.BadRequest);
                 }
 
-                return await tun.StartAsync(this, profile, start.LogLevel, remoteDns, sendEvent, cancellationToken).ConfigureAwait(false);
+                return await tun.StartAsync(this, profile, start.LogLevel, remoteDns, routing, sendEvent, cancellationToken).ConfigureAwait(false);
             case GetTunTrafficRequest:
                 return await tun.ReadTrafficAsync(this, cancellationToken).ConfigureAwait(false);
             case GetGeoStatusRequest when geo is not null:

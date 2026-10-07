@@ -33,7 +33,11 @@ public sealed record SystemProxySettings(string Host, int Port, IReadOnlyList<st
         "192.168.*", "169.254.*", "<local>",
     ];
 
-    public static SystemProxySettings ForLocalHttp(int port) => new("127.0.0.1", port, DefaultBypass);
+    /// <summary>Без обхода локальной сети (маршрутизация, ROADMAP 3.5): мимо прокси — только сам компьютер и имена без точки.</summary>
+    public static IReadOnlyList<string> LoopbackBypass { get; } = ["localhost", "127.*", "<local>"];
+
+    /// <param name="bypassLan">Частные сети — мимо прокси (<see cref="DefaultBypass"/>); иначе <see cref="LoopbackBypass"/>.</param>
+    public static SystemProxySettings ForLocalHttp(int port, bool bypassLan = true) => new("127.0.0.1", port, bypassLan ? DefaultBypass : LoopbackBypass);
 }
 
 public enum SystemProxyRecovery

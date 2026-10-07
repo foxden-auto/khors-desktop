@@ -1,0 +1,132 @@
+{
+  "description": "Только правила по имени, без обхода локальной сети: AsIs, без DNS Xray; напрямую — только сам компьютер; правило процесса в режиме «Системный прокси» не действует",
+  "link": "vless://3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b@vpn.example.com:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.example.org&fp=firefox&pbk=Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM&sid=6ba85179e30d4fc2&spx=%2F&type=tcp&headerType=none#Routing",
+  "options": {
+    "socksPort": 20808,
+    "httpPort": 20809
+  },
+  "routing": {
+    "bypassLan": false,
+    "rules": [
+      {
+        "match": "DomainSuffix",
+        "value": "example.org",
+        "action": "Direct"
+      },
+      {
+        "match": "Process",
+        "value": "chrome.exe",
+        "action": "Direct"
+      }
+    ]
+  },
+  "expected": {
+    "log": {
+      "loglevel": "warning",
+      "access": "none"
+    },
+    "inbounds": [
+      {
+        "tag": "socks-in",
+        "listen": "127.0.0.1",
+        "port": 20808,
+        "protocol": "socks",
+        "settings": {
+          "auth": "noauth",
+          "udp": true
+        },
+        "sniffing": {
+          "enabled": true,
+          "destOverride": [
+            "http",
+            "tls",
+            "quic"
+          ],
+          "routeOnly": true
+        }
+      },
+      {
+        "tag": "http-in",
+        "listen": "127.0.0.1",
+        "port": 20809,
+        "protocol": "http",
+        "sniffing": {
+          "enabled": true,
+          "destOverride": [
+            "http",
+            "tls",
+            "quic"
+          ],
+          "routeOnly": true
+        }
+      }
+    ],
+    "outbounds": [
+      {
+        "tag": "proxy",
+        "protocol": "vless",
+        "settings": {
+          "vnext": [
+            {
+              "address": "vpn.example.com",
+              "port": 443,
+              "users": [
+                {
+                  "id": "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b",
+                  "encryption": "none",
+                  "flow": "xtls-rprx-vision"
+                }
+              ]
+            }
+          ]
+        },
+        "streamSettings": {
+          "network": "raw",
+          "security": "reality",
+          "realitySettings": {
+            "serverName": "www.example.org",
+            "fingerprint": "firefox",
+            "publicKey": "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM",
+            "shortId": "6ba85179e30d4fc2",
+            "spiderX": "/"
+          }
+        }
+      },
+      {
+        "tag": "direct",
+        "protocol": "freedom"
+      },
+      {
+        "tag": "block",
+        "protocol": "blackhole"
+      }
+    ],
+    "routing": {
+      "domainStrategy": "AsIs",
+      "rules": [
+        {
+          "type": "field",
+          "ip": [
+            "127.0.0.0/8",
+            "::1/128"
+          ],
+          "outboundTag": "direct"
+        },
+        {
+          "type": "field",
+          "domain": [
+            "full:localhost"
+          ],
+          "outboundTag": "direct"
+        },
+        {
+          "type": "field",
+          "domain": [
+            "domain:example.org"
+          ],
+          "outboundTag": "direct"
+        }
+      ]
+    }
+  }
+}
