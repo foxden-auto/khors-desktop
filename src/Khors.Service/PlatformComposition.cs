@@ -11,7 +11,7 @@ internal static class PlatformComposition
     {
         if (OperatingSystem.IsWindows())
         {
-            return services.AddWindowsPlatform().AddWindowsServiceHost();
+            return services.AddWindowsPlatform().AddWindowsKillSwitch().AddWindowsServiceHost();
         }
 
         throw new PlatformNotSupportedException("KHORS service supports only Windows for now.");
@@ -22,7 +22,7 @@ internal static class PlatformComposition
     {
         if (OperatingSystem.IsWindows())
         {
-            return services.AddWindowsPlatform();
+            return services.AddWindowsPlatform().AddWindowsKillSwitch();
         }
 
         throw new PlatformNotSupportedException("KHORS service supports only Windows for now.");

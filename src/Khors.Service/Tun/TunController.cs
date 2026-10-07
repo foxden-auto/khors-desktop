@@ -5,6 +5,7 @@ using Khors.Engines;
 using Khors.Engines.Processes;
 using Khors.Engines.Tun;
 using Khors.Ipc;
+using Khors.Service.KillSwitch;
 using Microsoft.Extensions.Logging;
 
 namespace Khors.Service.Tun;
@@ -13,8 +14,9 @@ namespace Khors.Service.Tun;
 /// Режим TUN в службе: не больше одного одновременно. TUN принадлежит соединению, которое его включило
 /// (<c>owner</c>): закрылось соединение (окно вышло или упало) — TUN выключается, сеть работает напрямую.
 /// Лог ядер и их завершение уходят владельцу событиями. Профиль и секреты в журнал службы не пишутся.
+/// Kill Switch (<paramref name="killSwitch"/>) ставит блокировку до запуска ядер и разрешает туннель после.
 /// </summary>
-public sealed partial class TunController(ITunStarter starter, ILogger<TunController> logger) : IAsyncDisposable
+public sealed partial class TunController(ITunStarter starter, ILogger<TunController> logger, KillSwitchController? killSwitch = null) : IAsyncDisposable
 {
     private const int TailLines = 20;
 
@@ -39,6 +41,13 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
         {
             await StopCurrentAsync().ConfigureAwait(false);
 
+            // Блокировка — раньше ядер: ни одного пакета мимо туннеля, пока он поднимается.
+            if (killSwitch?.TunStarting() == false)
+            {
+                killSwitch.TunStartFailed();
+                return new TunFailedResponse(IpcTunFailure.KillSwitchFailed);
+            }
+
             ITunRun run;
             try
             {
@@ -47,7 +56,21 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
             catch (CoreStartException ex)
             {
                 LogStartFailed(ex.Failure, ex.Core);
+                killSwitch?.TunStartFailed();
                 return ToFailed(ex);
+            }
+            catch
+            {
+                killSwitch?.TunStartFailed();
+                throw;
+            }
+
+            // Без разрешения адаптера весь трафик стоял бы заблокированным — такое подключение бесполезно.
+            if (killSwitch?.TunStarted() == false)
+            {
+                await run.DisposeAsync().ConfigureAwait(false);
+                killSwitch.TunStartFailed();
+                return new TunFailedResponse(IpcTunFailure.KillSwitchFailed, ToIpc(run.Core));
             }
 
             _forward = (_, line) => send(new TunLogEvent(line.Text));
@@ -79,7 +102,8 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
     }
 
     /// <summary>Выключает TUN, если он принадлежит <paramref name="owner"/>.</summary>
-    public async Task StopAsync(object owner)
+    /// <param name="byUser">Отключение пользователем (команда окна), а не закрытое соединение: снимает Kill Switch «пока подключено».</param>
+    public async Task StopAsync(object owner, bool byUser = true)
     {
         await _gate.WaitAsync().ConfigureAwait(false);
         try
@@ -87,6 +111,7 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
             if (ReferenceEquals(_owner, owner))
             {
                 await StopCurrentAsync().ConfigureAwait(false);
+                killSwitch?.TunStopped(byUser);
             }
         }
         finally
@@ -163,6 +188,7 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
             LogCrashed(exit.ExitCode);
             var tail = run.Tail(TailLines);
             await StopCurrentAsync().ConfigureAwait(false);
+            killSwitch?.TunStopped(byUser: false);
             send(new TunExitedEvent(exit.ExitCode, tail));
         }
         finally

@@ -85,6 +85,7 @@ public sealed class ServiceTunLauncher(IIpcClientTransport transport, string cli
             IpcTunFailure.ConfigNotGenerated => CoreStartFailure.ConfigNotGenerated,
             IpcTunFailure.ExecutableNotFound => CoreStartFailure.ExecutableNotFound,
             IpcTunFailure.ReadyTimeout => CoreStartFailure.ReadyTimeout,
+            IpcTunFailure.KillSwitchFailed => CoreStartFailure.KillSwitchFailed,
             _ => CoreStartFailure.ExitedDuringStart,
         };
         return new CoreStartException(failure, $"TUN failed to start: {failed.Failure}.", failed.ExitCode, failed.LogTail ?? [], failed.Field)

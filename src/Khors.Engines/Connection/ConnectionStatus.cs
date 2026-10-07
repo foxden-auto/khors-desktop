@@ -81,6 +81,9 @@ public enum ConnectionFailureKind
 
     /// <summary>Режим TUN: служба KHORS не установлена, не запущена или не отвечает.</summary>
     ServiceUnavailable,
+
+    /// <summary>Режим TUN: Kill Switch включён, но фильтры не поставились.</summary>
+    KillSwitchFailed,
 }
 
 /// <summary>Причина неудачи. <see cref="LogTail"/> — последние строки лога ядра, уже замаскированные.</summary>

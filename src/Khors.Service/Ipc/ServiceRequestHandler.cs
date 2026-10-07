@@ -3,6 +3,7 @@ using Khors.Core.Routing;
 using Khors.Core.Storage;
 using Khors.Ipc;
 using Khors.Service.Geo;
+using Khors.Service.KillSwitch;
 using Khors.Service.Tun;
 
 namespace Khors.Service.Ipc;
@@ -16,7 +17,8 @@ public sealed record ServiceInfo(string Version, DateTimeOffset StartedAt);
 /// уровень лога — по списку). Соединение закрылось — включённый им TUN выключается.
 /// </summary>
 /// <param name="geo">Гео-базы службы; <c>null</c> — команды гео-баз недоступны (тесты протокола).</param>
-public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, Action<IpcPayload> sendEvent, ServiceGeo? geo = null) : IAsyncDisposable
+/// <param name="killSwitch">Kill Switch службы; <c>null</c> — команды Kill Switch недоступны (тесты протокола).</param>
+public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, Action<IpcPayload> sendEvent, ServiceGeo? geo = null, KillSwitchController? killSwitch = null) : IAsyncDisposable
 {
     private static readonly HashSet<string> s_logLevels = ["debug", "info", "warning", "error", "none"];
 
@@ -54,13 +56,22 @@ public sealed class ServiceRequestHandler(ServiceInfo info, TunController tun, A
             case UpdateGeoRequest when geo is not null:
                 return await geo.UpdateAsync(cancellationToken).ConfigureAwait(false);
             case StopTunRequest:
-                await tun.StopAsync(this).ConfigureAwait(false);
+                await tun.StopAsync(this, byUser: true).ConfigureAwait(false);
                 return new OkResponse();
+            case GetKillSwitchRequest when killSwitch is not null:
+                return killSwitch.Status();
+            case SetKillSwitchRequest set when killSwitch is not null && Enum.IsDefined(set.Mode):
+                return killSwitch.Set(set.Mode, set.AllowLocalNetwork);
+            case SetKillSwitchRequest:
+                return new ErrorResponse(IpcErrorCode.BadRequest);
+            case ReleaseKillSwitchRequest when killSwitch is not null:
+                return killSwitch.Release();
             default:
                 // Ответы и события службы клиент присылать не должен.
                 return new ErrorResponse(IpcErrorCode.UnknownCommand);
         }
     }
 
-    public ValueTask DisposeAsync() => new(tun.StopAsync(this));
+    // Соединение закрылось (окно вышло или упало) — TUN выключается, но это не отключение пользователем.
+    public ValueTask DisposeAsync() => new(tun.StopAsync(this, byUser: false));
 }

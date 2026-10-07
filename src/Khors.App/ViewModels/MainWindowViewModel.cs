@@ -60,6 +60,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         _geo = geo;
         _service = service;
         _serviceTransport = serviceTransport;
+        _killSwitch = new ServiceKillSwitchClient(serviceTransport, AppVersion);
         _subscriptionUpdater = subscriptionUpdater;
         _profiles = profiles;
         _settings = settings;
@@ -230,6 +231,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     /// <summary>Служба запущена и ответила на рукопожатие — режим TUN можно выбрать.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanSelectTun))]
+    [NotifyPropertyChangedFor(nameof(CanSelectKillSwitchAlways))]
     public partial bool IsServiceRunning { get; set; }
 
     /// <summary>
@@ -390,6 +392,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         IsServiceRunning = serviceVersion is not null;
         CanInstallService = state == ServiceState.NotInstalled || mismatch;
         CanRemoveService = state is not ServiceState.NotInstalled and not ServiceState.Unknown;
+        await RefreshKillSwitchAsync().ConfigureAwait(true);
     }
 
     private static string AppVersion => App.AppVersion;
@@ -823,6 +826,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         }
 
         OnPropertyChanged(nameof(CanSelectTun));
+        OnPropertyChanged(nameof(CanSelectKillSwitchAlways));
     }
 
     /// <summary>Возврат переключателя после неудачной смены режима — без новой смены.</summary>
@@ -877,6 +881,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         ToggleConnectionCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(CanChangeMode));
         OnPropertyChanged(nameof(CanSelectTun));
+        OnPropertyChanged(nameof(CanSelectProxy));
         if (status.State == AutoState.Connected && SortByLatency)
         {
             ReloadProfiles();
@@ -907,11 +912,17 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     partial void OnStateChanged(ConnectionState value)
     {
+        if (value is ConnectionState.Connected or ConnectionState.Failed or ConnectionState.Disconnected)
+        {
+            _ = RefreshKillSwitchAsync();
+        }
+
         OnPropertyChanged(nameof(IsConnected));
         OnPropertyChanged(nameof(IsFailed));
         OnPropertyChanged(nameof(ShowsLogLink));
         OnPropertyChanged(nameof(CanChangeMode));
         OnPropertyChanged(nameof(CanSelectTun));
+        OnPropertyChanged(nameof(CanSelectProxy));
     }
 
     partial void OnLogTailChanged(string? value)

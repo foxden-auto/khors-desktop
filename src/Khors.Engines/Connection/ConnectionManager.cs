@@ -246,6 +246,7 @@ public sealed class ConnectionManager : IAsyncDisposable
     {
         CoreStartFailure.ExecutableNotFound => new ConnectionFailure(ConnectionFailureKind.CoreNotFound, Core: ex.Core),
         CoreStartFailure.ServiceUnavailable => new ConnectionFailure(ConnectionFailureKind.ServiceUnavailable, Core: ex.Core),
+        CoreStartFailure.KillSwitchFailed => new ConnectionFailure(ConnectionFailureKind.KillSwitchFailed, Core: ex.Core),
         CoreStartFailure.ConfigNotGenerated => new ConnectionFailure(ConnectionFailureKind.UnsupportedByCore, ConfigError: ex.ConfigError, Core: ex.Core),
         _ => new ConnectionFailure(
             ex.Failure == CoreStartFailure.ReadyTimeout ? ConnectionFailureKind.CoreNotReady : ConnectionFailureKind.CoreStartFailed,

@@ -1,6 +1,7 @@
 using System.Threading.Channels;
 using Khors.Ipc;
 using Khors.Service.Geo;
+using Khors.Service.KillSwitch;
 using Khors.Service.Tun;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,7 @@ namespace Khors.Service.Ipc;
 /// Сервер IPC службы: принимает соединения транспорта и обслуживает каждое в своей задаче.
 /// Испорченный кадр закрывает только это соединение; число одновременных соединений ограничено.
 /// </summary>
-public sealed partial class IpcServer(IIpcServerTransport transport, ServiceInfo info, TunController tun, ServiceGeo geo, ILogger<IpcServer> logger) : BackgroundService
+public sealed partial class IpcServer(IIpcServerTransport transport, ServiceInfo info, TunController tun, ServiceGeo geo, KillSwitchController killSwitch, ILogger<IpcServer> logger) : BackgroundService
 {
     public const int MaxConnections = 8;
 
@@ -119,7 +120,7 @@ public sealed partial class IpcServer(IIpcServerTransport transport, ServiceInfo
             LogConnected(connection.Peer.ProcessId, connection.Peer.UserName ?? "?");
             try
             {
-                await ServeConnectionAsync(connection.Stream, send => new ServiceRequestHandler(info, tun, send, geo), cancellationToken).ConfigureAwait(false);
+                await ServeConnectionAsync(connection.Stream, send => new ServiceRequestHandler(info, tun, send, geo, killSwitch), cancellationToken).ConfigureAwait(false);
             }
             catch (IpcProtocolException ex)
             {

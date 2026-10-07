@@ -1,0 +1,217 @@
+using System.ComponentModel;
+using Khors.Core.Dns;
+using Khors.Core.Import;
+using Khors.Core.Routing;
+using Khors.Ipc;
+using Khors.Platform;
+using Khors.Service.KillSwitch;
+using Khors.Service.Tun;
+using Microsoft.Extensions.Logging.Abstractions;
+using Xunit;
+
+namespace Khors.Service.Tests;
+
+/// <summary>Подменный Kill Switch: настоящий WFP требует прав администратора.</summary>
+internal sealed class FakeKillSwitch : IKillSwitch
+{
+    public List<string> Calls { get; } = [];
+
+    public KillSwitchPolicy? Current { get; private set; }
+
+    public bool Persistent { get; set; }
+
+    public bool Fail { get; set; }
+
+    public void Apply(KillSwitchPolicy policy)
+    {
+        if (Fail)
+        {
+            throw new Win32Exception(5, "FwpmFilterAdd0 failed: 0x00000005.");
+        }
+
+        Current = policy;
+        Persistent = policy.Persistent;
+        Calls.Add($"apply:{(policy.Persistent ? "persistent" : "dynamic")}:{policy.TunnelInterface ?? "-"}:{(policy.AllowLocalNetwork ? "lan" : "nolan")}");
+    }
+
+    public void Remove()
+    {
+        Current = null;
+        Persistent = false;
+        Calls.Add("remove");
+    }
+
+    public bool HasPersistentFilters() => Persistent;
+}
+
+public sealed class KillSwitchControllerTests : IDisposable
+{
+    private readonly string _directory = Directory.CreateTempSubdirectory("khors-killswitch-").FullName;
+    private readonly FakeKillSwitch _wfp = new();
+
+    public void Dispose() => Directory.Delete(_directory, recursive: true);
+
+    private string SettingsFile => Path.Combine(_directory, "killswitch.json");
+
+    private KillSwitchController Controller(IpcKillSwitchMode mode = IpcKillSwitchMode.Off, bool allowLan = true)
+    {
+        var controller = new KillSwitchController(_wfp, SettingsFile, [@"C:\Program Files\KHORS\service\cores\sing-box\sing-box.exe"], NullLogger<KillSwitchController>.Instance);
+        if (mode != IpcKillSwitchMode.Off || !allowLan)
+        {
+            controller.Set(mode, allowLan);
+            _wfp.Calls.Clear();
+        }
+
+        return controller;
+    }
+
+    [Fact]
+    public void OffDoesNothing()
+    {
+        var controller = Controller();
+
+        Assert.True(controller.TunStarting());
+        Assert.True(controller.TunStarted());
+        controller.TunStopped(byUser: false);
+
+        Assert.Empty(_wfp.Calls);
+        Assert.Equal(new KillSwitchStatusResponse(IpcKillSwitchMode.Off, true, Active: false, Blocking: false), controller.Status());
+    }
+
+    [Fact]
+    public void WhileConnectedBlocksBeforeCoresAndReleasesOnUserDisconnect()
+    {
+        var controller = Controller(IpcKillSwitchMode.WhileConnected);
+
+        Assert.Empty(_wfp.Calls);
+        Assert.True(controller.TunStarting());
+        Assert.True(controller.Status().Blocking);
+        Assert.True(controller.TunStarted());
+        Assert.Equal(new KillSwitchStatusResponse(IpcKillSwitchMode.WhileConnected, true, Active: true, Blocking: false), controller.Status());
+        controller.TunStopped(byUser: true);
+
+        Assert.Equal(["apply:dynamic:-:lan", "apply:dynamic:KHORS:lan", "remove"], _wfp.Calls);
+        Assert.False(controller.Status().Active);
+    }
+
+    [Fact]
+    public void CrashOrClosedWindowKeepsBlockingUntilRelease()
+    {
+        var controller = Controller(IpcKillSwitchMode.WhileConnected, allowLan: false);
+        controller.TunStarting();
+        controller.TunStarted();
+
+        controller.TunStopped(byUser: false);
+
+        Assert.Equal("apply:dynamic:-:nolan", _wfp.Calls[^1]);
+        Assert.True(controller.Status().Blocking);
+
+        controller.Release();
+
+        Assert.Equal("remove", _wfp.Calls[^1]);
+        Assert.False(controller.Status().Active);
+    }
+
+    [Fact]
+    public void FailedStartReleasesWhileConnected()
+    {
+        var controller = Controller(IpcKillSwitchMode.WhileConnected);
+        controller.TunStarting();
+
+        controller.TunStartFailed();
+
+        Assert.Equal(["apply:dynamic:-:lan", "remove"], _wfp.Calls);
+    }
+
+    [Fact]
+    public void AlwaysBlocksWithoutTunnel()
+    {
+        var controller = Controller(IpcKillSwitchMode.Always);
+
+        controller.Initialize();
+        controller.TunStarting();
+        controller.TunStarted();
+        controller.TunStopped(byUser: true);
+        controller.Release();
+
+        Assert.Equal(["apply:persistent:-:lan", "apply:persistent:-:lan", "apply:persistent:KHORS:lan", "apply:persistent:-:lan", "apply:persistent:-:lan"], _wfp.Calls);
+        Assert.True(controller.Status().Blocking);
+    }
+
+    [Fact]
+    public void InitializeRemovesLeftoverPersistentFilters()
+    {
+        _wfp.Persistent = true;
+        var controller = Controller();
+
+        controller.Initialize();
+
+        Assert.Equal(["remove"], _wfp.Calls);
+    }
+
+    [Fact]
+    public void TurningOffRemovesFilters()
+    {
+        var controller = Controller(IpcKillSwitchMode.Always);
+        controller.Initialize();
+
+        controller.Set(IpcKillSwitchMode.Off, allowLocalNetwork: true);
+
+        Assert.Equal("remove", _wfp.Calls[^1]);
+        Assert.False(controller.Status().Active);
+    }
+
+    [Fact]
+    public void WfpFailureIsReported()
+    {
+        var controller = Controller(IpcKillSwitchMode.WhileConnected);
+        _wfp.Fail = true;
+
+        Assert.False(controller.TunStarting());
+        Assert.Contains("FwpmFilterAdd0", controller.Status().Error, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SettingSurvivesRestart()
+    {
+        Controller(IpcKillSwitchMode.Always, allowLan: false);
+
+        var restarted = new KillSwitchController(_wfp, SettingsFile, [], NullLogger<KillSwitchController>.Instance);
+
+        Assert.Equal(IpcKillSwitchMode.Always, restarted.Status().Mode);
+        Assert.False(restarted.Status().AllowLocalNetwork);
+    }
+
+    [Fact]
+    public async Task TunWithFailedKillSwitchDoesNotStart()
+    {
+        var controller = Controller(IpcKillSwitchMode.WhileConnected);
+        _wfp.Fail = true;
+        var starter = new FakeTunStarter();
+        await using var tun = new TunController(starter, NullLogger<TunController>.Instance, controller);
+        var profile = ShareLinkParser.Parse("hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com").Profile!;
+
+        var answer = await tun.StartAsync(new object(), profile, "warning", DnsPresets.Default.Server, new RoutingSettings(), _ => { }, TestContext.Current.CancellationToken);
+
+        Assert.Equal(new TunFailedResponse(IpcTunFailure.KillSwitchFailed), answer);
+        Assert.Empty(starter.Runs);
+    }
+
+    [Fact]
+    public async Task OwnerDisconnectKeepsBlockingButStopTunReleases()
+    {
+        var controller = Controller(IpcKillSwitchMode.WhileConnected);
+        await using var tun = new TunController(new FakeTunStarter(), NullLogger<TunController>.Instance, controller);
+        var profile = ShareLinkParser.Parse("hysteria2://Hy2Pa55@hy.example.com/?sni=hy.example.com").Profile!;
+        var ct = TestContext.Current.CancellationToken;
+
+        var owner = new object();
+        Assert.IsType<TunStartedResponse>(await tun.StartAsync(owner, profile, "warning", DnsPresets.Default.Server, new RoutingSettings(), _ => { }, ct));
+        await tun.StopAsync(owner, byUser: false);
+        Assert.True(controller.Status().Blocking);
+
+        Assert.IsType<TunStartedResponse>(await tun.StartAsync(owner, profile, "warning", DnsPresets.Default.Server, new RoutingSettings(), _ => { }, ct));
+        await tun.StopAsync(owner, byUser: true);
+        Assert.False(controller.Status().Active);
+    }
+}

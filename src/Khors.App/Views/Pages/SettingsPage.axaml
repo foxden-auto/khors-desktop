@@ -11,13 +11,33 @@
       <Border Classes="card">
         <StackPanel Spacing="10">
           <TextBlock Text="{x:Static res:Strings.SettingsModeHeader}" Classes="section" />
-          <RadioButton GroupName="settingsMode" IsChecked="{Binding IsProxyMode}" IsEnabled="{Binding CanChangeMode}"
+          <RadioButton GroupName="settingsMode" IsChecked="{Binding IsProxyMode}" IsEnabled="{Binding CanSelectProxy}"
                        Content="{x:Static res:Strings.ModeProxyOption}" ToolTip.Tip="{x:Static res:Strings.ModeProxyTooltip}" />
           <TextBlock Text="{x:Static res:Strings.ModeProxyTooltip}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
           <RadioButton GroupName="settingsMode" IsChecked="{Binding IsTunMode}" IsEnabled="{Binding CanSelectTun}"
                        Content="{x:Static res:Strings.ModeTunOption}" />
           <TextBlock Text="{x:Static res:Strings.ModeTunTooltip}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
           <TextBlock Text="{x:Static res:Strings.SettingsModeHint}" Classes="muted" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
+      <!-- Kill Switch (ROADMAP 4.1): настройка хранится в службе, действует в режиме TUN. -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{x:Static res:Strings.SettingsKillSwitchHeader}" Classes="section" />
+          <TextBlock Text="{x:Static res:Strings.SettingsKillSwitchHint}" Classes="muted" TextWrapping="Wrap" />
+          <TextBlock Text="{x:Static res:Strings.KillSwitchNeedsService}" Classes="warning" TextWrapping="Wrap" IsVisible="{Binding !IsServiceRunning}" />
+          <RadioButton GroupName="killSwitch" IsChecked="{Binding IsKillSwitchOff}" IsEnabled="{Binding IsServiceRunning}"
+                       Content="{x:Static res:Strings.KillSwitchOff}" />
+          <RadioButton GroupName="killSwitch" IsChecked="{Binding IsKillSwitchWhileConnected}" IsEnabled="{Binding IsServiceRunning}"
+                       Content="{x:Static res:Strings.KillSwitchWhileConnected}" />
+          <TextBlock Text="{x:Static res:Strings.KillSwitchWhileConnectedHint}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
+          <RadioButton GroupName="killSwitch" IsChecked="{Binding IsKillSwitchAlways}" IsEnabled="{Binding CanSelectKillSwitchAlways}"
+                       Content="{x:Static res:Strings.KillSwitchAlways}" />
+          <TextBlock Text="{x:Static res:Strings.KillSwitchAlwaysHint}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
+          <CheckBox IsChecked="{Binding KillSwitchAllowLan}" IsEnabled="{Binding IsServiceRunning}" Content="{x:Static res:Strings.KillSwitchAllowLan}" />
+          <TextBlock Text="{Binding KillSwitchError}" Classes="error" TextWrapping="Wrap"
+                     IsVisible="{Binding KillSwitchError, Converter={x:Static ObjectConverters.IsNotNull}}" />
         </StackPanel>
       </Border>
 

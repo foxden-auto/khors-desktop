@@ -1,5 +1,6 @@
 using Khors.Ipc;
 using Khors.Platform.Windows.Ipc;
+using Khors.Platform.Windows.KillSwitch;
 using Khors.Platform.Windows.Processes;
 using Khors.Platform.Windows.Proxy;
 using Khors.Platform.Windows.Screen;
@@ -29,6 +30,14 @@ public static class WindowsPlatform
         });
 
         // Остальные реализации — по мере появления (ROADMAP 3.x, 4.x).
+        return services;
+    }
+
+    /// <summary>Kill Switch на WFP — только для процессов с правами (служба и её установка/удаление).</summary>
+    public static IServiceCollection AddWindowsKillSwitch(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        services.AddSingleton<IKillSwitch, WfpKillSwitch>();
         return services;
     }
 

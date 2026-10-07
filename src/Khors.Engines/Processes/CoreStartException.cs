@@ -18,6 +18,9 @@ public enum CoreStartFailure
 
     /// <summary>Режим TUN: служба KHORS не установлена, не запущена или не отвечает.</summary>
     ServiceUnavailable,
+
+    /// <summary>Режим TUN: Kill Switch включён, но служба не смогла поставить фильтры — без защиты TUN не запускается.</summary>
+    KillSwitchFailed,
 }
 
 /// <summary>Ядро не запустилось. Сообщение и хвост лога не содержат секретов.</summary>

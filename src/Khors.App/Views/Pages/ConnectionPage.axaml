@@ -22,6 +22,10 @@
                        IsVisible="{Binding ProblemHint, Converter={x:Static ObjectConverters.IsNotNull}}" />
             <TextBlock Text="{Binding RoutingWarning}" Classes="warning" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
                        IsVisible="{Binding RoutingWarning, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBlock Text="{Binding KillSwitchBanner}" Classes="warning" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="480"
+                       IsVisible="{Binding KillSwitchBanner, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <Button Classes="link" HorizontalAlignment="Center" IsVisible="{Binding CanReleaseKillSwitch}"
+                    Command="{Binding ReleaseKillSwitchCommand}" Content="{x:Static res:Strings.ButtonReleaseKillSwitch}" />
             <Button Classes="link" HorizontalAlignment="Center" IsVisible="{Binding ShowsLogLink}"
                     Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:AppPage.Log}"
                     Content="{x:Static res:Strings.ShowLogLink}" />
@@ -48,7 +52,7 @@
             <Border Classes="segmented" HorizontalAlignment="Center" Margin="0,14,0,0">
               <StackPanel Orientation="Horizontal" Spacing="4">
                 <RadioButton Classes="segment" Theme="{StaticResource {x:Type ToggleButton}}" GroupName="heroMode"
-                             IsChecked="{Binding IsProxyMode}" IsEnabled="{Binding CanChangeMode}"
+                             IsChecked="{Binding IsProxyMode}" IsEnabled="{Binding CanSelectProxy}"
                              Content="{x:Static res:Strings.ModeProxyOption}" ToolTip.Tip="{x:Static res:Strings.ModeProxyTooltip}" />
                 <RadioButton Classes="segment" Theme="{StaticResource {x:Type ToggleButton}}" GroupName="heroMode"
                              IsChecked="{Binding IsTunMode}" IsEnabled="{Binding CanSelectTun}"

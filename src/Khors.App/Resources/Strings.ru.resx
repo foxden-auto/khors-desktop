@@ -29,6 +29,7 @@
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Вставить из буфера</value></data>
   <data name="ButtonInstallService" xml:space="preserve"><value>Установить</value></data>
   <data name="ButtonReconnect" xml:space="preserve"><value>Переподключить</value></data>
+  <data name="ButtonReleaseKillSwitch" xml:space="preserve"><value>Снять блокировку</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Задержка</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Обновить</value></data>
   <data name="ButtonUpdateGeo" xml:space="preserve"><value>Обновить сейчас</value></data>
@@ -66,6 +67,7 @@
   <data name="Failure_CoreNotReady" xml:space="preserve"><value>Ядро {0} запустилось, но не ответило вовремя.</value></data>
   <data name="Failure_CoreStartFailed" xml:space="preserve"><value>Ядро {0} не запустилось (код {1}).</value></data>
   <data name="Failure_CoreStartFailed_NoCode" xml:space="preserve"><value>Ядро {0} не запустилось.</value></data>
+  <data name="Failure_KillSwitchFailed" xml:space="preserve"><value>Не удалось включить Kill Switch — без защиты режим TUN не запускается. Подробности — в журнале службы; можно выключить Kill Switch в «Настройках».</value></data>
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>В профиле ошибка: {0}.</value></data>
   <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>Служба KHORS не отвечает — режим TUN недоступен. Установите службу в «Настройках» или переключитесь на «Системный прокси».</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Не удалось включить системный прокси Windows.</value></data>
@@ -132,6 +134,17 @@
   <data name="Issue_WireGuardKeyInvalid" xml:space="preserve"><value>WireGuard: неверный ключ (нужно 32 байта в base64)</value></data>
   <data name="Issue_WireGuardReservedInvalid" xml:space="preserve"><value>WireGuard: reserved — три числа 0–255</value></data>
   <data name="Issue_XhttpExtraInvalid" xml:space="preserve"><value>параметр extra XHTTP — не JSON-объект</value></data>
+  <data name="KillSwitchAllowLan" xml:space="preserve"><value>Разрешить локальную сеть (роутер, принтеры, общие папки)</value></data>
+  <data name="KillSwitchAlways" xml:space="preserve"><value>Постоянно</value></data>
+  <data name="KillSwitchAlwaysHint" xml:space="preserve"><value>Без туннеля KHORS трафик заблокирован всегда, в том числе после перезагрузки. Только в режиме TUN; «Системный прокси» недоступен, пока выбран этот вариант.</value></data>
+  <data name="KillSwitchBlockingAlways" xml:space="preserve"><value>Kill Switch блокирует трафик: KHORS не подключён (режим «Постоянно»).</value></data>
+  <data name="KillSwitchBlockingWhileConnected" xml:space="preserve"><value>Kill Switch блокирует трафик: подключение оборвалось. Подключитесь снова или снимите блокировку.</value></data>
+  <data name="KillSwitchErrorFormat" xml:space="preserve"><value>Kill Switch: служба не смогла поставить фильтры — {0}</value></data>
+  <data name="KillSwitchNeedsService" xml:space="preserve"><value>Нужна работающая служба KHORS (раздел «Служба KHORS» ниже).</value></data>
+  <data name="KillSwitchNoAnswer" xml:space="preserve"><value>Служба KHORS не ответила — настройка Kill Switch не изменена.</value></data>
+  <data name="KillSwitchOff" xml:space="preserve"><value>Выключен</value></data>
+  <data name="KillSwitchWhileConnected" xml:space="preserve"><value>Пока подключено</value></data>
+  <data name="KillSwitchWhileConnectedHint" xml:space="preserve"><value>Блокировка с подключения до отключения кнопкой. Падение ядра или закрытие KHORS её не снимает.</value></data>
   <data name="LatencyTesting" xml:space="preserve"><value>проверка…</value></data>
   <data name="LatencyTooltipFormat" xml:space="preserve"><value>Задержка через туннель по готовому соединению. Первое соединение (с установкой туннеля и TLS): {0} мс</value></data>
   <data name="Latency_Failed" xml:space="preserve"><value>нет ответа</value></data>
@@ -278,6 +291,8 @@
   <data name="SettingsDnsHint" xml:space="preserve"><value>Куда KHORS отправляет запросы имён сайтов в режиме TUN и для WireGuard. Запросы идут через сервер, провайдер их не видит; адрес в локальной сети (например, роутер) — напрямую. В режиме «Системный прокси» имена разрешает сервер. Изменение действует со следующего подключения.</value></data>
   <data name="SettingsGeoHeader" xml:space="preserve"><value>Гео-базы</value></data>
   <data name="SettingsGeoHint" xml:space="preserve"><value>Списки доменов и IP-адресов по странам и категориям для правил маршрутизации (например, «Обход для России»). Скачиваются с GitHub (v2fly), проверяются по контрольной сумме; у службы KHORS для режима TUN — своя копия.</value></data>
+  <data name="SettingsKillSwitchHeader" xml:space="preserve"><value>Kill Switch</value></data>
+  <data name="SettingsKillSwitchHint" xml:space="preserve"><value>Защита от утечки в режиме TUN: если туннель оборвался, трафик компьютера блокируется, а не идёт напрямую. Работает через службу KHORS.</value></data>
   <data name="SettingsModeHeader" xml:space="preserve"><value>Режим подключения</value></data>
   <data name="SettingsModeHint" xml:space="preserve"><value>Режим можно сменить и во время подключения — KHORS переподключится в новом режиме. Для TUN нужна служба KHORS.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Список серверов</value></data>

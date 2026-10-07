@@ -5,11 +5,11 @@ namespace Khors.Ipc;
 
 /// <summary>
 /// Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений (2 — команды TUN, 3 — счётчики трафика TUN,
-/// 4 — удалённый DNS, 5 — гео-базы службы, 6 — маршрутизация).
+/// 4 — удалённый DNS, 5 — гео-базы службы, 6 — маршрутизация, 7 — Kill Switch).
 /// </summary>
 public static class IpcProtocol
 {
-    public const int Version = 6;
+    public const int Version = 7;
 }
 
 /// <summary>
@@ -34,6 +34,10 @@ public static class IpcProtocol
 [JsonDerivedType(typeof(GetGeoStatusRequest), "getGeoStatus")]
 [JsonDerivedType(typeof(UpdateGeoRequest), "updateGeo")]
 [JsonDerivedType(typeof(GeoStatusResponse), "geoStatus")]
+[JsonDerivedType(typeof(GetKillSwitchRequest), "getKillSwitch")]
+[JsonDerivedType(typeof(SetKillSwitchRequest), "setKillSwitch")]
+[JsonDerivedType(typeof(ReleaseKillSwitchRequest), "releaseKillSwitch")]
+[JsonDerivedType(typeof(KillSwitchStatusResponse), "killSwitchStatus")]
 public abstract record IpcPayload;
 
 /// <summary>Первое сообщение клиента: версия протокола и версия приложения.</summary>
@@ -109,6 +113,9 @@ public enum IpcTunFailure
 
     /// <summary>Ядро не открыло локальный вход вовремя.</summary>
     ReadyTimeout,
+
+    /// <summary>Kill Switch включён, но фильтры не поставились — TUN без защиты не запускается.</summary>
+    KillSwitchFailed,
 }
 
 /// <summary>Режим TUN не включился. Лог — уже замаскирован службой.</summary>
@@ -164,6 +171,37 @@ public sealed record GetGeoStatusRequest : IpcPayload;
 public sealed record UpdateGeoRequest : IpcPayload;
 
 public sealed record GeoStatusResponse(IReadOnlyList<IpcGeoFile> Files) : IpcPayload;
+
+/// <summary>Режим Kill Switch (docs/SPEC.md, 4.6); действует только в режиме TUN.</summary>
+public enum IpcKillSwitchMode
+{
+    Off,
+
+    /// <summary>Блокировка с подключения TUN до отключения пользователем; падение ядра или окна её не снимает.</summary>
+    WhileConnected,
+
+    /// <summary>Блокировка всегда, кроме туннеля; переживает перезагрузку.</summary>
+    Always,
+}
+
+/// <summary>Состояние Kill Switch службы.</summary>
+public sealed record GetKillSwitchRequest : IpcPayload;
+
+/// <summary>Сменить режим Kill Switch; служба сохраняет его у себя (<c>%ProgramData%\KHORS</c>).</summary>
+public sealed record SetKillSwitchRequest(IpcKillSwitchMode Mode, bool AllowLocalNetwork) : IpcPayload;
+
+/// <summary>Снять блокировку «пока подключено», оставшуюся после падения ядра или окна (TUN не работает).</summary>
+public sealed record ReleaseKillSwitchRequest : IpcPayload;
+
+/// <param name="Active">Фильтры Kill Switch стоят.</param>
+/// <param name="Blocking">Фильтры стоят, а туннеля нет: трафик компьютера заблокирован.</param>
+/// <param name="Error">Последняя ошибка WFP (текст для журнала), <c>null</c> — ошибок нет.</param>
+public sealed record KillSwitchStatusResponse(
+    IpcKillSwitchMode Mode,
+    bool AllowLocalNetwork,
+    bool Active,
+    bool Blocking,
+    string? Error = null) : IpcPayload;
 
 /// <summary>Кадр протокола: запрос и ответ на него с одинаковым <see cref="Id"/>; события службы — с <c>Id = 0</c>.</summary>
 public sealed record IpcEnvelope(long Id, IpcPayload Payload);

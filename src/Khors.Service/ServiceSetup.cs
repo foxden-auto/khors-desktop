@@ -24,6 +24,10 @@ internal static class ServiceSetup
             else
             {
                 control.Uninstall();
+
+                // После остановки службы её временные фильтры уже сняты; постоянные (Kill Switch «Постоянно») снимаем сами,
+                // чтобы после удаления программы в WFP ничего не осталось (docs/SPEC.md, 7.6).
+                services.GetRequiredService<IKillSwitch>().Remove();
             }
 
             Console.WriteLine($"KHORS service {command}: done.");

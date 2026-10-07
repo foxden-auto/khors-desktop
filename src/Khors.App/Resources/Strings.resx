@@ -29,6 +29,7 @@
   <data name="ButtonImportClipboard" xml:space="preserve"><value>Paste from clipboard</value></data>
   <data name="ButtonInstallService" xml:space="preserve"><value>Install</value></data>
   <data name="ButtonReconnect" xml:space="preserve"><value>Reconnect</value></data>
+  <data name="ButtonReleaseKillSwitch" xml:space="preserve"><value>Lift the block</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Latency</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Update</value></data>
   <data name="ButtonUpdateGeo" xml:space="preserve"><value>Update now</value></data>
@@ -66,6 +67,7 @@
   <data name="Failure_CoreNotReady" xml:space="preserve"><value>The {0} core started but did not respond in time.</value></data>
   <data name="Failure_CoreStartFailed" xml:space="preserve"><value>The {0} core failed to start (code {1}).</value></data>
   <data name="Failure_CoreStartFailed_NoCode" xml:space="preserve"><value>The {0} core failed to start.</value></data>
+  <data name="Failure_KillSwitchFailed" xml:space="preserve"><value>Could not turn on the kill switch — TUN mode does not start without protection. See the service log for details; you can turn the kill switch off in Settings.</value></data>
   <data name="Failure_ProfileInvalid" xml:space="preserve"><value>The profile has an error: {0}.</value></data>
   <data name="Failure_ServiceUnavailable" xml:space="preserve"><value>The KHORS service does not respond — TUN mode is unavailable. Install the service in Settings or switch to System proxy.</value></data>
   <data name="Failure_SystemProxyFailed" xml:space="preserve"><value>Could not enable the Windows system proxy.</value></data>
@@ -132,6 +134,17 @@
   <data name="Issue_WireGuardKeyInvalid" xml:space="preserve"><value>WireGuard: invalid key (32 bytes in base64 expected)</value></data>
   <data name="Issue_WireGuardReservedInvalid" xml:space="preserve"><value>WireGuard: reserved must be three numbers 0–255</value></data>
   <data name="Issue_XhttpExtraInvalid" xml:space="preserve"><value>XHTTP extra is not a JSON object</value></data>
+  <data name="KillSwitchAllowLan" xml:space="preserve"><value>Allow the local network (router, printers, shared folders)</value></data>
+  <data name="KillSwitchAlways" xml:space="preserve"><value>Always</value></data>
+  <data name="KillSwitchAlwaysHint" xml:space="preserve"><value>Without the KHORS tunnel traffic is always blocked, including after a restart. TUN mode only; System proxy is unavailable while this is selected.</value></data>
+  <data name="KillSwitchBlockingAlways" xml:space="preserve"><value>The kill switch is blocking traffic: KHORS is not connected (Always mode).</value></data>
+  <data name="KillSwitchBlockingWhileConnected" xml:space="preserve"><value>The kill switch is blocking traffic: the connection dropped. Connect again or lift the block.</value></data>
+  <data name="KillSwitchErrorFormat" xml:space="preserve"><value>Kill switch: the service could not set the filters — {0}</value></data>
+  <data name="KillSwitchNeedsService" xml:space="preserve"><value>Requires the running KHORS service (the KHORS service section below).</value></data>
+  <data name="KillSwitchNoAnswer" xml:space="preserve"><value>The KHORS service did not answer — the kill switch setting was not changed.</value></data>
+  <data name="KillSwitchOff" xml:space="preserve"><value>Off</value></data>
+  <data name="KillSwitchWhileConnected" xml:space="preserve"><value>While connected</value></data>
+  <data name="KillSwitchWhileConnectedHint" xml:space="preserve"><value>Blocking from connecting until you press Disconnect. A core crash or closing KHORS does not lift it.</value></data>
   <data name="LatencyTesting" xml:space="preserve"><value>testing…</value></data>
   <data name="LatencyTooltipFormat" xml:space="preserve"><value>Latency through the tunnel over an established connection. First connection (tunnel and TLS setup): {0} ms</value></data>
   <data name="Latency_Failed" xml:space="preserve"><value>no response</value></data>
@@ -278,6 +291,8 @@
   <data name="SettingsDnsHint" xml:space="preserve"><value>Where KHORS sends site name lookups in TUN mode and for WireGuard. Lookups go through the server, so your provider does not see them; an address on the local network (such as your router) is queried directly. In System proxy mode the server resolves names. Changes apply from the next connection.</value></data>
   <data name="SettingsGeoHeader" xml:space="preserve"><value>Geo databases</value></data>
   <data name="SettingsGeoHint" xml:space="preserve"><value>Lists of domains and IP addresses by country and category for routing rules (for example, “Bypass for Russia”). They are downloaded from GitHub (v2fly) and verified by checksum; the KHORS service keeps its own copy for TUN mode.</value></data>
+  <data name="SettingsKillSwitchHeader" xml:space="preserve"><value>Kill switch</value></data>
+  <data name="SettingsKillSwitchHint" xml:space="preserve"><value>Leak protection in TUN mode: if the tunnel drops, the computer's traffic is blocked instead of going direct. Works through the KHORS service.</value></data>
   <data name="SettingsModeHeader" xml:space="preserve"><value>Connection mode</value></data>
   <data name="SettingsModeHint" xml:space="preserve"><value>The mode can be changed while connected too — KHORS reconnects in the new mode. TUN requires the KHORS service.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Server list</value></data>
