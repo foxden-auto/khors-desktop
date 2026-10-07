@@ -164,6 +164,8 @@
   <data name="ModeProxyOption" xml:space="preserve"><value>System proxy</value></data>
   <data name="ModeProxyShort" xml:space="preserve"><value>Proxy</value></data>
   <data name="ModeProxyTooltip" xml:space="preserve"><value>Apps that use the Windows system proxy (browsers and most apps) go through KHORS</value></data>
+  <data name="ModeSwitchFailedFormat" xml:space="preserve"><value>Could not switch to {0} mode: {1}</value></data>
+  <data name="ModeSwitchRevertedFormat" xml:space="preserve"><value>Could not switch to {0} mode: {1} The connection is back in {2} mode.</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Mode: system proxy</value></data>
   <data name="ModeTunOption" xml:space="preserve"><value>TUN</value></data>
   <data name="ModeTunTooltip" xml:space="preserve"><value>All traffic of this computer goes through KHORS, including games and apps without proxy support. Requires the running KHORS service (see Settings).</value></data>
@@ -277,7 +279,7 @@
   <data name="SettingsGeoHeader" xml:space="preserve"><value>Geo databases</value></data>
   <data name="SettingsGeoHint" xml:space="preserve"><value>Lists of domains and IP addresses by country and category for routing rules (for example, “Bypass for Russia”). They are downloaded from GitHub (v2fly) and verified by checksum; the KHORS service keeps its own copy for TUN mode.</value></data>
   <data name="SettingsModeHeader" xml:space="preserve"><value>Connection mode</value></data>
-  <data name="SettingsModeHint" xml:space="preserve"><value>The mode can be changed while disconnected. TUN requires the KHORS service.</value></data>
+  <data name="SettingsModeHint" xml:space="preserve"><value>The mode can be changed while connected too — KHORS reconnects in the new mode. TUN requires the KHORS service.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Server list</value></data>
   <data name="SettingsRoutingHeader" xml:space="preserve"><value>Routing</value></data>
   <data name="SettingsRoutingHint" xml:space="preserve"><value>What goes through the server and what goes direct. Works in both modes; changes apply from the next connection.</value></data>

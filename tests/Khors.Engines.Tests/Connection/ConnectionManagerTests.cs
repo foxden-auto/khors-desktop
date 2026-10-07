@@ -45,7 +45,7 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
 
         await _manager.ConnectAsync(ValidProfile(), s_preferences, TestContext.Current.CancellationToken);
 
-        Assert.Equal(["start", "watchdog", "proxy-on:2001"], _events);
+        Assert.Equal(["start:SystemProxy", "watchdog", "proxy-on:2001"], _events);
         Assert.Equal([ConnectionState.Connecting, ConnectionState.Connected], states);
         Assert.Equal(ConnectionState.Connected, _manager.Status.State);
         Assert.Equal(2000, _manager.Status.SocksPort);
@@ -73,6 +73,61 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
         await _manager.ConnectAsync(ValidProfile(), preferences, TestContext.Current.CancellationToken);
 
         Assert.Equal(bypassLan ? SystemProxySettings.DefaultBypass : SystemProxySettings.LoopbackBypass, _proxy.Last?.Bypass);
+    }
+
+    private static readonly CoreStartPreferences s_tun = s_preferences with { Mode = Khors.Core.Storage.ConnectionMode.Tun };
+
+    [Fact]
+    public async Task SwitchToTunRestoresProxyBeforeStartingTun()
+    {
+        var profile = ValidProfile();
+        await _manager.ConnectAsync(profile, s_preferences, TestContext.Current.CancellationToken);
+        _events.Clear();
+
+        var result = await _manager.SwitchModeAsync(s_tun, s_preferences, TestContext.Current.CancellationToken);
+
+        Assert.Equal(new ModeSwitchResult(ModeSwitchOutcome.Switched), result);
+        Assert.Equal(["proxy-restore", "core-dispose", "start:Tun"], _events);
+        Assert.Equal(ConnectionState.Connected, _manager.Status.State);
+        Assert.Equal(profile.Id, _manager.Status.Profile?.Id);
+    }
+
+    [Fact]
+    public async Task FailedSwitchReturnsToPreviousMode()
+    {
+        await _manager.ConnectAsync(ValidProfile(), s_preferences, TestContext.Current.CancellationToken);
+        _launcher.FailWhen = p => p.Mode == Khors.Core.Storage.ConnectionMode.Tun
+            ? new CoreStartException(CoreStartFailure.ServiceUnavailable, "no service")
+            : null;
+        _events.Clear();
+
+        var result = await _manager.SwitchModeAsync(s_tun, s_preferences, TestContext.Current.CancellationToken);
+
+        Assert.Equal(ModeSwitchOutcome.Reverted, result.Outcome);
+        Assert.Equal(ConnectionFailureKind.ServiceUnavailable, result.Failure?.Kind);
+        Assert.Equal(["proxy-restore", "core-dispose", "start:Tun", "start:SystemProxy", "watchdog", "proxy-on:2001"], _events);
+        Assert.Equal(ConnectionState.Connected, _manager.Status.State);
+    }
+
+    [Fact]
+    public async Task SwitchFailsWhenNeitherModeStarts()
+    {
+        await _manager.ConnectAsync(ValidProfile(), s_preferences, TestContext.Current.CancellationToken);
+        _launcher.FailWith = new CoreStartException(CoreStartFailure.ExecutableNotFound, "gone");
+
+        var result = await _manager.SwitchModeAsync(s_tun, s_preferences, TestContext.Current.CancellationToken);
+
+        Assert.Equal(ModeSwitchOutcome.Failed, result.Outcome);
+        Assert.Equal(ConnectionState.Failed, _manager.Status.State);
+    }
+
+    [Fact]
+    public async Task SwitchWithoutConnectionDoesNothing()
+    {
+        var result = await _manager.SwitchModeAsync(s_tun, s_preferences, TestContext.Current.CancellationToken);
+
+        Assert.Equal(ModeSwitchOutcome.NotConnected, result.Outcome);
+        Assert.Empty(_events);
     }
 
     [Fact]
@@ -218,7 +273,7 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
 
         await _manager.ConnectAsync(ValidProfile("second"), s_preferences, TestContext.Current.CancellationToken);
 
-        Assert.Equal(["proxy-restore", "core-dispose", "start", "watchdog", "proxy-on:2001"], _events);
+        Assert.Equal(["proxy-restore", "core-dispose", "start:SystemProxy", "watchdog", "proxy-on:2001"], _events);
         Assert.Equal("second", _manager.Status.Profile!.Name);
 
         // Завершение старого ядра после переключения не считается падением нового подключения.
@@ -242,16 +297,19 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
     {
         public CoreStartException? FailWith { get; set; }
 
+        /// <summary>Отказ только для некоторых запусков (например, режима TUN).</summary>
+        public Func<CoreStartPreferences, CoreStartException?>? FailWhen { get; set; }
+
         public IReadOnlyList<string> MissingGeo { get; set; } = [];
 
         public FakeSession? Last { get; private set; }
 
         public Task<ICoreSession> StartAsync(Profile profile, CoreStartPreferences preferences, CancellationToken cancellationToken)
         {
-            events.Add("start");
-            if (FailWith is not null)
+            events.Add($"start:{preferences.Mode}");
+            if ((FailWith ?? FailWhen?.Invoke(preferences)) is { } failure)
             {
-                throw FailWith;
+                throw failure;
             }
 
             Last = new FakeSession(events) { MissingGeo = MissingGeo };

@@ -137,6 +137,45 @@ public sealed class AutoConnector : IAsyncDisposable
         _loop = RunAsync(triggers, session.Token);
     }
 
+    /// <summary>
+    /// Смена режима при работающем «Авто» (<see cref="ConnectionManager.SwitchModeAsync"/>): переподключение текущего
+    /// профиля — своё переключение, не сбой. Не поднялся ни один режим — «Авто» переходит к следующему профилю
+    /// (с режимом из настроек на тот момент).
+    /// </summary>
+    public async Task<ModeSwitchResult> SwitchModeAsync(CoreStartPreferences target, CoreStartPreferences previous, CancellationToken cancellationToken = default)
+    {
+        if (!IsActive)
+        {
+            return await _connection.SwitchModeAsync(target, previous, cancellationToken).ConfigureAwait(false);
+        }
+
+        await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        ModeSwitchResult result;
+        try
+        {
+            Interlocked.Increment(ref _switching);
+            try
+            {
+                result = await _connection.SwitchModeAsync(target, previous, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                Interlocked.Decrement(ref _switching);
+            }
+        }
+        finally
+        {
+            _gate.Release();
+        }
+
+        if (result.Outcome == ModeSwitchOutcome.Failed)
+        {
+            Volatile.Read(ref _triggers)?.Writer.TryWrite(AutoTrigger.Failure);
+        }
+
+        return result;
+    }
+
     /// <summary>Останавливает «Авто»; <paramref name="disconnect"/> — заодно отключиться.</summary>
     public async Task StopAsync(bool disconnect)
     {

@@ -66,6 +66,22 @@ public sealed class AutoConnectorTests : IAsyncDisposable
     }
 
     [Fact]
+    public async Task FailedModeSwitchKeepsCurrentProfile()
+    {
+        await _auto.StartAsync(Ct);
+        _launcher.TunBroken = true;
+        var tun = new CoreStartPreferences(Mode: Khors.Core.Storage.ConnectionMode.Tun);
+
+        var result = await _auto.SwitchModeAsync(tun, new CoreStartPreferences(), Ct);
+        await Task.Delay(100, Ct);
+
+        Assert.Equal(ModeSwitchOutcome.Reverted, result.Outcome);
+        Assert.Equal(new AutoStatus(AutoState.Connected, _fast.Id), _auto.Status);
+        Assert.Equal(_fast.Id, _connection.Status.Profile!.Id);
+        Assert.Equal(ConnectionState.Connected, _connection.Status.State);
+    }
+
+    [Fact]
     public async Task ProfileThatFailsToStartIsSkipped()
     {
         _launcher.Broken.Add(_fast.Id);
@@ -251,6 +267,9 @@ public sealed class AutoConnectorTests : IAsyncDisposable
 
         public HashSet<Guid> Broken { get; } = [];
 
+        /// <summary>Режим TUN не запускается (например, служба недоступна).</summary>
+        public bool TunBroken { get; set; }
+
         public ConcurrentDictionary<Guid, FakeSession> Sessions { get; } = new();
 
         public int Starts => Volatile.Read(ref _starts);
@@ -258,7 +277,7 @@ public sealed class AutoConnectorTests : IAsyncDisposable
         public Task<ICoreSession> StartAsync(Profile profile, CoreStartPreferences preferences, CancellationToken cancellationToken)
         {
             Interlocked.Increment(ref _starts);
-            if (Broken.Contains(profile.Id))
+            if (Broken.Contains(profile.Id) || (TunBroken && preferences.Mode == Khors.Core.Storage.ConnectionMode.Tun))
             {
                 throw new CoreStartException(CoreStartFailure.ExitedDuringStart, "exited", 1) { Core = CoreKind.Xray };
             }

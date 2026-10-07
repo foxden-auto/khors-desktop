@@ -259,7 +259,11 @@ STRINGS = {
     "ModeProxyShort": ("Прокси", "Proxy"),
     "SessionModeCoreFormat": ("{0} · {1}", "{0} · {1}"),
     "SettingsModeHeader": ("Режим подключения", "Connection mode"),
-    "SettingsModeHint": ("Режим меняется, пока нет подключения. Для TUN нужна служба KHORS.", "The mode can be changed while disconnected. TUN requires the KHORS service."),
+    "SettingsModeHint": ("Режим можно сменить и во время подключения — KHORS переподключится в новом режиме. Для TUN нужна служба KHORS.",
+                         "The mode can be changed while connected too — KHORS reconnects in the new mode. TUN requires the KHORS service."),
+    "ModeSwitchRevertedFormat": ("Не удалось включить режим «{0}»: {1} Подключение вернулось в режим «{2}».",
+                                 "Could not switch to {0} mode: {1} The connection is back in {2} mode."),
+    "ModeSwitchFailedFormat": ("Не удалось включить режим «{0}»: {1}", "Could not switch to {0} mode: {1}"),
     # Удалённый DNS (ROADMAP 3.4)
     "SettingsDnsHeader": ("DNS", "DNS"),
     "SettingsDnsHint": ("Куда KHORS отправляет запросы имён сайтов в режиме TUN и для WireGuard. Запросы идут через сервер, провайдер их не видит; адрес в локальной сети (например, роутер) — напрямую. В режиме «Системный прокси» имена разрешает сервер. Изменение действует со следующего подключения.",

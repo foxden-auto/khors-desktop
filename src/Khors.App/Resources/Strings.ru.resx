@@ -164,6 +164,8 @@
   <data name="ModeProxyOption" xml:space="preserve"><value>Системный прокси</value></data>
   <data name="ModeProxyShort" xml:space="preserve"><value>Прокси</value></data>
   <data name="ModeProxyTooltip" xml:space="preserve"><value>Через KHORS идут программы, которые используют системный прокси Windows (браузеры и большинство приложений)</value></data>
+  <data name="ModeSwitchFailedFormat" xml:space="preserve"><value>Не удалось включить режим «{0}»: {1}</value></data>
+  <data name="ModeSwitchRevertedFormat" xml:space="preserve"><value>Не удалось включить режим «{0}»: {1} Подключение вернулось в режим «{2}».</value></data>
   <data name="ModeSystemProxy" xml:space="preserve"><value>Режим: системный прокси</value></data>
   <data name="ModeTunOption" xml:space="preserve"><value>TUN</value></data>
   <data name="ModeTunTooltip" xml:space="preserve"><value>Весь трафик компьютера через KHORS — в том числе игры и программы без поддержки прокси. Нужна работающая служба KHORS (см. «Настройки»).</value></data>
@@ -277,7 +279,7 @@
   <data name="SettingsGeoHeader" xml:space="preserve"><value>Гео-базы</value></data>
   <data name="SettingsGeoHint" xml:space="preserve"><value>Списки доменов и IP-адресов по странам и категориям для правил маршрутизации (например, «Обход для России»). Скачиваются с GitHub (v2fly), проверяются по контрольной сумме; у службы KHORS для режима TUN — своя копия.</value></data>
   <data name="SettingsModeHeader" xml:space="preserve"><value>Режим подключения</value></data>
-  <data name="SettingsModeHint" xml:space="preserve"><value>Режим меняется, пока нет подключения. Для TUN нужна служба KHORS.</value></data>
+  <data name="SettingsModeHint" xml:space="preserve"><value>Режим можно сменить и во время подключения — KHORS переподключится в новом режиме. Для TUN нужна служба KHORS.</value></data>
   <data name="SettingsProfilesHeader" xml:space="preserve"><value>Список серверов</value></data>
   <data name="SettingsRoutingHeader" xml:space="preserve"><value>Маршрутизация</value></data>
   <data name="SettingsRoutingHint" xml:space="preserve"><value>Что идёт через сервер, а что напрямую. Действует в обоих режимах; изменения — со следующего подключения.</value></data>

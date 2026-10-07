@@ -38,6 +38,24 @@ public sealed record ConnectionStatus(
     public static ConnectionStatus Disconnected { get; } = new(ConnectionState.Disconnected);
 }
 
+public enum ModeSwitchOutcome
+{
+    /// <summary>Подключено в новом режиме.</summary>
+    Switched,
+
+    /// <summary>Новый режим не поднялся — подключение вернулось в прежний.</summary>
+    Reverted,
+
+    /// <summary>Не поднялся ни новый режим, ни прежний: подключения нет.</summary>
+    Failed,
+
+    /// <summary>Подключения не было — переключать нечего, режим применится при подключении.</summary>
+    NotConnected,
+}
+
+/// <param name="Failure">Почему не поднялся новый режим (<see cref="ModeSwitchOutcome.Reverted"/>, <see cref="ModeSwitchOutcome.Failed"/>).</param>
+public sealed record ModeSwitchResult(ModeSwitchOutcome Outcome, ConnectionFailure? Failure = null);
+
 public enum ConnectionFailureKind
 {
     /// <summary>В профиле ошибки валидации.</summary>

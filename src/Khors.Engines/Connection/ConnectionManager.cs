@@ -114,6 +114,32 @@ public sealed class ConnectionManager : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Смена режима «Системный прокси» ↔ TUN без отключения пользователем (ROADMAP 3.7): тот же профиль переподключается
+    /// с <paramref name="target"/>. Старый режим снимается до запуска нового (прокси восстановлен, TUN выключен), поэтому
+    /// режимы не накладываются. Новый режим не поднялся — подключение возвращается в <paramref name="previous"/>,
+    /// чтобы пользователь не остался без VPN; причина — в результате.
+    /// </summary>
+    public async Task<ModeSwitchResult> SwitchModeAsync(CoreStartPreferences target, CoreStartPreferences previous, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(previous);
+        if (Status is not { State: ConnectionState.Connected, Profile: { } profile })
+        {
+            return new ModeSwitchResult(ModeSwitchOutcome.NotConnected);
+        }
+
+        await ConnectAsync(profile, target, cancellationToken).ConfigureAwait(false);
+        if (Status.State == ConnectionState.Connected)
+        {
+            return new ModeSwitchResult(ModeSwitchOutcome.Switched);
+        }
+
+        var failure = Status.Failure;
+        await ConnectAsync(profile, previous, cancellationToken).ConfigureAwait(false);
+        return new ModeSwitchResult(Status.State == ConnectionState.Connected ? ModeSwitchOutcome.Reverted : ModeSwitchOutcome.Failed, failure);
+    }
+
     public async Task DisconnectAsync()
     {
         await _gate.WaitAsync().ConfigureAwait(false);

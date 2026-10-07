@@ -216,7 +216,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     public bool HasMessage => !string.IsNullOrEmpty(Message);
 
-    /// <summary>Режим TUN (весь трафик через службу) вместо системного прокси. Меняется, пока не подключено.</summary>
+    /// <summary>Режим TUN (весь трафик через службу) вместо системного прокси. При подключении смена режима переподключает (ROADMAP 3.7).</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsProxyMode))]
     public partial bool IsTunMode { get; set; }
@@ -232,8 +232,11 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     [NotifyPropertyChangedFor(nameof(CanSelectTun))]
     public partial bool IsServiceRunning { get; set; }
 
-    /// <summary>Режим меняется только без подключения (переключение на лету — ROADMAP 3.7).</summary>
-    public bool CanChangeMode => State is ConnectionState.Disconnected or ConnectionState.Failed && !_auto.IsActive;
+    /// <summary>
+    /// Режим меняется без подключения и при подключении (переподключение в новом режиме, ROADMAP 3.7); не меняется,
+    /// пока идёт подключение, отключение или подбор сервера «Авто».
+    /// </summary>
+    public bool CanChangeMode => State is not (ConnectionState.Connecting or ConnectionState.Disconnecting) && _auto.Status.State != AutoState.Selecting;
 
     public bool CanSelectTun => CanChangeMode && (IsServiceRunning || IsTunMode);
 
@@ -809,13 +812,53 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     partial void OnIsTunModeChanged(bool value)
     {
         var mode = value ? ConnectionMode.Tun : ConnectionMode.SystemProxy;
-        if (mode != _settings.Current.ConnectionMode)
+        var previous = _settings.Current.ConnectionMode;
+        if (mode != previous)
         {
             _settings.Update(s => s with { ConnectionMode = mode });
+            if (!_revertingMode && State == ConnectionState.Connected)
+            {
+                _ = SwitchModeAsync(mode, previous);
+            }
         }
 
         OnPropertyChanged(nameof(CanSelectTun));
     }
+
+    /// <summary>Возврат переключателя после неудачной смены режима — без новой смены.</summary>
+    private bool _revertingMode;
+
+    /// <summary>
+    /// Смена режима при подключении: переподключение в новом режиме; не поднялся — подключение и настройка
+    /// возвращаются к прежнему режиму, причина — в сообщении.
+    /// </summary>
+    private async Task SwitchModeAsync(ConnectionMode mode, ConnectionMode previous)
+    {
+        Message = null;
+        var target = CoreStartPreferences.From(_settings.Current);
+        var result = await _auto.SwitchModeAsync(target, target with { Mode = previous }).ConfigureAwait(true);
+        if (result.Outcome is not (ModeSwitchOutcome.Reverted or ModeSwitchOutcome.Failed))
+        {
+            return;
+        }
+
+        _revertingMode = true;
+        try
+        {
+            IsTunMode = previous == ConnectionMode.Tun;
+        }
+        finally
+        {
+            _revertingMode = false;
+        }
+
+        var reason = result.Failure is { } failure ? Localizer.Describe(failure) : string.Empty;
+        Message = result.Outcome == ModeSwitchOutcome.Reverted
+            ? Localizer.Format("ModeSwitchRevertedFormat", ModeName(mode), reason, ModeName(previous))
+            : Localizer.Format("ModeSwitchFailedFormat", ModeName(mode), reason);
+    }
+
+    private static string ModeName(ConnectionMode mode) => Localizer.Get(mode == ConnectionMode.Tun ? "ModeTunOption" : "ModeProxyOption");
 
     partial void OnSortByLatencyChanged(bool value)
     {
