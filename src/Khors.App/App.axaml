@@ -20,6 +20,16 @@
       <Setter Property="Foreground" Value="{DynamicResource KhorsForegroundBrush}" />
     </Style>
 
+    <!-- Рамка окна, которую рисует Avalonia 12 поверх своей шапки (Views/MainWindow.axaml): заголовок окна
+         выводится в нашей шапке, кнопка «во весь экран» не нужна — остаются «свернуть / развернуть / закрыть».
+         У текста заголовка видимость задана в шаблоне, поэтому скрываем его прозрачностью. -->
+    <Style Selector="WindowDrawnDecorations /template/ Panel#PART_TitleTextPanel">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="WindowDrawnDecorations /template/ Button#PART_FullScreenButton">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
     <!-- Текст -->
     <Style Selector="TextBlock.brand">
       <Setter Property="FontSize" Value="20" />
