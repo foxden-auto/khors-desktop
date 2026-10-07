@@ -1,6 +1,7 @@
 using Khors.Ipc;
 using Khors.Platform.Windows.Ipc;
 using Khors.Platform.Windows.KillSwitch;
+using Khors.Platform.Windows.Network;
 using Khors.Platform.Windows.Processes;
 using Khors.Platform.Windows.Proxy;
 using Khors.Platform.Windows.Screen;
@@ -21,6 +22,8 @@ public static class WindowsPlatform
         services.AddSingleton<ISystemProxy>(_ => new WindowsSystemProxy(StateDirectory));
         services.AddSingleton<IScreenCapture, GdiScreenCapture>();
         services.AddSingleton<IServiceControl, WindowsServiceControl>();
+        services.AddSingleton<INetworkMonitor>(_ => new WindowsNetworkMonitor());
+        services.AddSingleton<IPowerEvents, WindowsPowerEvents>();
 
         // Клиент IPC доверяет только процессу службы KhorsService (канал мог занять чужой процесс).
         services.AddSingleton<IIpcClientTransport>(sp =>

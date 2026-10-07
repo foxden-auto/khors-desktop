@@ -213,9 +213,10 @@
   <data name="QrWindowTitle" xml:space="preserve"><value>QR-код профиля</value></data>
   <data name="RateKbFormat" xml:space="preserve"><value>{0:0} КБ/с</value></data>
   <data name="RateMbFormat" xml:space="preserve"><value>{0:0.#} МБ/с</value></data>
+  <data name="ReconnectAttemptFormat" xml:space="preserve"><value>Попытка {0}…</value></data>
+  <data name="ReconnectRetryFormat" xml:space="preserve"><value>Подключение оборвалось. Попытка {0} через {1} с.</value></data>
+  <data name="ReconnectWaitingForNetwork" xml:space="preserve"><value>Нет сети — KHORS подключится, когда она появится.</value></data>
   <data name="RoutingBypassLan" xml:space="preserve"><value>Локальная сеть напрямую (роутер, принтеры, общие папки)</value></data>
-  <data name="RoutingTunIpv6" xml:space="preserve"><value>IPv6 через VPN (режим TUN)</value></data>
-  <data name="RoutingTunIpv6Hint" xml:space="preserve"><value>Включайте, только если у сервера есть выход в IPv6. Выключено — в режиме TUN IPv6 блокируется, программы сразу переходят на IPv4, утечки через IPv6 нет.</value></data>
   <data name="RoutingError_Duplicate" xml:space="preserve"><value>Такое правило уже есть.</value></data>
   <data name="RoutingError_InvalidAddress" xml:space="preserve"><value>Нужен IP-адрес или подсеть с маской без лишних битов, например 203.0.113.0/24.</value></data>
   <data name="RoutingError_InvalidDomain" xml:space="preserve"><value>Это не имя сайта. Введите имя без https:// и пути, например example.com.</value></data>
@@ -235,6 +236,8 @@
   <data name="RoutingRulesEmpty" xml:space="preserve"><value>Своих правил нет.</value></data>
   <data name="RoutingRulesHeader" xml:space="preserve"><value>Свои правила</value></data>
   <data name="RoutingRulesHint" xml:space="preserve"><value>Проверяются сверху вниз раньше пресета; срабатывает первое подходящее.</value></data>
+  <data name="RoutingTunIpv6" xml:space="preserve"><value>IPv6 через VPN (режим TUN)</value></data>
+  <data name="RoutingTunIpv6Hint" xml:space="preserve"><value>Включайте, только если у сервера есть выход в IPv6. Выключено — в режиме TUN IPv6 блокируется, программы сразу переходят на IPv4, утечки через IPv6 нет.</value></data>
   <data name="RuleAction_Block" xml:space="preserve"><value>Блокировать</value></data>
   <data name="RuleAction_Direct" xml:space="preserve"><value>Напрямую</value></data>
   <data name="RuleAction_Proxy" xml:space="preserve"><value>Через сервер</value></data>
@@ -289,6 +292,8 @@
   <data name="SessionSent" xml:space="preserve"><value>Отправлено</value></data>
   <data name="SessionServer" xml:space="preserve"><value>Сервер</value></data>
   <data name="SessionTime" xml:space="preserve"><value>Время</value></data>
+  <data name="SettingsAutoReconnect" xml:space="preserve"><value>Переподключаться автоматически</value></data>
+  <data name="SettingsAutoReconnectHint" xml:space="preserve"><value>Если подключение оборвалось само (ядро завершилось, служба перезапустилась), KHORS подключается снова: через 1, 2, 4… до 60 с, без сети — когда она появится. После смены сети и сна подключение проверяется и при необходимости перезапускается. Kill Switch на это время не снимается. При «Авто» вместо этого выбирается другой сервер.</value></data>
   <data name="SettingsDnsHeader" xml:space="preserve"><value>DNS</value></data>
   <data name="SettingsDnsHint" xml:space="preserve"><value>Куда KHORS отправляет запросы имён сайтов в режиме TUN и для WireGuard. Запросы идут через сервер, провайдер их не видит; адрес в локальной сети (например, роутер) — напрямую. В режиме «Системный прокси» имена разрешает сервер. Изменение действует со следующего подключения.</value></data>
   <data name="SettingsGeoHeader" xml:space="preserve"><value>Гео-базы</value></data>
@@ -313,6 +318,7 @@
   <data name="StatusDisconnected" xml:space="preserve"><value>Отключено</value></data>
   <data name="StatusDisconnecting" xml:space="preserve"><value>Отключение…</value></data>
   <data name="StatusFailed" xml:space="preserve"><value>Ошибка подключения</value></data>
+  <data name="StatusReconnecting" xml:space="preserve"><value>Переподключение…</value></data>
   <data name="StorageCorrupt" xml:space="preserve"><value>Файл профилей повреждён и отложен рядом; начат новый список.</value></data>
   <data name="StorageReadOnly" xml:space="preserve"><value>Профили сохранены более новой версией KHORS — изменения не записываются.</value></data>
   <data name="StorageRestoredFromBackup" xml:space="preserve"><value>Файл профилей был повреждён — профили восстановлены из резервной копии.</value></data>

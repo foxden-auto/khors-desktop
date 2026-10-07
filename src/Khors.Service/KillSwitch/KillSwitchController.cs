@@ -29,6 +29,7 @@ public sealed partial class KillSwitchController
     private readonly Lock _lock = new();
     private KillSwitchSettings _settings;
     private bool _engaged;
+    private bool _engagedBeforeStart;
     private bool _tunnelUp;
     private bool _tunnelIpv6;
     private bool _active;
@@ -122,6 +123,7 @@ public sealed partial class KillSwitchController
         lock (_lock)
         {
             _tunnelUp = false;
+            _engagedBeforeStart = _engaged;
             _engaged = _settings.Mode != IpcKillSwitchMode.Off;
             return Refresh();
         }
@@ -139,13 +141,16 @@ public sealed partial class KillSwitchController
         }
     }
 
-    /// <summary>TUN не запустился: подключения не было — блокировка «пока подключено» снимается.</summary>
+    /// <summary>
+    /// TUN не запустился: подключения не было — блокировка «пока подключено» снимается. Если она стояла и до запуска
+    /// (подключение оборвалось, окно переподключается — ROADMAP 4.3), она остаётся.
+    /// </summary>
     public void TunStartFailed()
     {
         lock (_lock)
         {
             _tunnelUp = false;
-            _engaged = false;
+            _engaged = _engagedBeforeStart;
             Refresh();
         }
     }

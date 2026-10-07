@@ -213,9 +213,10 @@
   <data name="QrWindowTitle" xml:space="preserve"><value>Profile QR code</value></data>
   <data name="RateKbFormat" xml:space="preserve"><value>{0:0} KB/s</value></data>
   <data name="RateMbFormat" xml:space="preserve"><value>{0:0.#} MB/s</value></data>
+  <data name="ReconnectAttemptFormat" xml:space="preserve"><value>Attempt {0}…</value></data>
+  <data name="ReconnectRetryFormat" xml:space="preserve"><value>Connection lost. Attempt {0} in {1} s.</value></data>
+  <data name="ReconnectWaitingForNetwork" xml:space="preserve"><value>No network — KHORS will reconnect when it is back.</value></data>
   <data name="RoutingBypassLan" xml:space="preserve"><value>Local network direct (router, printers, shared folders)</value></data>
-  <data name="RoutingTunIpv6" xml:space="preserve"><value>IPv6 through VPN (TUN mode)</value></data>
-  <data name="RoutingTunIpv6Hint" xml:space="preserve"><value>Turn on only if the server has IPv6 connectivity. When off, IPv6 is blocked in TUN mode, apps fall back to IPv4 right away and nothing leaks over IPv6.</value></data>
   <data name="RoutingError_Duplicate" xml:space="preserve"><value>This rule already exists.</value></data>
   <data name="RoutingError_InvalidAddress" xml:space="preserve"><value>Enter an IP address or a subnet whose address has no bits beyond the mask, for example 203.0.113.0/24.</value></data>
   <data name="RoutingError_InvalidDomain" xml:space="preserve"><value>This is not a site name. Enter a name without https:// and a path, for example example.com.</value></data>
@@ -235,6 +236,8 @@
   <data name="RoutingRulesEmpty" xml:space="preserve"><value>No rules yet.</value></data>
   <data name="RoutingRulesHeader" xml:space="preserve"><value>Your rules</value></data>
   <data name="RoutingRulesHint" xml:space="preserve"><value>Checked top to bottom before the preset; the first match wins.</value></data>
+  <data name="RoutingTunIpv6" xml:space="preserve"><value>IPv6 through VPN (TUN mode)</value></data>
+  <data name="RoutingTunIpv6Hint" xml:space="preserve"><value>Turn on only if the server has IPv6 connectivity. When off, IPv6 is blocked in TUN mode, apps fall back to IPv4 right away and nothing leaks over IPv6.</value></data>
   <data name="RuleAction_Block" xml:space="preserve"><value>Block</value></data>
   <data name="RuleAction_Direct" xml:space="preserve"><value>Direct</value></data>
   <data name="RuleAction_Proxy" xml:space="preserve"><value>Through server</value></data>
@@ -289,6 +292,8 @@
   <data name="SessionSent" xml:space="preserve"><value>Sent</value></data>
   <data name="SessionServer" xml:space="preserve"><value>Server</value></data>
   <data name="SessionTime" xml:space="preserve"><value>Time</value></data>
+  <data name="SettingsAutoReconnect" xml:space="preserve"><value>Reconnect automatically</value></data>
+  <data name="SettingsAutoReconnectHint" xml:space="preserve"><value>If the connection drops by itself (the core exited, the service restarted), KHORS connects again: after 1, 2, 4… up to 60 s, or as soon as the network is back. After a network change or sleep the connection is checked and restarted if needed. Kill Switch stays on meanwhile. With Auto, another server is picked instead.</value></data>
   <data name="SettingsDnsHeader" xml:space="preserve"><value>DNS</value></data>
   <data name="SettingsDnsHint" xml:space="preserve"><value>Where KHORS sends site name lookups in TUN mode and for WireGuard. Lookups go through the server, so your provider does not see them; an address on the local network (such as your router) is queried directly. In System proxy mode the server resolves names. Changes apply from the next connection.</value></data>
   <data name="SettingsGeoHeader" xml:space="preserve"><value>Geo databases</value></data>
@@ -313,6 +318,7 @@
   <data name="StatusDisconnected" xml:space="preserve"><value>Disconnected</value></data>
   <data name="StatusDisconnecting" xml:space="preserve"><value>Disconnecting…</value></data>
   <data name="StatusFailed" xml:space="preserve"><value>Connection failed</value></data>
+  <data name="StatusReconnecting" xml:space="preserve"><value>Reconnecting…</value></data>
   <data name="StorageCorrupt" xml:space="preserve"><value>The profiles file is damaged and was set aside; starting a new list.</value></data>
   <data name="StorageReadOnly" xml:space="preserve"><value>Profiles were saved by a newer KHORS version — changes are not saved.</value></data>
   <data name="StorageRestoredFromBackup" xml:space="preserve"><value>The profiles file was damaged — profiles restored from the backup.</value></data>

@@ -293,7 +293,7 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
         Assert.Equal(ConnectionStatus.Disconnected, _manager.Status);
     }
 
-    private sealed class FakeLauncher(List<string> events) : ICoreLauncher
+    internal sealed class FakeLauncher(List<string> events) : ICoreLauncher
     {
         public CoreStartException? FailWith { get; set; }
 
@@ -317,7 +317,7 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
         }
     }
 
-    private sealed class FakeSession(List<string> events) : ICoreSession
+    internal sealed class FakeSession(List<string> events) : ICoreSession
     {
         private readonly TaskCompletionSource<CoreExit> _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -349,7 +349,7 @@ public sealed class ConnectionManagerTests : IAsyncDisposable
         }
     }
 
-    private sealed class FakeSystemProxy(List<string> events) : ISystemProxy
+    internal sealed class FakeSystemProxy(List<string> events) : ISystemProxy
     {
         public bool FailEnable { get; set; }
 

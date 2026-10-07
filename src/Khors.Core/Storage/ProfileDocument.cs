@@ -62,7 +62,8 @@ public sealed record AppSettings(
     ConnectionMode ConnectionMode = ConnectionMode.SystemProxy,
     string RemoteDns = AppSettings.DefaultRemoteDns,
     bool GeoAutoUpdate = true,
-    DateTimeOffset? GeoLastCheck = null)
+    DateTimeOffset? GeoLastCheck = null,
+    bool AutoReconnect = true)
 {
     public const int CurrentSchemaVersion = 1;
 

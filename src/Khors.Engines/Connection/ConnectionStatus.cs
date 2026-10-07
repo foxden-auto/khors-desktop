@@ -14,6 +14,12 @@ public enum ConnectionState
 
     /// <summary>Подключение не удалось или оборвалось; причина — в <see cref="ConnectionStatus.Failure"/>.</summary>
     Failed,
+
+    /// <summary>
+    /// Подключение оборвалось само, KHORS подключается снова (ROADMAP 4.3): ход — в <see cref="ConnectionStatus.Reconnect"/>,
+    /// последняя причина — в <see cref="ConnectionStatus.Failure"/>.
+    /// </summary>
+    Reconnecting,
 }
 
 /// <summary>Текущее состояние подключения. Не содержит секретов.</summary>
@@ -24,6 +30,7 @@ public enum ConnectionState
 /// <param name="MissingGeo">
 /// Подключено, но правила маршрутизации с этими категориями не действуют: их нет в гео-базе (<see cref="ICoreSession.MissingGeo"/>).
 /// </param>
+/// <param name="Reconnect">Ход переподключения (<see cref="ConnectionState.Reconnecting"/>).</param>
 public sealed record ConnectionStatus(
     ConnectionState State,
     Profile? Profile = null,
@@ -33,10 +40,17 @@ public sealed record ConnectionStatus(
     ConnectionFailure? Failure = null,
     CoreKind? Core = null,
     CoreDiagnosis? Problem = null,
-    EquatableArray<string> MissingGeo = default)
+    EquatableArray<string> MissingGeo = default,
+    ReconnectProgress? Reconnect = null)
 {
     public static ConnectionStatus Disconnected { get; } = new(ConnectionState.Disconnected);
 }
+
+/// <summary>Ход переподключения.</summary>
+/// <param name="Attempt">Номер попытки, с 1.</param>
+/// <param name="RetryAt">Когда будет попытка; <c>null</c> — идёт сейчас или ждём сеть.</param>
+/// <param name="WaitingForNetwork">Сети нет — попытка будет, когда она появится.</param>
+public sealed record ReconnectProgress(int Attempt, DateTimeOffset? RetryAt = null, bool WaitingForNetwork = false);
 
 public enum ModeSwitchOutcome
 {

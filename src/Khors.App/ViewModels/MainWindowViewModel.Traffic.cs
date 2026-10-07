@@ -37,6 +37,7 @@ public sealed partial class MainWindowViewModel
     private void OnSessionTick()
     {
         UpdateSessionTime();
+        UpdateReconnectCountdown();
         _ = PollTrafficAsync();
     }
 

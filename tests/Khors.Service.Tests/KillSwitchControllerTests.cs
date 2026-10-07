@@ -124,6 +124,21 @@ public sealed class KillSwitchControllerTests : IDisposable
     }
 
     [Fact]
+    public void FailedReconnectKeepsBlockingAfterCrash()
+    {
+        var controller = Controller(IpcKillSwitchMode.WhileConnected);
+        controller.TunStarting();
+        controller.TunStarted();
+        controller.TunStopped(byUser: false);
+
+        controller.TunStarting();
+        controller.TunStartFailed();
+
+        Assert.True(controller.Status().Blocking);
+        Assert.DoesNotContain("remove", _wfp.Calls);
+    }
+
+    [Fact]
     public void AlwaysBlocksWithoutTunnel()
     {
         var controller = Controller(IpcKillSwitchMode.Always);

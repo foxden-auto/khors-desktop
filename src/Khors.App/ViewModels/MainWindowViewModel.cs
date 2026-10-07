@@ -73,6 +73,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         IsTunMode = settings.Current.ConnectionMode == ConnectionMode.Tun;
         LoadDnsSetting();
         LoadRoutingSetting();
+        LoadReconnectSetting();
         InitGeo();
 
         // «Авто» — до загрузки списка, чтобы загрузка не выбрала первый профиль поверх сохранённого выбора.
@@ -166,7 +167,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     public bool HasNoLogTail => !HasLogTail;
 
     /// <summary>Ошибка подключения с логом ядра — ссылка «Подробности — в журнале».</summary>
-    public bool ShowsLogLink => IsFailed && HasLogTail;
+    public bool ShowsLogLink => (IsFailed || IsReconnecting) && HasLogTail;
 
     public bool HasNoProfiles => Profiles.Count == 0;
 
@@ -238,7 +239,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     /// Режим меняется без подключения и при подключении (переподключение в новом режиме, ROADMAP 3.7); не меняется,
     /// пока идёт подключение, отключение или подбор сервера «Авто».
     /// </summary>
-    public bool CanChangeMode => State is not (ConnectionState.Connecting or ConnectionState.Disconnecting) && _auto.Status.State != AutoState.Selecting;
+    public bool CanChangeMode => State is not (ConnectionState.Connecting or ConnectionState.Disconnecting or ConnectionState.Reconnecting) && _auto.Status.State != AutoState.Selecting;
 
     public bool CanSelectTun => CanChangeMode && (IsServiceRunning || IsTunMode);
 
@@ -290,6 +291,18 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             return;
         }
 
+        if (State == ConnectionState.Reconnecting)
+        {
+            // Отключение во время попыток — то же явное отключение: блокировка Kill Switch «пока подключено» снимается.
+            await _connection.DisconnectAsync().ConfigureAwait(true);
+            if (IsTunMode)
+            {
+                await ReleaseKillSwitchAsync().ConfigureAwait(true);
+            }
+
+            return;
+        }
+
         if (State is ConnectionState.Connected or ConnectionState.Connecting)
         {
             await _connection.DisconnectAsync().ConfigureAwait(true);
@@ -315,7 +328,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     }
 
     private bool CanToggleConnection() =>
-        State is ConnectionState.Connected or ConnectionState.Connecting
+        State is ConnectionState.Connected or ConnectionState.Connecting or ConnectionState.Reconnecting
         || _auto.IsActive
         || (State is ConnectionState.Disconnected or ConnectionState.Failed && (SelectedProfile is not null || (IsAutoSelected && HasProfiles)));
 
@@ -655,7 +668,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             return;
         }
 
-        if (_connection.Status.Profile?.SubscriptionId == item.Id && State is ConnectionState.Connected or ConnectionState.Connecting)
+        if (_connection.Status.Profile?.SubscriptionId == item.Id && State is ConnectionState.Connected or ConnectionState.Connecting or ConnectionState.Reconnecting)
         {
             await _connection.DisconnectAsync().ConfigureAwait(true);
         }
@@ -698,7 +711,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             return;
         }
 
-        if (_connection.Status.Profile?.Id == item.Id && State is ConnectionState.Connected or ConnectionState.Connecting)
+        if (_connection.Status.Profile?.Id == item.Id && State is ConnectionState.Connected or ConnectionState.Connecting or ConnectionState.Reconnecting)
         {
             await _connection.DisconnectAsync().ConfigureAwait(true);
         }
@@ -728,7 +741,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         }
 
         Message = null;
-        var reconnect = _connection.Status.Profile?.Id == item.Id && State is ConnectionState.Connected or ConnectionState.Connecting;
+        var reconnect = _connection.Status.Profile?.Id == item.Id && State is ConnectionState.Connected or ConnectionState.Connecting or ConnectionState.Reconnecting;
         _profiles.Update(updated);
         if (reconnect)
         {
@@ -912,13 +925,14 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     partial void OnStateChanged(ConnectionState value)
     {
-        if (value is ConnectionState.Connected or ConnectionState.Failed or ConnectionState.Disconnected)
+        if (value is ConnectionState.Connected or ConnectionState.Failed or ConnectionState.Disconnected or ConnectionState.Reconnecting)
         {
             _ = RefreshKillSwitchAsync();
         }
 
         OnPropertyChanged(nameof(IsConnected));
         OnPropertyChanged(nameof(IsFailed));
+        OnPropertyChanged(nameof(IsReconnecting));
         OnPropertyChanged(nameof(ShowsLogLink));
         OnPropertyChanged(nameof(CanChangeMode));
         OnPropertyChanged(nameof(CanSelectTun));
@@ -990,13 +1004,14 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         State = status.State;
         ActiveProfileName = status.Profile?.Name;
         StatusText = Localizer.Get($"Status{status.State}");
-        ConnectButtonText = Localizer.Get(status.State is ConnectionState.Connected or ConnectionState.Connecting ? "ButtonDisconnect" : "ButtonConnect");
+        ConnectButtonText = Localizer.Get(status.State is ConnectionState.Connected or ConnectionState.Connecting or ConnectionState.Reconnecting ? "ButtonDisconnect" : "ButtonConnect");
 
         StatusDetail = status switch
         {
             { State: ConnectionState.Connected } when IsTunMode => Localizer.Format("TunConnectedFormat", Localizer.CoreName(status.Core)),
             { State: ConnectionState.Connected, HttpPort: { } http, SocksPort: { } socks } => Localizer.Format("LocalProxyFormat", http, socks, Localizer.CoreName(status.Core)),
             { State: ConnectionState.Failed, Failure: { } failure } => Localizer.Describe(failure),
+            { State: ConnectionState.Reconnecting } => DescribeReconnect(status),
             { State: ConnectionState.Disconnected } when SelectedProfile is null && !IsAutoSelected => Localizer.Get("NoProfileSelected"),
             { State: ConnectionState.Disconnected } => Localizer.Get("HintDisconnected"),
             _ => null,
@@ -1007,6 +1022,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         {
             { State: ConnectionState.Connected, Problem: { } problem } => Localizer.Format("ConnectionProblemFormat", Localizer.Describe(problem)),
             { State: ConnectionState.Failed, Failure.Problem: { } problem } => Localizer.Describe(problem),
+            { State: ConnectionState.Reconnecting, Failure: { } failure } => Localizer.Describe(failure),
             _ when _auto.Status.State == AutoState.Waiting => Localizer.Get("AutoWaiting"),
             _ => null,
         };
@@ -1040,7 +1056,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
             _lastSessionLog = null;
         }
 
-        if (status.State == ConnectionState.Connected)
+        if (status.State is ConnectionState.Connected or ConnectionState.Reconnecting)
         {
             _sessionTimer.Start();
         }
@@ -1129,7 +1145,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
 
     private void MarkActiveProfile()
     {
-        var activeId = _connection.Status is { State: ConnectionState.Connected or ConnectionState.Connecting, Profile: { } profile } ? profile.Id : (Guid?)null;
+        var activeId = _connection.Status is { State: ConnectionState.Connected or ConnectionState.Connecting or ConnectionState.Reconnecting, Profile: { } profile } ? profile.Id : (Guid?)null;
         foreach (var item in Profiles)
         {
             item.IsActive = item.Id == activeId;

@@ -18,6 +18,8 @@
                        Content="{x:Static res:Strings.ModeTunOption}" />
           <TextBlock Text="{x:Static res:Strings.ModeTunTooltip}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
           <TextBlock Text="{x:Static res:Strings.SettingsModeHint}" Classes="muted" TextWrapping="Wrap" />
+          <CheckBox IsChecked="{Binding AutoReconnect}" Content="{x:Static res:Strings.SettingsAutoReconnect}" Margin="0,6,0,0" />
+          <TextBlock Text="{x:Static res:Strings.SettingsAutoReconnectHint}" Classes="caption" TextWrapping="Wrap" Margin="28,-6,0,4" />
         </StackPanel>
       </Border>
 

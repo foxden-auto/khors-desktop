@@ -27,6 +27,9 @@ public partial class App : Application, IDisposable
     // Замер профиля для «Авто»: короче обычного теста — неответивший сервер не задерживает подбор.
     private static readonly TimeSpan s_autoProbeTimeout = TimeSpan.FromSeconds(6);
 
+    // Проверка подключения после смены сети и пробуждения (ROADMAP 4.3).
+    private static readonly TimeSpan s_healthCheckTimeout = TimeSpan.FromSeconds(10);
+
     /// <summary>Версия приложения для рукопожатия со службой.</summary>
     internal static string AppVersion { get; } = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
 
@@ -81,6 +84,9 @@ public partial class App : Application, IDisposable
 
         // Гео-базы (ROADMAP 3.6): проверка раз в сутки, первая — вскоре после запуска.
         _services.GetRequiredService<GeoManager>().Start();
+
+        // Переподключение после обрыва, смены сети и сна (ROADMAP 4.3).
+        _services.GetRequiredService<ConnectionWatchdog>();
 
         // Завершение сеанса Windows и т.п.: сначала отключаемся и возвращаем прокси.
         desktop.ShutdownRequested += (_, e) =>
@@ -137,6 +143,21 @@ public partial class App : Application, IDisposable
         services.AddSingleton(sp =>
         {
             var connection = sp.GetRequiredService<ConnectionManager>();
+            var settings = sp.GetRequiredService<SettingsStore>();
+            var auto = sp.GetRequiredService<AutoConnector>();
+
+            // При «Авто» обрыв обрабатывает оно само — переходом на другой сервер.
+            connection.ReconnectEnabled = () => settings.Current.AutoReconnect && !auto.IsActive;
+            return new ConnectionWatchdog(
+                connection,
+                sp.GetService<INetworkMonitor>(),
+                CreatePowerEvents(sp),
+                async ct => connection.Status is not { State: ConnectionState.Connected, HttpPort: { } port }
+                    || (await LatencyTester.MeasureThroughProxyAsync(port, LatencyTester.TestUrlOrDefault(settings.Current.LatencyTestUrl), s_healthCheckTimeout, ct).ConfigureAwait(false)).Status == LatencyStatus.Ok);
+        });
+        services.AddSingleton(sp =>
+        {
+            var connection = sp.GetRequiredService<ConnectionManager>();
             return new GeoDatabaseUpdater(
                 sp.GetRequiredService<AppPaths>().GeoDirectory,
                 () => connection.Status is { State: ConnectionState.Connected, HttpPort: { } port } ? port : null);
@@ -147,6 +168,20 @@ public partial class App : Application, IDisposable
             sp.GetRequiredService<SettingsStore>()));
         services.AddSingleton<MainWindowViewModel>();
         return services.BuildServiceProvider();
+    }
+
+    /// <summary>Без уведомлений о сне KHORS работает как раньше — переподключение по смене сети и обрыву остаётся.</summary>
+    private static IPowerEvents? CreatePowerEvents(IServiceProvider services)
+    {
+        try
+        {
+            return services.GetService<IPowerEvents>();
+        }
+        catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or EntryPointNotFoundException or DllNotFoundException)
+        {
+            System.Diagnostics.Trace.TraceError($"KHORS power notifications unavailable: {ex.GetType().Name}");
+            return null;
+        }
     }
 
     private static void ApplyLanguage(string? language)
@@ -211,6 +246,13 @@ public partial class App : Application, IDisposable
             {
                 await RunExitStepAsync(() => _services.GetRequiredService<SubscriptionScheduler>().DisposeAsync().AsTask()).ConfigureAwait(true);
                 await RunExitStepAsync(() => _services.GetRequiredService<GeoManager>().DisposeAsync().AsTask()).ConfigureAwait(true);
+
+                // Проверки после смены сети — до отключения, чтобы не перезапустили ядро во время выхода.
+                await RunExitStepAsync(() =>
+                {
+                    _services.GetRequiredService<ConnectionWatchdog>().Dispose();
+                    return Task.CompletedTask;
+                }).ConfigureAwait(true);
 
                 // «Авто» — до отключения, чтобы не начало подбирать сервер заново.
                 await RunExitStepAsync(() => _services.GetRequiredService<AutoConnector>().DisposeAsync().AsTask()).ConfigureAwait(true);

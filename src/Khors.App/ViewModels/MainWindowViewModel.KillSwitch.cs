@@ -122,7 +122,9 @@ public sealed partial class MainWindowViewModel
         }
 
         // Блокировку показываем, только когда подключения нет: во время запуска TUN фильтры стоят, а адаптера ещё нет.
-        var blocking = status is { Blocking: true } && State is not (Engines.Connection.ConnectionState.Connected or Engines.Connection.ConnectionState.Connecting);
+        // Во время переподключения блокировка — ожидаемая, о ней говорит статус.
+        var blocking = status is { Blocking: true }
+            && State is not (Engines.Connection.ConnectionState.Connected or Engines.Connection.ConnectionState.Connecting or Engines.Connection.ConnectionState.Reconnecting);
         KillSwitchBanner = blocking
             ? Localizer.Get(status!.Mode == IpcKillSwitchMode.Always ? "KillSwitchBlockingAlways" : "KillSwitchBlockingWhileConnected")
             : null;
