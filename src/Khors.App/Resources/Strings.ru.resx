@@ -21,6 +21,7 @@
   <data name="ButtonAdd" xml:space="preserve"><value>Добавить</value></data>
   <data name="ButtonAddRule" xml:space="preserve"><value>Добавить правило</value></data>
   <data name="ButtonCancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="ButtonCheckCores" xml:space="preserve"><value>Проверить обновления</value></data>
   <data name="ButtonClose" xml:space="preserve"><value>Закрыть</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Подключить</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Копировать весь лог</value></data>
@@ -35,6 +36,7 @@
   <data name="ButtonResetNetwork" xml:space="preserve"><value>Сбросить сетевые настройки KHORS</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Задержка</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Обновить</value></data>
+  <data name="ButtonUpdateCores" xml:space="preserve"><value>Обновить ядра</value></data>
   <data name="ButtonUpdateGeo" xml:space="preserve"><value>Обновить сейчас</value></data>
   <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} ГБ</value></data>
   <data name="BytesKbFormat" xml:space="preserve"><value>{0:0} КБ</value></data>
@@ -48,8 +50,37 @@
   <data name="ClipboardNoQr" xml:space="preserve"><value>На картинке в буфере обмена не найден QR-код.</value></data>
   <data name="ConnectionProblemFormat" xml:space="preserve"><value>Соединения с сервером не устанавливаются. {0}</value></data>
   <data name="CoreAutoFormat" xml:space="preserve"><value>Автоматически (сейчас {0})</value></data>
+  <data name="CoreAvailableFormat" xml:space="preserve"><value>Доступна версия {0}.</value></data>
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>Ядро {0} не запустит этот профиль: {1}. Выбор ядра не изменён.</value></data>
+  <data name="CoreLocalFormat" xml:space="preserve"><value>Окно: {0}</value></data>
+  <data name="CoreLocalShippedFormat" xml:space="preserve"><value>Окно: {0} (из поставки)</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Лог ядра скопирован в буфер обмена: строк {0}. Адреса и ключи в нём замаскированы.</value></data>
+  <data name="CoreNewerSeriesFormat" xml:space="preserve"><value>Вышла версия {0} новой серии — она придёт с новой версией KHORS.</value></data>
+  <data name="CoreRollbackFormat" xml:space="preserve"><value>Откатить на {0}</value></data>
+  <data name="CoreServiceFormat" xml:space="preserve"><value>Служба: {0}</value></data>
+  <data name="CoreServiceShippedFormat" xml:space="preserve"><value>Служба: {0} (из поставки)</value></data>
+  <data name="CoreServiceUnknown" xml:space="preserve"><value>Служба: не установлена или не отвечает</value></data>
+  <data name="CoreUpdateError_ChecksumMismatch" xml:space="preserve"><value>архив не совпал с контрольной суммой релиза</value></data>
+  <data name="CoreUpdateError_HttpError" xml:space="preserve"><value>GitHub ответил ошибкой (возможно, лимит запросов — повторите позже)</value></data>
+  <data name="CoreUpdateError_Incompatible" xml:space="preserve"><value>ядро не приняло конфиги KHORS — оставлена прежняя версия</value></data>
+  <data name="CoreUpdateError_InvalidArchive" xml:space="preserve"><value>в архиве нет ожидаемых файлов</value></data>
+  <data name="CoreUpdateError_InvalidResponse" xml:space="preserve"><value>ответ GitHub не разбирается</value></data>
+  <data name="CoreUpdateError_Network" xml:space="preserve"><value>нет связи с GitHub</value></data>
+  <data name="CoreUpdateError_NotFound" xml:space="preserve"><value>подходящего релиза нет</value></data>
+  <data name="CoreUpdateError_NothingToRollback" xml:space="preserve"><value>откатываться некуда</value></data>
+  <data name="CoreUpdateError_Timeout" xml:space="preserve"><value>GitHub не ответил вовремя</value></data>
+  <data name="CoreUpdateError_TooLarge" xml:space="preserve"><value>файл больше допустимого</value></data>
+  <data name="CoreUpdateError_WriteFailed" xml:space="preserve"><value>не удалось записать файлы</value></data>
+  <data name="CoresCheckFailedFormat" xml:space="preserve"><value>{0}: не удалось проверить ({1}).</value></data>
+  <data name="CoresChecking" xml:space="preserve"><value>Проверка обновлений…</value></data>
+  <data name="CoresLocalFailedFormat" xml:space="preserve"><value>окно — не обновлено: {0}</value></data>
+  <data name="CoresReconnectHint" xml:space="preserve"><value>Новое ядро будет использовано со следующего подключения — переподключитесь.</value></data>
+  <data name="CoresRolledBackFormat" xml:space="preserve"><value>{0}: возвращена предыдущая версия.</value></data>
+  <data name="CoresServiceFailedFormat" xml:space="preserve"><value>служба — не обновлена: {0}</value></data>
+  <data name="CoresServiceUnavailable" xml:space="preserve"><value>служба не отвечает</value></data>
+  <data name="CoresUpToDate" xml:space="preserve"><value>Обновлений нет: установлены последние версии серии.</value></data>
+  <data name="CoresUpdatedFormat" xml:space="preserve"><value>{0} обновлён до {1}.</value></data>
+  <data name="CoresUpdating" xml:space="preserve"><value>Загрузка и проверка ядер… Это может занять несколько минут.</value></data>
   <data name="DnsCustomHint" xml:space="preserve"><value>Форматы: https://адрес/путь (DoH), tls://адрес (DoT), udp://адрес, tcp://адрес или просто IP. Порт — через двоеточие.</value></data>
   <data name="DnsCustomOption" xml:space="preserve"><value>Свой адрес</value></data>
   <data name="DnsCustomPlaceholder" xml:space="preserve"><value>https://dns.example.com/dns-query</value></data>
@@ -312,6 +343,8 @@
   <data name="SessionTime" xml:space="preserve"><value>Время</value></data>
   <data name="SettingsAutoReconnect" xml:space="preserve"><value>Переподключаться автоматически</value></data>
   <data name="SettingsAutoReconnectHint" xml:space="preserve"><value>Если подключение оборвалось само (ядро завершилось, служба перезапустилась), KHORS подключается снова: через 1, 2, 4… до 60 с, без сети — когда она появится. После смены сети и сна подключение проверяется и при необходимости перезапускается. Kill Switch на это время не снимается. При «Авто» вместо этого выбирается другой сервер.</value></data>
+  <data name="SettingsCoresHeader" xml:space="preserve"><value>Ядра</value></data>
+  <data name="SettingsCoresHint" xml:space="preserve"><value>Xray и sing-box из официальных релизов на GitHub. Проверка и загрузка — только по кнопке; обновление — в пределах серии этой версии KHORS (Xray 26.x, sing-box 1.14.x), с проверкой контрольной суммы и конфигов KHORS. Окно и служба обновляют свои копии; новое ядро — со следующего подключения.</value></data>
   <data name="SettingsDnsHeader" xml:space="preserve"><value>DNS</value></data>
   <data name="SettingsDnsHint" xml:space="preserve"><value>Куда KHORS отправляет запросы имён сайтов в режиме TUN и для WireGuard. Запросы идут через сервер, провайдер их не видит; адрес в локальной сети (например, роутер) — напрямую. В режиме «Системный прокси» имена разрешает сервер. Изменение действует со следующего подключения.</value></data>
   <data name="SettingsGeoHeader" xml:space="preserve"><value>Гео-базы</value></data>

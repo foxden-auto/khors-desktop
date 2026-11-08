@@ -61,7 +61,7 @@ public static class WindowsPlatform
         services.AddSingleton(_ =>
         {
             var paths = new ServicePaths(ServiceDataDirectory.DefaultPath);
-            ServiceDataDirectory.Ensure(paths.DataDirectory, Path.GetFileName(paths.GeoDirectory));
+            ServiceDataDirectory.Ensure(paths.DataDirectory, Path.GetFileName(paths.GeoDirectory), Path.GetFileName(paths.CoresDirectory));
             return paths;
         });
         return services;

@@ -12,6 +12,7 @@ using Khors.Core.Diagnostics;
 using Khors.Engines;
 using Khors.Engines.Auto;
 using Khors.Engines.Connection;
+using Khors.Engines.Cores;
 using Khors.Engines.Latency;
 using Khors.Ipc;
 using Khors.Engines.Storage;
@@ -62,6 +63,9 @@ public partial class App : Application, IDisposable
         }
 
         _services = BuildServices();
+
+        // Обновлённые ядра окна (ROADMAP 5.2) — до первого запуска ядра.
+        CoreLocator.Store = _services.GetRequiredService<CoreUpdater>().Store;
         ApplyLanguage(_services.GetRequiredService<SettingsStore>().Current.Language);
 
         // Следы прошлого аварийного завершения (системный прокси) — до первого подключения (CLAUDE.md, правило 9).
@@ -166,6 +170,16 @@ public partial class App : Application, IDisposable
             sp.GetRequiredService<GeoDatabaseUpdater>(),
             new ServiceGeoClient(sp.GetRequiredService<IIpcClientTransport>(), AppVersion),
             sp.GetRequiredService<SettingsStore>()));
+        services.AddSingleton(sp =>
+        {
+            var connection = sp.GetRequiredService<ConnectionManager>();
+            return new CoreUpdater(
+                new CoreStore(sp.GetRequiredService<AppPaths>().CoresDirectory),
+                () => connection.Status is { State: ConnectionState.Connected, HttpPort: { } port } ? port : null);
+        });
+        services.AddSingleton(sp => new CoreManager(
+            sp.GetRequiredService<CoreUpdater>(),
+            new ServiceCoresClient(sp.GetRequiredService<IIpcClientTransport>(), AppVersion)));
         services.AddSingleton<MainWindowViewModel>();
         return services.BuildServiceProvider();
     }

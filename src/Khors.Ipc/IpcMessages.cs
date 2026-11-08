@@ -5,11 +5,12 @@ namespace Khors.Ipc;
 
 /// <summary>
 /// Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений (2 — команды TUN, 3 — счётчики трафика TUN,
-/// 4 — удалённый DNS, 5 — гео-базы службы, 6 — маршрутизация, 7 — Kill Switch, 8 — сброс сетевых настроек).
+/// 4 — удалённый DNS, 5 — гео-базы службы, 6 — маршрутизация, 7 — Kill Switch, 8 — сброс сетевых настроек,
+/// 9 — обновление ядер).
 /// </summary>
 public static class IpcProtocol
 {
-    public const int Version = 8;
+    public const int Version = 9;
 }
 
 /// <summary>
@@ -40,6 +41,10 @@ public static class IpcProtocol
 [JsonDerivedType(typeof(KillSwitchStatusResponse), "killSwitchStatus")]
 [JsonDerivedType(typeof(ResetNetworkRequest), "resetNetwork")]
 [JsonDerivedType(typeof(NetworkResetResponse), "networkReset")]
+[JsonDerivedType(typeof(GetCoresRequest), "getCores")]
+[JsonDerivedType(typeof(UpdateCoreRequest), "updateCore")]
+[JsonDerivedType(typeof(RollbackCoreRequest), "rollbackCore")]
+[JsonDerivedType(typeof(CoresStatusResponse), "coresStatus")]
 public abstract record IpcPayload;
 
 /// <summary>Первое сообщение клиента: версия протокола и версия приложения.</summary>
@@ -307,3 +312,26 @@ public sealed record IpcResetItem(IpcResetStep Step, IpcResetOutcome Outcome, st
 public sealed record ResetNetworkRequest : IpcPayload;
 
 public sealed record NetworkResetResponse(IReadOnlyList<IpcResetItem> Items) : IpcPayload;
+
+/// <summary>Ядро службы (ROADMAP 5.2).</summary>
+/// <param name="Version">Работающая версия.</param>
+/// <param name="Shipped">Работает ядро из поставки службы.</param>
+/// <param name="PreviousVersion">Версия для отката; <c>null</c> — откатываться некуда.</param>
+public sealed record IpcCoreState(IpcCore Core, string Version, bool Shipped, string? PreviousVersion = null);
+
+/// <summary>Версии ядер службы — без сети.</summary>
+public sealed record GetCoresRequest : IpcPayload;
+
+/// <summary>
+/// Обновить ядро службы до версии <paramref name="Version"/>. Релиз, архив и контрольную сумму служба получает и проверяет
+/// сама (CLAUDE.md, правило 8): от окна — только номер версии, принимается версия из серии поставки. Ответ — после
+/// загрузки и проверки, может занять минуты.
+/// </summary>
+public sealed record UpdateCoreRequest(IpcCore Core, string Version) : IpcPayload;
+
+/// <summary>Вернуть предыдущую версию ядра службы (или поставку).</summary>
+public sealed record RollbackCoreRequest(IpcCore Core) : IpcPayload;
+
+/// <param name="Error">Код <c>CoreUpdateError</c> последней команды, если она не удалась.</param>
+/// <param name="Detail">Текст ядра при несовместимости (конфиги проверки вымышленные).</param>
+public sealed record CoresStatusResponse(IReadOnlyList<IpcCoreState> Cores, string? Error = null, string? Detail = null) : IpcPayload;

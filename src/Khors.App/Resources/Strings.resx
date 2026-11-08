@@ -21,6 +21,7 @@
   <data name="ButtonAdd" xml:space="preserve"><value>Add</value></data>
   <data name="ButtonAddRule" xml:space="preserve"><value>Add rule</value></data>
   <data name="ButtonCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="ButtonCheckCores" xml:space="preserve"><value>Check for updates</value></data>
   <data name="ButtonClose" xml:space="preserve"><value>Close</value></data>
   <data name="ButtonConnect" xml:space="preserve"><value>Connect</value></data>
   <data name="ButtonCopyCoreLog" xml:space="preserve"><value>Copy the whole log</value></data>
@@ -35,6 +36,7 @@
   <data name="ButtonResetNetwork" xml:space="preserve"><value>Reset KHORS network settings</value></data>
   <data name="ButtonTestLatency" xml:space="preserve"><value>Latency</value></data>
   <data name="ButtonUpdate" xml:space="preserve"><value>Update</value></data>
+  <data name="ButtonUpdateCores" xml:space="preserve"><value>Update cores</value></data>
   <data name="ButtonUpdateGeo" xml:space="preserve"><value>Update now</value></data>
   <data name="BytesGbFormat" xml:space="preserve"><value>{0:0.##} GB</value></data>
   <data name="BytesKbFormat" xml:space="preserve"><value>{0:0} KB</value></data>
@@ -48,8 +50,37 @@
   <data name="ClipboardNoQr" xml:space="preserve"><value>No QR code was found in the clipboard image.</value></data>
   <data name="ConnectionProblemFormat" xml:space="preserve"><value>Connections to the server fail. {0}</value></data>
   <data name="CoreAutoFormat" xml:space="preserve"><value>Automatic (now {0})</value></data>
+  <data name="CoreAvailableFormat" xml:space="preserve"><value>Version {0} is available.</value></data>
   <data name="CoreChoiceRejectedFormat" xml:space="preserve"><value>The {0} core cannot run this profile: {1}. The core choice was not changed.</value></data>
+  <data name="CoreLocalFormat" xml:space="preserve"><value>Window: {0}</value></data>
+  <data name="CoreLocalShippedFormat" xml:space="preserve"><value>Window: {0} (bundled)</value></data>
   <data name="CoreLogCopiedFormat" xml:space="preserve"><value>Core log copied to the clipboard: {0} lines. Addresses and keys are masked.</value></data>
+  <data name="CoreNewerSeriesFormat" xml:space="preserve"><value>Version {0} of a new series is out — it will come with a new KHORS version.</value></data>
+  <data name="CoreRollbackFormat" xml:space="preserve"><value>Roll back to {0}</value></data>
+  <data name="CoreServiceFormat" xml:space="preserve"><value>Service: {0}</value></data>
+  <data name="CoreServiceShippedFormat" xml:space="preserve"><value>Service: {0} (bundled)</value></data>
+  <data name="CoreServiceUnknown" xml:space="preserve"><value>Service: not installed or not responding</value></data>
+  <data name="CoreUpdateError_ChecksumMismatch" xml:space="preserve"><value>the archive does not match the release checksum</value></data>
+  <data name="CoreUpdateError_HttpError" xml:space="preserve"><value>GitHub returned an error (possibly the request limit — try again later)</value></data>
+  <data name="CoreUpdateError_Incompatible" xml:space="preserve"><value>the core rejected KHORS configs — the previous version is kept</value></data>
+  <data name="CoreUpdateError_InvalidArchive" xml:space="preserve"><value>the archive lacks the expected files</value></data>
+  <data name="CoreUpdateError_InvalidResponse" xml:space="preserve"><value>the GitHub response cannot be read</value></data>
+  <data name="CoreUpdateError_Network" xml:space="preserve"><value>no connection to GitHub</value></data>
+  <data name="CoreUpdateError_NotFound" xml:space="preserve"><value>no suitable release</value></data>
+  <data name="CoreUpdateError_NothingToRollback" xml:space="preserve"><value>nothing to roll back to</value></data>
+  <data name="CoreUpdateError_Timeout" xml:space="preserve"><value>GitHub did not respond in time</value></data>
+  <data name="CoreUpdateError_TooLarge" xml:space="preserve"><value>the file is larger than allowed</value></data>
+  <data name="CoreUpdateError_WriteFailed" xml:space="preserve"><value>failed to write the files</value></data>
+  <data name="CoresCheckFailedFormat" xml:space="preserve"><value>{0}: check failed ({1}).</value></data>
+  <data name="CoresChecking" xml:space="preserve"><value>Checking for updates…</value></data>
+  <data name="CoresLocalFailedFormat" xml:space="preserve"><value>window — not updated: {0}</value></data>
+  <data name="CoresReconnectHint" xml:space="preserve"><value>The new core is used from the next connection — reconnect.</value></data>
+  <data name="CoresRolledBackFormat" xml:space="preserve"><value>{0}: the previous version is restored.</value></data>
+  <data name="CoresServiceFailedFormat" xml:space="preserve"><value>service — not updated: {0}</value></data>
+  <data name="CoresServiceUnavailable" xml:space="preserve"><value>the service does not respond</value></data>
+  <data name="CoresUpToDate" xml:space="preserve"><value>No updates: the latest versions of the series are installed.</value></data>
+  <data name="CoresUpdatedFormat" xml:space="preserve"><value>{0} updated to {1}.</value></data>
+  <data name="CoresUpdating" xml:space="preserve"><value>Downloading and verifying cores… This may take a few minutes.</value></data>
   <data name="DnsCustomHint" xml:space="preserve"><value>Formats: https://host/path (DoH), tls://host (DoT), udp://host, tcp://host or just an IP. Add a port after a colon.</value></data>
   <data name="DnsCustomOption" xml:space="preserve"><value>Custom address</value></data>
   <data name="DnsCustomPlaceholder" xml:space="preserve"><value>https://dns.example.com/dns-query</value></data>
@@ -312,6 +343,8 @@
   <data name="SessionTime" xml:space="preserve"><value>Time</value></data>
   <data name="SettingsAutoReconnect" xml:space="preserve"><value>Reconnect automatically</value></data>
   <data name="SettingsAutoReconnectHint" xml:space="preserve"><value>If the connection drops by itself (the core exited, the service restarted), KHORS connects again: after 1, 2, 4… up to 60 s, or as soon as the network is back. After a network change or sleep the connection is checked and restarted if needed. Kill Switch stays on meanwhile. With Auto, another server is picked instead.</value></data>
+  <data name="SettingsCoresHeader" xml:space="preserve"><value>Cores</value></data>
+  <data name="SettingsCoresHint" xml:space="preserve"><value>Xray and sing-box from the official GitHub releases. Checking and downloading happen only on request; updates stay within the series of this KHORS version (Xray 26.x, sing-box 1.14.x) and are verified by checksum and KHORS configs. The window and the service update their own copies; a new core is used from the next connection.</value></data>
   <data name="SettingsDnsHeader" xml:space="preserve"><value>DNS</value></data>
   <data name="SettingsDnsHint" xml:space="preserve"><value>Where KHORS sends site name lookups in TUN mode and for WireGuard. Lookups go through the server, so your provider does not see them; an address on the local network (such as your router) is queried directly. In System proxy mode the server resolves names. Changes apply from the next connection.</value></data>
   <data name="SettingsGeoHeader" xml:space="preserve"><value>Geo databases</value></data>

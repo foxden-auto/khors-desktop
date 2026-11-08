@@ -3,25 +3,25 @@
   "cores": [
     {
       "name": "xray",
-      "version": "26.9.9",
+      "version": "26.10.31",
       "license": "MPL-2.0",
-      "source": "https://github.com/XTLS/Xray-core/tree/v26.9.9",
+      "source": "https://github.com/XTLS/Xray-core/tree/v26.10.31",
       "assets": [
         {
           "platform": "win-x64",
-          "url": "https://github.com/XTLS/Xray-core/releases/download/v26.9.9/Xray-windows-64.zip",
-          "sha256": "244deaba2098c2964e49bba90df3707777e5f5f428a82d2f29604015f24beec2",
+          "url": "https://github.com/XTLS/Xray-core/releases/download/v26.10.31/Xray-windows-64.zip",
+          "sha256": "2e04a9995a6f2ad1b28c0bb25c708ecb2695e43a1c9c7889c4b6ac2b48cf7a6a",
           "files": [
-            { "entry": "xray.exe", "path": "xray.exe", "sha256": "0d0fc0ea2b05641acb78c01fc36ad694e7b029861b2d5eb93da0e3e9fda9a98f" },
+            { "entry": "xray.exe", "path": "xray.exe", "sha256": "d5b558191cccb1e92a5772b68b8cab67717b26f634b0f15153215f65ae982a7e" },
             { "entry": "LICENSE", "path": "LICENSE", "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5" }
           ]
         },
         {
           "platform": "linux-x64",
-          "url": "https://github.com/XTLS/Xray-core/releases/download/v26.9.9/Xray-linux-64.zip",
-          "sha256": "1eb9175d0f0a8f8149c9230a7fc5ae66ce332ed20a53155ce61fe62e3f58b7df",
+          "url": "https://github.com/XTLS/Xray-core/releases/download/v26.10.31/Xray-linux-64.zip",
+          "sha256": "e4bd9119f50ae7c41658b1abd0679ae06f98bd864a2907ff33f2f2cf7081b214",
           "files": [
-            { "entry": "xray", "path": "xray", "sha256": "c4ae6798c38e0e5343b192406746333cd0ba7ff3eb984f8c4b9939dcb68c3f8a", "executable": true },
+            { "entry": "xray", "path": "xray", "sha256": "cc4b84d3069569f297a61f04b914f2bb37e9d202fd7b84cb50def1fc30fd40e1", "executable": true },
             { "entry": "LICENSE", "path": "LICENSE", "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5" }
           ]
         }

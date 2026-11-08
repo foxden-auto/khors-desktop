@@ -24,7 +24,7 @@ public sealed partial class KillSwitchController
 
     private readonly IKillSwitch? _killSwitch;
     private readonly string _settingsFile;
-    private readonly IReadOnlyList<string> _applications;
+    private readonly Func<IReadOnlyList<string>> _applications;
     private readonly ILogger<KillSwitchController> _logger;
     private readonly Lock _lock = new();
     private KillSwitchSettings _settings;
@@ -38,6 +38,13 @@ public sealed partial class KillSwitchController
     /// <param name="killSwitch"><c>null</c> — платформа без Kill Switch: настройка сохраняется, фильтров нет.</param>
     /// <param name="applications">Полные пути ядер в каталоге службы.</param>
     public KillSwitchController(IKillSwitch? killSwitch, string settingsFile, IReadOnlyList<string> applications, ILogger<KillSwitchController> logger)
+        : this(killSwitch, settingsFile, () => applications, logger)
+    {
+        ArgumentNullException.ThrowIfNull(applications);
+    }
+
+    /// <param name="applications">Пути ядер — запрашиваются при каждой смене фильтров (ядро могли обновить, ROADMAP 5.2).</param>
+    public KillSwitchController(IKillSwitch? killSwitch, string settingsFile, Func<IReadOnlyList<string>> applications, ILogger<KillSwitchController> logger)
     {
         ArgumentNullException.ThrowIfNull(settingsFile);
         ArgumentNullException.ThrowIfNull(applications);
@@ -240,7 +247,7 @@ public sealed partial class KillSwitchController
         var policy = new KillSwitchPolicy(
             Persistent: _settings.Mode == IpcKillSwitchMode.Always,
             _settings.AllowLocalNetwork,
-            _applications,
+            _applications(),
             _tunnelUp ? TunnelInterface : null,
             _tunnelIpv6);
         if (!Try(() => _killSwitch.Apply(policy)))

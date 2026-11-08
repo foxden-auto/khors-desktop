@@ -98,6 +98,11 @@ public class IpcProtocolTests
         new TunLogEvent("line"),
         new TunExitedEvent(1, []),
         new ResetNetworkRequest(),
+        new GetCoresRequest(),
+        new UpdateCoreRequest(IpcCore.SingBox, "1.14.3"),
+        new RollbackCoreRequest(IpcCore.Xray),
+        new CoresStatusResponse([new IpcCoreState(IpcCore.Xray, "26.10.1", false, "26.9.9"), new IpcCoreState(IpcCore.SingBox, "1.14.2", true)]),
+        new CoresStatusResponse([], "Incompatible", "Failed to build config"),
         new NetworkResetResponse([
             new IpcResetItem(IpcResetStep.Tunnel, IpcResetOutcome.Done),
             new IpcResetItem(IpcResetStep.KillSwitch, IpcResetOutcome.NothingToDo),

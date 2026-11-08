@@ -143,6 +143,38 @@
         </StackPanel>
       </Border>
 
+      <!-- Ядра (ROADMAP 5.2): версии окна и службы, проверка и обновление из GitHub Releases по кнопке, откат. -->
+      <Border Classes="card" IsVisible="{Binding HasCoresSupport}">
+        <StackPanel Spacing="10">
+          <TextBlock Text="{x:Static res:Strings.SettingsCoresHeader}" Classes="section" />
+          <TextBlock Text="{x:Static res:Strings.SettingsCoresHint}" Classes="muted" TextWrapping="Wrap" />
+          <ItemsControl ItemsSource="{Binding CoreRows}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:CoreRowItem">
+                <Grid ColumnDefinitions="90,*,Auto" Margin="0,4">
+                  <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Top" />
+                  <StackPanel Grid.Column="1" Spacing="2">
+                    <TextBlock Text="{Binding LocalText}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding ServiceText}" Classes="caption" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding Available}" Classes="warning" TextWrapping="Wrap"
+                               IsVisible="{Binding Available, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                  </StackPanel>
+                  <Button Grid.Column="2" Classes="secondary" Margin="12,0,0,0" VerticalAlignment="Top" IsVisible="{Binding CanRollback}"
+                          Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).RollbackCoreCommand}" CommandParameter="{Binding}"
+                          Content="{Binding RollbackText}" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Classes="secondary" Command="{Binding CheckCoresCommand}" Content="{x:Static res:Strings.ButtonCheckCores}" />
+            <Button Classes="secondary" Command="{Binding UpdateCoresCommand}" Content="{x:Static res:Strings.ButtonUpdateCores}" IsVisible="{Binding HasCoreUpdates}" />
+          </StackPanel>
+          <SelectableTextBlock Text="{Binding CoresMessage}" TextWrapping="Wrap"
+                               IsVisible="{Binding CoresMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+      </Border>
+
       <!-- Служба KHORS (режим TUN): состояние, установка и удаление с запросом прав администратора. -->
       <Border Classes="card">
         <StackPanel Spacing="10">

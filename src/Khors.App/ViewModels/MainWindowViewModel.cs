@@ -12,6 +12,7 @@ using Khors.Core.Qr;
 using Khors.Core.Storage;
 using Khors.Engines.Auto;
 using Khors.Engines.Connection;
+using Khors.Engines.Cores;
 using Khors.Engines.Geo;
 using Khors.Engines.Latency;
 using Khors.Engines.Storage;
@@ -36,6 +37,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
     private readonly IIpcClientTransport _serviceTransport;
     private readonly GeoManager _geo;
     private readonly ISystemProxy? _systemProxy;
+    private readonly CoreManager? _cores;
     private readonly ServiceNetworkResetClient _networkReset;
     private readonly DispatcherTimer _sessionTimer;
     private readonly Dictionary<Guid, LatencyResult> _latency = [];
@@ -57,9 +59,11 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         IServiceControl service,
         IIpcClientTransport serviceTransport,
         GeoManager geo,
-        ISystemProxy? systemProxy = null)
+        ISystemProxy? systemProxy = null,
+        CoreManager? cores = null)
     {
         _systemProxy = systemProxy;
+        _cores = cores;
         _networkReset = new ServiceNetworkResetClient(serviceTransport, AppVersion);
         _auto = auto;
         _geo = geo;
@@ -80,6 +84,7 @@ public sealed partial class MainWindowViewModel : ObservableObject, IProfileActi
         LoadRoutingSetting();
         LoadReconnectSetting();
         InitGeo();
+        InitCores();
 
         // «Авто» — до загрузки списка, чтобы загрузка не выбрала первый профиль поверх сохранённого выбора.
         IsAutoSelected = settings.Current.AutoSelect;

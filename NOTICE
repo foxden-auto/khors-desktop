@@ -14,13 +14,19 @@ processes and does not link against them.
 
 Component        License                    Source
 ---------------  -------------------------  -----------------------------------------
-Xray-core        MPL-2.0                    https://github.com/XTLS/Xray-core
+Xray-core 26.10.31 MPL-2.0                    https://github.com/XTLS/Xray-core
 sing-box         GPL-3.0-or-later (*)       https://github.com/SagerNet/sing-box
 Wintun           Prebuilt Binaries License  https://www.wintun.net
 
 (*) Check the additional terms in the sing-box LICENSE (use of the project
     name) before each release. The exact sing-box version shipped and a link
     to its corresponding source are listed in tools/cores/cores.lock.json.
+
+Cores updated from the application (Settings → Cores) are the official
+release builds of the same projects, downloaded from their GitHub Releases
+together with their LICENSE files; the source of each version is the
+matching tag in the project repository (for example,
+https://github.com/SagerNet/sing-box/tree/v1.14.3).
 
 -------------------------------------------------------------------------------
 .NET libraries (NuGet packages shipped with the application)

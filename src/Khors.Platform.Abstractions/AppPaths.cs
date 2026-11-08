@@ -11,6 +11,9 @@ public sealed record AppPaths(string DataDirectory, string StateDirectory)
 
     /// <summary>Гео-базы окна (режим «Системный прокси»).</summary>
     public string GeoDirectory => Path.Combine(DataDirectory, "geo");
+
+    /// <summary>Обновлённые ядра окна (ROADMAP 5.2).</summary>
+    public string CoresDirectory => Path.Combine(DataDirectory, "cores");
 }
 
 /// <summary>Каталоги данных службы KHORS (Windows — <c>%ProgramData%\KHORS</c>): писать туда может только служба и администраторы.</summary>
@@ -18,4 +21,7 @@ public sealed record ServicePaths(string DataDirectory)
 {
     /// <summary>Гео-базы службы (режим TUN).</summary>
     public string GeoDirectory => Path.Combine(DataDirectory, "geo");
+
+    /// <summary>Обновлённые ядра службы (ROADMAP 5.2): запускаются с правами службы, поэтому — только в её каталоге.</summary>
+    public string CoresDirectory => Path.Combine(DataDirectory, "cores");
 }

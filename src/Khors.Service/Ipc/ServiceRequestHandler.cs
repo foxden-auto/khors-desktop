@@ -2,6 +2,7 @@ using Khors.Core.Dns;
 using Khors.Core.Routing;
 using Khors.Core.Storage;
 using Khors.Ipc;
+using Khors.Service.Cores;
 using Khors.Service.Geo;
 using Khors.Service.KillSwitch;
 using Khors.Service.Tun;
@@ -19,13 +20,15 @@ public sealed record ServiceInfo(string Version, DateTimeOffset StartedAt);
 /// <param name="geo">Гео-базы службы; <c>null</c> — команды гео-баз недоступны (тесты протокола).</param>
 /// <param name="killSwitch">Kill Switch службы; <c>null</c> — команды Kill Switch недоступны (тесты протокола).</param>
 /// <param name="reset">Сброс сетевых настроек; <c>null</c> — команда недоступна (тесты протокола).</param>
+/// <param name="cores">Ядра службы; <c>null</c> — команды ядер недоступны (тесты протокола).</param>
 public sealed class ServiceRequestHandler(
     ServiceInfo info,
     TunController tun,
     Action<IpcPayload> sendEvent,
     ServiceGeo? geo = null,
     KillSwitchController? killSwitch = null,
-    NetworkReset? reset = null) : IAsyncDisposable
+    NetworkReset? reset = null,
+    ServiceCores? cores = null) : IAsyncDisposable
 {
     private static readonly HashSet<string> s_logLevels = ["debug", "info", "warning", "error", "none"];
 
@@ -75,6 +78,14 @@ public sealed class ServiceRequestHandler(
                 return killSwitch.Release();
             case ResetNetworkRequest when reset is not null:
                 return await reset.RunAsync().ConfigureAwait(false);
+            case GetCoresRequest when cores is not null:
+                return cores.Status();
+            case UpdateCoreRequest update when cores is not null && Enum.IsDefined(update.Core) && update.Version is { Length: <= 32 }:
+                return await cores.UpdateAsync(update.Core, update.Version, cancellationToken).ConfigureAwait(false);
+            case RollbackCoreRequest rollback when cores is not null && Enum.IsDefined(rollback.Core):
+                return cores.Rollback(rollback.Core);
+            case UpdateCoreRequest or RollbackCoreRequest:
+                return new ErrorResponse(IpcErrorCode.BadRequest);
             default:
                 // Ответы и события службы клиент присылать не должен.
                 return new ErrorResponse(IpcErrorCode.UnknownCommand);
