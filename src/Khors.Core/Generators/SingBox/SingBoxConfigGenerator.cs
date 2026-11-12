@@ -817,6 +817,66 @@ public static class SingBoxConfigGenerator
             endpoint["mtu"] = mtu;
         }
 
+        if (wireGuard is AmneziaWireGuardSettings awg)
+        {
+            var amnezia = new JsonObject();
+            Add(amnezia, "jc", awg.Jc);
+            Add(amnezia, "jmin", awg.Jmin);
+            Add(amnezia, "jmax", awg.Jmax);
+            Add(amnezia, "s1", awg.S1);
+            Add(amnezia, "s2", awg.S2);
+            Add(amnezia, "s3", awg.S3);
+            Add(amnezia, "s4", awg.S4);
+            Add(amnezia, "h1", awg.H1);
+            Add(amnezia, "h2", awg.H2);
+            Add(amnezia, "h3", awg.H3);
+            Add(amnezia, "h4", awg.H4);
+            Add(amnezia, "i1", awg.I1);
+            Add(amnezia, "i2", awg.I2);
+            Add(amnezia, "i3", awg.I3);
+            Add(amnezia, "i4", awg.I4);
+            Add(amnezia, "i5", awg.I5);
+            Add(amnezia, "header_protection_key", awg.HeaderProtectionKey);
+            Add(amnezia, "content_padding_addition", awg.ContentPaddingAddition);
+            Add(amnezia, "rekey_after_time", awg.RekeyAfterTime);
+            Add(amnezia, "rekey_timeout", awg.RekeyTimeout);
+            Add(amnezia, "reject_after_time", awg.RejectAfterTime);
+            Add(amnezia, "keepalive_timeout", awg.KeepaliveTimeout);
+            Add(amnezia, "max_handshake_attempts", awg.MaxHandshakeAttempts);
+            Add(amnezia, "random_trailers", awg.RandomTrailers);
+            Add(amnezia, "disable_cookies", awg.DisableCookies);
+            foreach (var option in awg.ExtraOptions)
+            {
+                amnezia[option.Key] = option.Value;
+            }
+
+            endpoint["amnezia"] = amnezia;
+        }
+
         return endpoint;
+    }
+
+    private static void Add(JsonObject target, string key, string? value)
+    {
+        if (value is not null)
+        {
+            target[key] = value;
+        }
+    }
+
+    private static void Add(JsonObject target, string key, int? value)
+    {
+        if (value is { } number)
+        {
+            target[key] = number;
+        }
+    }
+
+    private static void Add(JsonObject target, string key, bool? value)
+    {
+        if (value is { } flag)
+        {
+            target[key] = flag;
+        }
     }
 }

@@ -145,7 +145,12 @@ public sealed class CoreManager(CoreUpdater local, IServiceCoresClient? service)
         }
     }
 
-    private static IpcCore ToIpc(CoreKind kind) => kind == CoreKind.Xray ? IpcCore.Xray : IpcCore.SingBox;
+    private static IpcCore ToIpc(CoreKind kind) => kind switch
+    {
+        CoreKind.Xray => IpcCore.Xray,
+        CoreKind.SingBox => IpcCore.SingBox,
+        _ => IpcCore.SingBoxExtended,
+    };
 }
 
 /// <summary>Ядра службы по IPC: отдельное соединение на запрос.</summary>
@@ -165,7 +170,12 @@ public sealed class ServiceCoresClient(IIpcClientTransport transport, string cli
     public Task<CoresStatusResponse?> RollbackAsync(CoreKind kind, CancellationToken cancellationToken) =>
         RequestAsync(new RollbackCoreRequest(ToIpc(kind)), s_connectTimeout, cancellationToken);
 
-    private static IpcCore ToIpc(CoreKind kind) => kind == CoreKind.Xray ? IpcCore.Xray : IpcCore.SingBox;
+    private static IpcCore ToIpc(CoreKind kind) => kind switch
+    {
+        CoreKind.Xray => IpcCore.Xray,
+        CoreKind.SingBox => IpcCore.SingBox,
+        _ => IpcCore.SingBoxExtended,
+    };
 
     private async Task<CoresStatusResponse?> RequestAsync(IpcPayload request, TimeSpan timeout, CancellationToken cancellationToken)
     {

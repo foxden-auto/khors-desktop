@@ -83,6 +83,7 @@ public static class Localizer
     {
         CoreKind.Xray => "Xray",
         CoreKind.SingBox => "sing-box",
+        CoreKind.SingBoxExtended => "sing-box-extended",
         _ => string.Empty,
     };
 

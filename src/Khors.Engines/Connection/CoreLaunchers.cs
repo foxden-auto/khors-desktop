@@ -34,12 +34,17 @@ public static class CoreSelection
     public static CoreChoice Select(Profile profile)
     {
         ArgumentNullException.ThrowIfNull(profile);
+        if (profile.Protocol is AmneziaWireGuardSettings && profile.Core == CorePreference.Auto)
+        {
+            return new CoreChoice(CoreKind.SingBoxExtended, Automatic: true, null);
+        }
+
         switch (profile.Core)
         {
             case CorePreference.Xray:
                 return new CoreChoice(CoreKind.Xray, Automatic: false, XrayConfigGenerator.FindUnsupported(profile));
             case CorePreference.SingBox:
-                return new CoreChoice(CoreKind.SingBox, Automatic: false, SingBoxConfigGenerator.FindUnsupported(profile));
+                return new CoreChoice(CoreKind.SingBox, Automatic: false, profile.Protocol is AmneziaWireGuardSettings ? "protocol.amnezia" : SingBoxConfigGenerator.FindUnsupported(profile));
         }
 
         var xray = XrayConfigGenerator.FindUnsupported(profile);
@@ -111,10 +116,14 @@ public sealed class CoreKindLauncher(CoreKind kind, SecretMasker masker, IChildP
 /// Запуск ядра, выбранного <see cref="CoreSelection"/>; в режиме TUN — через службу (<paramref name="tun"/>),
 /// без неё режим TUN недоступен.
 /// </summary>
-public sealed class SelectingCoreLauncher(ICoreLauncher xray, ICoreLauncher singBox, ICoreLauncher? tun = null) : ICoreLauncher
+public sealed class SelectingCoreLauncher(ICoreLauncher xray, ICoreLauncher singBox, ICoreLauncher? tun = null, ICoreLauncher? singBoxExtended = null) : ICoreLauncher
 {
     public SelectingCoreLauncher(SecretMasker masker, IChildProcessGuard? guard, ICoreLauncher? tun = null, string? geoDirectory = null)
-        : this(new CoreKindLauncher(CoreKind.Xray, masker, guard, geoDirectory), new CoreKindLauncher(CoreKind.SingBox, masker, guard, geoDirectory), tun)
+        : this(
+            new CoreKindLauncher(CoreKind.Xray, masker, guard, geoDirectory),
+            new CoreKindLauncher(CoreKind.SingBox, masker, guard, geoDirectory),
+            tun,
+            new CoreKindLauncher(CoreKind.SingBoxExtended, masker, guard, geoDirectory))
     {
     }
 
@@ -127,6 +136,11 @@ public sealed class SelectingCoreLauncher(ICoreLauncher xray, ICoreLauncher sing
                 ?? throw new CoreStartException(CoreStartFailure.ServiceUnavailable, "TUN mode is not available.") { Core = CoreSelection.For(profile) };
         }
 
-        return (CoreSelection.For(profile) == CoreKind.SingBox ? singBox : xray).StartAsync(profile, preferences, cancellationToken);
+        return CoreSelection.For(profile) switch
+        {
+            CoreKind.SingBox => singBox.StartAsync(profile, preferences, cancellationToken),
+            CoreKind.SingBoxExtended when singBoxExtended is not null => singBoxExtended.StartAsync(profile, preferences, cancellationToken),
+            _ => xray.StartAsync(profile, preferences, cancellationToken),
+        };
     }
 }

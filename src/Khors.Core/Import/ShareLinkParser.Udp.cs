@@ -117,7 +117,7 @@ public static partial class ShareLinkParser
             .Select(b => int.TryParse(b, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? value : -1)
             .ToArray();
 
-        var protocol = new WireGuardSettings
+        var wireGuard = new WireGuardSettings
         {
             PrivateKey = new Secret(privateKey),
             PeerPublicKey = new Secret(publicKey),
@@ -126,6 +126,9 @@ public static partial class ShareLinkParser
             Reserved = reserved,
             Mtu = Number(query.Take("mtu")),
         };
+        ProtocolSettings protocol = AmneziaWireGuardOptions.HasOptions(url.Query)
+            ? AmneziaWireGuardOptions.Create(wireGuard, query)
+            : wireGuard;
 
         return new Profile
         {

@@ -43,6 +43,7 @@ public static partial class ShareLinkParser
                 "hysteria2" or "hy2" => LinkParseResult.Success(ParseHysteria2(body)),
                 "tuic" => LinkParseResult.Success(ParseTuic(body)),
                 "wireguard" or "wg" => LinkParseResult.Success(ParseWireGuard(body)),
+                "vpn" => LinkParseResult.Success(AmneziaConfigParser.ParseVpnLink(body)),
                 _ => LinkParseResult.Failure(LinkParseErrorCode.UnsupportedScheme, "scheme"),
             };
         }

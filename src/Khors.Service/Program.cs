@@ -38,7 +38,7 @@ builder.Services.AddSingleton(sp => new KillSwitchController(
     sp.GetService<IKillSwitch>(),
     Path.Combine(sp.GetRequiredService<ServicePaths>().DataDirectory, "killswitch.json"),
     // Пути ядер — при каждой смене фильтров: после обновления ядра (ROADMAP 5.2) разрешение нужно новому файлу.
-    () => [.. new[] { CoreKind.SingBox, CoreKind.Xray }.Select(k => CoreLocator.Find(k)).OfType<string>()],
+    () => [.. new[] { CoreKind.SingBox, CoreKind.SingBoxExtended, CoreKind.Xray }.Select(k => CoreLocator.Find(k)).OfType<string>()],
     sp.GetRequiredService<ILogger<KillSwitchController>>()));
 builder.Services.AddSingleton(sp => new CoreUpdater(new CoreStore(sp.GetRequiredService<ServicePaths>().CoresDirectory)));
 builder.Services.AddSingleton(sp => new ServiceCores(sp.GetRequiredService<CoreUpdater>()));

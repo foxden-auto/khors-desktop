@@ -24,6 +24,9 @@ public enum SubscriptionFormat
 
     /// <summary>Конфиг Xray или массив конфигов (выходы с полем <c>protocol</c>).</summary>
     XrayJson,
+
+    /// <summary>Конфигурация AmneziaWG в формате wg-quick.</summary>
+    AmneziaWireGuard,
 }
 
 /// <param name="Profiles">Профили подписки без Id (назначаются при слиянии), без повторов.</param>
@@ -36,6 +39,18 @@ public static class SubscriptionContent
     {
         ArgumentNullException.ThrowIfNull(body);
         var text = body.Trim().TrimStart('\uFEFF');
+
+        if (AmneziaConfigParser.LooksLikeConfig(text))
+        {
+            try
+            {
+                return Unique(SubscriptionFormat.AmneziaWireGuard, [AmneziaConfigParser.Parse(text)], new List<ImportLineError>());
+            }
+            catch (LinkFormatException ex)
+            {
+                return new SubscriptionContentResult(SubscriptionFormat.AmneziaWireGuard, default, new EquatableArray<ImportLineError>([new ImportLineError(1, new LinkParseError(ex.Code, ex.Field))]));
+            }
+        }
 
         if (text.StartsWith('{') || text.StartsWith('['))
         {

@@ -163,6 +163,7 @@ public sealed partial class ProfileItemViewModel(Profile profile, IProfileAction
         ShadowsocksSettings => "Shadowsocks",
         Hysteria2Settings => "Hysteria2",
         TuicSettings => "TUIC",
+        AmneziaWireGuardSettings => "AmneziaWG",
         WireGuardSettings => "WireGuard",
         _ => string.Empty,
     };

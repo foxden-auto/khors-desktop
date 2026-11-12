@@ -52,6 +52,32 @@
           ]
         }
       ]
+    },
+    {
+      "name": "sing-box-extended",
+      "version": "1.14.1-extended-2.7.2",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/shtorm-7/sing-box-extended/tree/v1.14.1-extended-2.7.2",
+      "assets": [
+        {
+          "platform": "win-x64",
+          "url": "https://github.com/shtorm-7/sing-box-extended/releases/download/v1.14.1-extended-2.7.2/sing-box-1.14.1-extended-2.7.2-windows-amd64.zip",
+          "sha256": "631104caf4b2ee36a74b3ffa8f73f465a5dcc9d03d85e575401b3d1031a5dc52",
+          "files": [
+            { "entry": "sing-box-1.14.1-extended-2.7.2-windows-amd64/sing-box.exe", "path": "sing-box.exe", "sha256": "61fccc36998829c3149b5e32c61a7b286e863fe8833d351eefecf3cd6618d951" },
+            { "entry": "sing-box-1.14.1-extended-2.7.2-windows-amd64/LICENSE", "path": "LICENSE", "sha256": "650d5e3b99a446fb38e820fa87a49562e0c79eab868fff58618ac487a58e554c" }
+          ]
+        },
+        {
+          "platform": "linux-x64",
+          "url": "https://github.com/shtorm-7/sing-box-extended/releases/download/v1.14.1-extended-2.7.2/sing-box-1.14.1-extended-2.7.2-linux-amd64.tar.gz",
+          "sha256": "c57646ac53e793559d736dce9cba12dbf6845d187b0bfd8c3aacf61a4328941d",
+          "files": [
+            { "entry": "sing-box-1.14.1-extended-2.7.2-linux-amd64/sing-box", "path": "sing-box", "sha256": "00ac880b46fdf901d49713b1fc09fb27e1dcdbde683fca6bb18b012eeb419cf8", "executable": true },
+            { "entry": "sing-box-1.14.1-extended-2.7.2-linux-amd64/LICENSE", "path": "LICENSE", "sha256": "650d5e3b99a446fb38e820fa87a49562e0c79eab868fff58618ac487a58e554c" }
+          ]
+        }
+      ]
     }
   ]
 }

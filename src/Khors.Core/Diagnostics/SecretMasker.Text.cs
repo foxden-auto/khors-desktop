@@ -42,6 +42,10 @@ public sealed partial class SecretMasker
         var trimmed = rest.TrimEnd('.', ',', ';', ':', '!', '?', ')');
         var trailing = rest[trimmed.Length..];
         var lower = scheme.ToLowerInvariant();
+        if (lower == "vpn")
+        {
+            return scheme + "://" + Mask(SecretKind.Key, trimmed);
+        }
 
         var fragmentAt = trimmed.IndexOf('#', StringComparison.Ordinal);
         var fragment = fragmentAt >= 0 ? trimmed[fragmentAt..] : string.Empty;
@@ -230,7 +234,7 @@ public sealed partial class SecretMasker
         return looksLikeAddress && IsIPv6(value) ? MaskHost(value) : value;
     }
 
-    [GeneratedRegex(@"(?<![\w+.-])(?<scheme>vless|vmess|trojan|ss|socks5?|https?|wss?|hysteria2?|hy2|tuic|wireguard|wg|anytls)://(?<rest>[^\s""'<>\\]+)", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"(?<![\w+.-])(?<scheme>vless|vmess|trojan|ss|socks5?|https?|wss?|hysteria2?|hy2|tuic|wireguard|wg|anytls|vpn)://(?<rest>[^\s""'<>\\]+)", RegexOptions.IgnoreCase)]
     private static partial Regex LinkPattern();
 
     [GeneratedRegex(

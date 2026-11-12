@@ -174,7 +174,7 @@ internal static class ClashYaml
             addresses.Add(ipv6.Contains('/', StringComparison.Ordinal) ? ipv6 : ipv6 + "/128");
         }
 
-        return new WireGuardSettings
+        var wireGuard = new WireGuardSettings
         {
             PrivateKey = new Secret(fields.String("private-key") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "private-key")),
             PeerPublicKey = new Secret(fields.String("public-key") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "public-key")),
@@ -183,6 +183,9 @@ internal static class ClashYaml
             Reserved = new EquatableArray<int>(fields.Strings("reserved").Select(b => int.TryParse(b, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? value : -1)),
             Mtu = fields.Int("mtu"),
         };
+        return fields.Map("amnezia-wg-option") is { } options
+            ? AmneziaWireGuardOptions.Create(wireGuard, options.AllScalars())
+            : wireGuard;
     }
 
     /// <summary>TLS для QUIC: sni, alpn, skip-cert-verify; fingerprint mihomo — SHA-256 сертификата (закрепление).</summary>

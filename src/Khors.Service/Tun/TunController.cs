@@ -149,7 +149,12 @@ public sealed partial class TunController(ITunStarter starter, ILogger<TunContro
         }
     }
 
-    internal static IpcCore ToIpc(CoreKind core) => core == CoreKind.Xray ? IpcCore.Xray : IpcCore.SingBox;
+    internal static IpcCore ToIpc(CoreKind core) => core switch
+    {
+        CoreKind.Xray => IpcCore.Xray,
+        CoreKind.SingBox => IpcCore.SingBox,
+        _ => IpcCore.SingBoxExtended,
+    };
 
     private static TunFailedResponse ToFailed(CoreStartException ex) => new(
         ex.Failure switch

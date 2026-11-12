@@ -5,7 +5,7 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <data name="AboutDescription" xml:space="preserve"><value>Открытый VPN/прокси-клиент. Подключается через ядра Xray-core и sing-box — это отдельные программы со своими лицензиями.</value></data>
+  <data name="AboutDescription" xml:space="preserve"><value>Открытый VPN/прокси-клиент. Подключается через ядра Xray-core, sing-box и sing-box-extended — это отдельные программы со своими лицензиями.</value></data>
   <data name="AboutGeoData" xml:space="preserve"><value>Гео-базы: domain-list-community (v2fly, MIT) и geoip (v2fly, CC BY-SA 4.0); IP Geolocation by DB-IP (db-ip.com, CC BY 4.0).</value></data>
   <data name="AboutLicense" xml:space="preserve"><value>Лицензия Apache 2.0. Сторонние компоненты и их лицензии перечислены в файле NOTICE.</value></data>
   <data name="AboutVersionFormat" xml:space="preserve"><value>Версия {0}</value></data>
@@ -344,7 +344,7 @@
   <data name="SettingsAutoReconnect" xml:space="preserve"><value>Переподключаться автоматически</value></data>
   <data name="SettingsAutoReconnectHint" xml:space="preserve"><value>Если подключение оборвалось само (ядро завершилось, служба перезапустилась), KHORS подключается снова: через 1, 2, 4… до 60 с, без сети — когда она появится. После смены сети и сна подключение проверяется и при необходимости перезапускается. Kill Switch на это время не снимается. При «Авто» вместо этого выбирается другой сервер.</value></data>
   <data name="SettingsCoresHeader" xml:space="preserve"><value>Ядра</value></data>
-  <data name="SettingsCoresHint" xml:space="preserve"><value>Xray и sing-box из официальных релизов на GitHub. Проверка и загрузка — только по кнопке; обновление — в пределах серии этой версии KHORS (Xray 26.x, sing-box 1.14.x), с проверкой контрольной суммы и конфигов KHORS. Окно и служба обновляют свои копии; новое ядро — со следующего подключения.</value></data>
+  <data name="SettingsCoresHint" xml:space="preserve"><value>Xray, sing-box и sing-box-extended из официальных релизов на GitHub. Проверка и загрузка — только по кнопке; обновление — в пределах серии этой версии KHORS (Xray 26.x, sing-box и sing-box-extended 1.14.x), с проверкой контрольной суммы и конфигов KHORS. Окно и служба обновляют свои копии; новое ядро — со следующего подключения.</value></data>
   <data name="SettingsDnsHeader" xml:space="preserve"><value>DNS</value></data>
   <data name="SettingsDnsHint" xml:space="preserve"><value>Куда KHORS отправляет запросы имён сайтов в режиме TUN и для WireGuard. Запросы идут через сервер, провайдер их не видит; адрес в локальной сети (например, роутер) — напрямую. В режиме «Системный прокси» имена разрешает сервер. Изменение действует со следующего подключения.</value></data>
   <data name="SettingsGeoHeader" xml:space="preserve"><value>Гео-базы</value></data>

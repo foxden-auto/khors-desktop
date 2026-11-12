@@ -140,7 +140,7 @@ internal static class SingBoxJson
             .Select(b => int.TryParse(b, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? value : -1);
         var addresses = fields.Strings("address") is { Length: > 0 } endpointAddresses ? endpointAddresses : fields.Strings("local_address");
 
-        var protocol = new WireGuardSettings
+        var wireGuard = new WireGuardSettings
         {
             PrivateKey = new Secret(fields.String("private_key") ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "private_key")),
             PeerPublicKey = new Secret(publicKey ?? throw new LinkFormatException(LinkParseErrorCode.MissingCredentials, "public_key")),
@@ -149,6 +149,9 @@ internal static class SingBoxJson
             Reserved = new EquatableArray<int>(reserved),
             Mtu = fields.Int("mtu"),
         };
+        ProtocolSettings protocol = fields.Object("amnezia") is { } options
+            ? AmneziaWireGuardOptions.Create(wireGuard, options.Remaining().Select(o => new KeyValuePair<string, string>(o.Key["amnezia.".Length..], o.Value)))
+            : wireGuard;
 
         return new Profile
         {

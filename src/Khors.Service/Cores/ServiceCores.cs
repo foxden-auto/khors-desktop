@@ -23,7 +23,17 @@ public sealed class ServiceCores(CoreUpdater updater)
     public CoresStatusResponse Rollback(IpcCore core) =>
         updater.Rollback(FromIpc(core)) ? Status() : Status(error: "NothingToRollback");
 
-    private static IpcCore ToIpc(CoreKind kind) => kind == CoreKind.Xray ? IpcCore.Xray : IpcCore.SingBox;
+    private static IpcCore ToIpc(CoreKind kind) => kind switch
+    {
+        CoreKind.Xray => IpcCore.Xray,
+        CoreKind.SingBox => IpcCore.SingBox,
+        _ => IpcCore.SingBoxExtended,
+    };
 
-    private static CoreKind FromIpc(IpcCore core) => core == IpcCore.Xray ? CoreKind.Xray : CoreKind.SingBox;
+    private static CoreKind FromIpc(IpcCore core) => core switch
+    {
+        IpcCore.Xray => CoreKind.Xray,
+        IpcCore.SingBox => CoreKind.SingBox,
+        _ => CoreKind.SingBoxExtended,
+    };
 }

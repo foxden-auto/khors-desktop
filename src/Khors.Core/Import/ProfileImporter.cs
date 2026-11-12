@@ -38,7 +38,7 @@ public static class ProfileImporter
 
         // Конфиг целиком (Clash/mihomo YAML, sing-box или Xray JSON) — разбирается как содержимое подписки.
         var content = SubscriptionContent.Parse(text);
-        var (parsed, errors) = content.Format is SubscriptionFormat.ClashYaml or SubscriptionFormat.SingBoxJson or SubscriptionFormat.XrayJson
+        var (parsed, errors) = content.Format is SubscriptionFormat.ClashYaml or SubscriptionFormat.SingBoxJson or SubscriptionFormat.XrayJson or SubscriptionFormat.AmneziaWireGuard
             ? ([.. content.Profiles], [.. content.Errors])
             : LinkText.Parse(text);
         foreach (var profile in parsed)

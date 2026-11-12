@@ -90,13 +90,14 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
 
         var options = new CoreStartOptions { PreferredSocksPort = null, PreferredHttpPort = null, LogLevel = logLevel, RemoteDns = remoteDns };
         var plan = RoutingPlan.Build(routing, tun: true);
-        if (choice.Core == CoreKind.SingBox)
+        if (choice.Core is CoreKind.SingBox or CoreKind.SingBoxExtended)
         {
             var singBox = await StartSingBoxAsync(
+                choice.Core,
                 profile,
                 options with { Tun = new SingBoxTunOptions { Ipv6 = routing.TunIpv6 }, TrafficStats = true, ReadyTimeout = s_tunReadyTimeout, Routing = plan, GeoDirectory = geoDirectory },
                 cancellationToken).ConfigureAwait(false);
-            return new TunRun(CoreKind.SingBox, singBox, chained: null);
+            return new TunRun(choice.Core, singBox, chained: null);
         }
 
         var server = await ResolveServerAsync(profile, cancellationToken).ConfigureAwait(false);
@@ -112,7 +113,7 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
                 Routing = plan,
                 GeoDirectory = geoDirectory,
             };
-            var singBox = await StartSingBoxAsync(resolved, tunOptions, cancellationToken).ConfigureAwait(false);
+            var singBox = await StartSingBoxAsync(CoreKind.SingBox, resolved, tunOptions, cancellationToken).ConfigureAwait(false);
             return new TunRun(CoreKind.Xray, singBox, xray);
         }
         catch
@@ -129,11 +130,11 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
     /// (<see cref="RemoveStaleAdapter"/>), если служба это умеет. Откуда берётся битый адаптер, не установлено
     /// (ROADMAP, «Известные проблемы»).
     /// </summary>
-    private async Task<CoreSession> StartSingBoxAsync(Profile profile, CoreStartOptions options, CancellationToken cancellationToken)
+    private async Task<CoreSession> StartSingBoxAsync(CoreKind kind, Profile profile, CoreStartOptions options, CancellationToken cancellationToken)
     {
         try
         {
-            return await CoreLauncher.StartAsync(CoreKind.SingBox, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);
+            return await CoreLauncher.StartAsync(kind, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);
         }
         catch (CoreStartException ex) when (IsStaleAdapter(ex.LogTail))
         {
@@ -146,7 +147,7 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
                 // Не удалили — повтор всё равно может пройти (так было и до удаления).
             }
 
-            return await CoreLauncher.StartAsync(CoreKind.SingBox, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);
+            return await CoreLauncher.StartAsync(kind, profile, options, masker, guard, cancellationToken).ConfigureAwait(false);
         }
     }
 

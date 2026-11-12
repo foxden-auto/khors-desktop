@@ -189,6 +189,7 @@ public sealed class CoreUpdaterTests : IDisposable
     [Theory]
     [InlineData(CoreKind.Xray)]
     [InlineData(CoreKind.SingBox)]
+    [InlineData(CoreKind.SingBoxExtended)]
     public async Task ShippedCoresPassCompatibilityCheck(CoreKind kind)
     {
         var executable = CoreLocator.Find(kind);

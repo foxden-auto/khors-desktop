@@ -16,6 +16,7 @@ Component        License                    Source
 ---------------  -------------------------  -----------------------------------------
 Xray-core 26.10.31 MPL-2.0                    https://github.com/XTLS/Xray-core
 sing-box         GPL-3.0-or-later (*)       https://github.com/SagerNet/sing-box
+sing-box-extended GPL-3.0-or-later (*)      https://github.com/shtorm-7/sing-box-extended
 Wintun           Prebuilt Binaries License  https://www.wintun.net
 
 (*) Check the additional terms in the sing-box LICENSE (use of the project

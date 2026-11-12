@@ -5,7 +5,7 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <data name="AboutDescription" xml:space="preserve"><value>An open VPN/proxy client. It connects through the Xray-core and sing-box cores, which are separate programs with their own licenses.</value></data>
+  <data name="AboutDescription" xml:space="preserve"><value>An open VPN/proxy client. It connects through the Xray-core, sing-box and sing-box-extended cores, which are separate programs with their own licenses.</value></data>
   <data name="AboutGeoData" xml:space="preserve"><value>Geo databases: domain-list-community (v2fly, MIT) and geoip (v2fly, CC BY-SA 4.0); IP Geolocation by DB-IP (db-ip.com, CC BY 4.0).</value></data>
   <data name="AboutLicense" xml:space="preserve"><value>Licensed under Apache 2.0. Third-party components and their licenses are listed in the NOTICE file.</value></data>
   <data name="AboutVersionFormat" xml:space="preserve"><value>Version {0}</value></data>
@@ -344,7 +344,7 @@
   <data name="SettingsAutoReconnect" xml:space="preserve"><value>Reconnect automatically</value></data>
   <data name="SettingsAutoReconnectHint" xml:space="preserve"><value>If the connection drops by itself (the core exited, the service restarted), KHORS connects again: after 1, 2, 4… up to 60 s, or as soon as the network is back. After a network change or sleep the connection is checked and restarted if needed. Kill Switch stays on meanwhile. With Auto, another server is picked instead.</value></data>
   <data name="SettingsCoresHeader" xml:space="preserve"><value>Cores</value></data>
-  <data name="SettingsCoresHint" xml:space="preserve"><value>Xray and sing-box from the official GitHub releases. Checking and downloading happen only on request; updates stay within the series of this KHORS version (Xray 26.x, sing-box 1.14.x) and are verified by checksum and KHORS configs. The window and the service update their own copies; a new core is used from the next connection.</value></data>
+  <data name="SettingsCoresHint" xml:space="preserve"><value>Xray, sing-box and sing-box-extended from the official GitHub releases. Checking and downloading happen only on request; updates stay within the series of this KHORS version (Xray 26.x, sing-box and sing-box-extended 1.14.x) and are verified by checksum and KHORS configs. The window and the service update their own copies; a new core is used from the next connection.</value></data>
   <data name="SettingsDnsHeader" xml:space="preserve"><value>DNS</value></data>
   <data name="SettingsDnsHint" xml:space="preserve"><value>Where KHORS sends site name lookups in TUN mode and for WireGuard. Lookups go through the server, so your provider does not see them; an address on the local network (such as your router) is queried directly. In System proxy mode the server resolves names. Changes apply from the next connection.</value></data>
   <data name="SettingsGeoHeader" xml:space="preserve"><value>Geo databases</value></data>

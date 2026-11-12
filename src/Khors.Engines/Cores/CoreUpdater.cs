@@ -97,7 +97,7 @@ public sealed class CoreUpdater : IDisposable
     public async Task<CoreCheckOutcome> CheckAsync(CoreKind kind, CancellationToken cancellationToken = default)
     {
         var core = CoreCatalog.Get(kind);
-        var (tags, error) = await FetchTagsAsync(CoreReleases.SeriesTagsUrl(core), cancellationToken).ConfigureAwait(false);
+        var (tags, error) = await FetchTagsAsync(core, CoreReleases.SeriesTagsUrl(core), cancellationToken).ConfigureAwait(false);
         if (error is not null)
         {
             return new CoreCheckOutcome(kind, null, error);
@@ -136,7 +136,7 @@ public sealed class CoreUpdater : IDisposable
         string? newerSeries = null;
         foreach (var url in CoreReleases.NextSeriesTagsUrls(core))
         {
-            var (next, _) = await FetchTagsAsync(url, cancellationToken).ConfigureAwait(false);
+            var (next, _) = await FetchTagsAsync(core, url, cancellationToken).ConfigureAwait(false);
             foreach (var version in next ?? [])
             {
                 if (CoreVersion.Compare(version, newerSeries) > 0)
@@ -149,7 +149,7 @@ public sealed class CoreUpdater : IDisposable
         return new CoreCheckOutcome(kind, new CoreReleaseChoice(latest, newerSeries));
     }
 
-    private async Task<(IReadOnlyList<string>? Tags, CoreUpdateError? Error)> FetchTagsAsync(Uri url, CancellationToken cancellationToken)
+    private async Task<(IReadOnlyList<string>? Tags, CoreUpdateError? Error)> FetchTagsAsync(CoreInfo core, Uri url, CancellationToken cancellationToken)
     {
         var (data, error) = await FetchAsync(url, MaxApiBytes, s_apiTimeout, cancellationToken).ConfigureAwait(false);
         if (error is not null)
@@ -159,7 +159,7 @@ public sealed class CoreUpdater : IDisposable
 
         try
         {
-            return (CoreReleases.ParseTags(data!), null);
+            return (CoreReleases.ParseTags(data!, core), null);
         }
         catch (JsonException)
         {

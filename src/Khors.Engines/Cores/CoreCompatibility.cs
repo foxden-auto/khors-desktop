@@ -34,6 +34,8 @@ public static class CoreCompatibility
         "wireguard://RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14%3D@198.51.100.9:51820?publickey=S2BGSyYNxTf1wij4Qk%2F8nbbFhbbGfzsDwb4shXmfImw%3D&address=10.0.0.2%2F32#wg",
     ];
 
+    private const string AwgLink = "wireguard://RotLZicYjYUFFxy3SYlIvOJxpGmWtNthOuIC4yZdZ14%3D@198.51.100.9:51820?publickey=S2BGSyYNxTf1wij4Qk%2F8nbbFhbbGfzsDwb4shXmfImw%3D&address=10.0.0.2%2F32&jc=4&jmin=10&jmax=50&s1=1&s2=2&h1=1&h2=2&h3=3&h4=4#awg";
+
     /// <summary>Конфиги для проверки ядра: те же генераторы, что при подключении (в том числе TUN для sing-box).</summary>
     public static IReadOnlyList<string> Configs(CoreKind kind)
     {
@@ -56,6 +58,12 @@ public static class CoreCompatibility
                 HttpPort = 10809,
                 ClashApi = new ClashApiOptions(10811, "compatibility-check"),
             })));
+        }
+
+        if (kind == CoreKind.SingBoxExtended)
+        {
+            configs.Add(Json(SingBoxConfigGenerator.Generate(Profile(AwgLink), new SingBoxConfigOptions { SocksPort = 10808, HttpPort = 10809 })));
+            configs.Add(Json(SingBoxConfigGenerator.Generate(Profile(AwgLink), new SingBoxConfigOptions { SocksPort = 10808, HttpPort = 10809, Tun = new SingBoxTunOptions() })));
         }
 
         // TUN (служба) и цепочка TUN → SOCKS → Xray.

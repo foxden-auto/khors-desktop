@@ -4,4 +4,5 @@ public enum CoreKind
 {
     Xray,
     SingBox,
+    SingBoxExtended,
 }

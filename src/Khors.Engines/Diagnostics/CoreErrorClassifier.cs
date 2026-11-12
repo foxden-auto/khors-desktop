@@ -144,7 +144,7 @@ public static class CoreErrorClassifier
     private static bool IsServerDialFailure(CoreKind core, string line) => core switch
     {
         CoreKind.Xray => Has(line, "failed to find an available destination"),
-        CoreKind.SingBox => (Has(line, "open connection") || Has(line, "open packet connection"))
+        CoreKind.SingBox or CoreKind.SingBoxExtended => (Has(line, "open connection") || Has(line, "open packet connection"))
             && Has(line, "outbound/")
             && !Has(line, "outbound/direct")
             && !Has(line, "outbound/block"),

@@ -5,7 +5,7 @@
 
 ## 1. Назначение
 
-KHORS Desktop — универсальный открытый кроссплатформенный VPN/прокси-клиент. Первая целевая платформа — Windows, следующая — Linux. Он принимает конфигурации любых совместимых серверов (ссылки, подписки, JSON) и подключается к ним через внешние ядра Xray-core и sing-box.
+KHORS Desktop — универсальный открытый кроссплатформенный VPN/прокси-клиент. Первая целевая платформа — Windows, следующая — Linux. Он принимает конфигурации любых совместимых серверов (ссылки, подписки, JSON) и подключается к ним через внешние ядра Xray-core, sing-box и sing-box-extended (форк sing-box с AmneziaWG).
 
 Клиент не привязан к серверам KHORS. Серверы KHORS — лишь один из возможных источников подписки.
 
@@ -31,7 +31,7 @@ KHORS Desktop — универсальный открытый кроссплат
 | ОС | Первый релиз: Windows 10 1809+ и Windows 11, x64. Далее: Linux x64 (`Khors.Platform.Linux`), ARM64 — позже |
 | Язык | C#, .NET 10 (LTS), `Nullable` включён |
 | UI | Avalonia + CommunityToolkit.Mvvm (MVVM). **Решено (этап 0.1):** Avalonia, ради переноса на Linux. Конкретная стабильная версия фиксируется при создании решения (0.2) |
-| Ядра | Xray-core и sing-box — отдельные исполняемые файлы, запускаемые как дочерние процессы |
+| Ядра | Xray-core, sing-box и sing-box-extended — отдельные исполняемые файлы, запускаемые как дочерние процессы |
 | TUN | Драйвер wintun; TUN-интерфейс поднимает sing-box (inbound `tun`) |
 | Привилегированная часть | Платформенно-независимая логика службы в `Khors.Service`; хост — служба Windows `KhorsService` (LocalSystem), на Linux — юнит systemd |
 | IPC UI ↔ служба | Сообщения JSON поверх абстрактного транспорта. Windows — named pipe с ACL (доступ только интерактивным пользователям), Linux — Unix-сокет с правами доступа к файлу сокета |
@@ -76,6 +76,7 @@ UI → генератор конфига → ядро (Xray или sing-box) с 
 UI → служба → sing-box поднимает TUN (`auto_route`, `strict_route`, перехват DNS).
 - Профиль, требующий Xray (VLESS/REALITY/XHTTP и т.п.): Xray запускается с локальным SOCKS-inbound, sing-box отправляет в него трафик из TUN. Цепочка: TUN(sing-box) → SOCKS 127.0.0.1 → Xray → сервер.
 - Профиль, нативный для sing-box: sing-box обрабатывает всё сам.
+- Профиль AmneziaWG: обрабатывает sing-box-extended (тот же формат конфига sing-box с полем `amnezia` в WireGuard endpoint).
 - Трафик самих процессов ядер к серверу обязан идти мимо TUN (исключения маршрутизации по процессу/адресу сервера), иначе возникает петля.
 
 ### 3.4. Выбор ядра
@@ -86,6 +87,7 @@ UI → служба → sing-box поднимает TUN (`auto_route`, `strict_r
 |---|---|
 | VLESS (в т.ч. REALITY, Vision, XHTTP), VMess, Trojan, Shadowsocks | Xray-core |
 | Hysteria2, TUIC, AnyTLS, WireGuard | sing-box |
+| AmneziaWG | sing-box-extended (отдельный внешний процесс) |
 | Возможность, отсутствующая в выбранном ядре | Ошибка с понятным объяснением при сохранении профиля |
 
 Причина выбора Xray для REALITY: sing-box на момент написания не передаёт X25519MLKEM768 в ClientHello REALITY и не может подключаться к серверам Xray-core 26.9.8+ (ошибка `reality verification failed`).
@@ -115,8 +117,8 @@ UI → служба → sing-box поднимает TUN (`auto_route`, `strict_r
 
 ### 4.1. Импорт конфигураций
 
-- **Ссылки:** `vless://`, `vmess://` (base64 JSON, формат v2rayN), `trojan://`, `ss://` (SIP002 и legacy), `hysteria2://` / `hy2://`, `tuic://`, `wireguard://`.
-- **Подписки:** URL, ответ в формате base64-списка ссылок, простого списка ссылок, Clash/mihomo YAML, sing-box JSON, Xray JSON. Учитывать заголовки `subscription-userinfo` (трафик, срок) и `profile-update-interval`.
+- **Ссылки:** `vless://`, `vmess://` (base64 JSON, формат v2rayN), `trojan://`, `ss://` (SIP002 и legacy), `hysteria2://` / `hy2://`, `tuic://`, `wireguard://` (в т.ч. с параметрами AmneziaWG), `vpn://` (Base64 с текстом wg-quick `.conf`).
+- **Подписки:** URL, ответ в формате base64-списка ссылок, простого списка ссылок, Clash/mihomo YAML (в т.ч. `amnezia-wg-option`), sing-box JSON (в т.ч. WireGuard endpoint с полем `amnezia`), Xray JSON. Файлы wg-quick `.conf` распознаются как AmneziaWG/WireGuard-профили. Учитывать заголовки `subscription-userinfo` (трафик, срок) и `profile-update-interval`.
 - **Источники:** вставка из буфера обмена (одна или много ссылок), файл, QR-код из изображения в буфере обмена или файла, сканирование QR с экрана.
 - **Ручное создание и редактирование** профиля в форме.
 - **Экспорт:** профиль в ссылку и QR.
@@ -124,7 +126,7 @@ UI → служба → sing-box поднимает TUN (`auto_route`, `strict_r
 
 ### 4.2. Модель профиля (минимум)
 
-Протокол и его параметры; адрес, порт; транспорт (tcp/raw, ws, grpc, httpupgrade, xhttp, quic); безопасность (none, tls, reality) с SNI, ALPN, fingerprint uTLS, закреплённым сертификатом (`pcs`) и проверкой по имени (`vcn`), REALITY public key, short id, spiderX, ключом ML-DSA-65 (`pqv`), признаком поддержки X25519MLKEM768 сервером (`support-x25519mlkem768`, такие профили — только через Xray); flow; мультиплекс; выбор ядра (auto/xray/singbox); имя, группа, источник (ручной/подписка), дата обновления; служебное поле `unknownParams`. `schemaVersion` хранится в корне файла профилей (миграции — на уровне файла).
+Протокол и его параметры; адрес, порт; транспорт (tcp/raw, ws, grpc, httpupgrade, xhttp, quic); безопасность (none, tls, reality) с SNI, ALPN, fingerprint uTLS, закреплённым сертификатом (`pcs`) и проверкой по имени (`vcn`), REALITY public key, short id, spiderX, ключом ML-DSA-65 (`pqv`), признаком поддержки X25519MLKEM768 сервером (`support-x25519mlkem768`, такие профили — только через Xray); flow; мультиплекс; выбор ядра (auto/xray/singbox/singbox-extended); параметры AmneziaWG (Jc/Jmin/Jmax, S1–S4, H1–H4, I1–I5 и длинные опции); имя, группа, источник (ручной/подписка), дата обновления; служебное поле `unknownParams`. `schemaVersion` хранится в корне файла профилей (миграции — на уровне файла).
 
 Fingerprint по умолчанию для REALITY — `firefox`.
 
@@ -165,7 +167,7 @@ Fingerprint по умолчанию для REALITY — `firefox`.
 
 ### 4.8. Управление ядрами
 
-- В поставке — закреплённые версии официальных сборок Xray-core и sing-box; версии и SHA-256 в `tools/cores/cores.lock.json`.
+- В поставке — закреплённые версии официальных сборок Xray-core, sing-box и sing-box-extended; версии и SHA-256 в `tools/cores/cores.lock.json`.
 - Обновление ядер из GitHub Releases по кнопке с проверкой контрольной суммы/подписи; откат на предыдущую версию. Обновление — в пределах серии поставки (Xray — тот же мажор, sing-box — та же ветка); новая серия приходит с новой версией KHORS. Контрольная сумма — SHA-256 из API GitHub (подписей у релизов ядер нет); новое ядро включается, только если принимает конфиги KHORS. У окна и у службы — свои копии.
 - Возможность указать путь к собственной сборке ядра (для разработчиков и форков).
 

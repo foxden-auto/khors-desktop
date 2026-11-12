@@ -30,7 +30,7 @@ if ($LASTEXITCODE -ne 0 -or -not $version) { throw 'Не удалось проч
 Write-Host "KHORS Desktop $version"
 
 $cores = Join-Path $root 'cores\win-x64'
-foreach ($core in 'xray\xray.exe', 'sing-box\sing-box.exe') {
+foreach ($core in 'xray\xray.exe', 'sing-box\sing-box.exe', 'sing-box-extended\sing-box.exe') {
     if (-not (Test-Path (Join-Path $cores $core))) { throw "Нет ядра $core — выполните: dotnet run tools/cores/fetch-cores.cs" }
 }
 
@@ -48,6 +48,7 @@ foreach ($project in 'src\Khors.App', 'src\Khors.Service') {
 New-Item -ItemType Directory -Force (Join-Path $staging 'cores') | Out-Null
 Copy-Item -Recurse (Join-Path $cores 'xray') (Join-Path $staging 'cores')
 Copy-Item -Recurse (Join-Path $cores 'sing-box') (Join-Path $staging 'cores')
+Copy-Item -Recurse (Join-Path $cores 'sing-box-extended') (Join-Path $staging 'cores')
 Copy-Item (Join-Path $root 'LICENSE'), (Join-Path $root 'NOTICE') $staging
 
 # Только то, что поставляется: публикация могла оставить лишнее (например, .pdb при другой настройке).

@@ -14,6 +14,7 @@ namespace Khors.Core.Profiles;
 [JsonDerivedType(typeof(Hysteria2Settings), "hysteria2")]
 [JsonDerivedType(typeof(TuicSettings), "tuic")]
 [JsonDerivedType(typeof(WireGuardSettings), "wireguard")]
+[JsonDerivedType(typeof(AmneziaWireGuardSettings), "amneziawg")]
 public abstract record ProtocolSettings
 {
     /// <summary>Протокол на UDP со своим транспортом (QUIC или WireGuard) — транспорт профиля не применяется.</summary>
@@ -115,7 +116,7 @@ public sealed record TuicSettings : ProtocolSettings
 }
 
 /// <summary>WireGuard. Ключи — base64 по 32 байта.</summary>
-public sealed record WireGuardSettings : ProtocolSettings
+public record WireGuardSettings : ProtocolSettings
 {
     public required Secret PrivateKey { get; init; }
 
@@ -135,4 +136,63 @@ public sealed record WireGuardSettings : ProtocolSettings
     public override bool HasOwnTransport => true;
 
     public override string ToString() => $"WireGuardSettings {{ Mtu = {Mtu} }}";
+}
+
+/// <summary>AmneziaWG: WireGuard с параметрами маскировки пакетов и рукопожатия.</summary>
+public sealed record AmneziaWireGuardSettings : WireGuardSettings
+{
+    public int? Jc { get; init; }
+
+    public int? Jmin { get; init; }
+
+    public int? Jmax { get; init; }
+
+    public int? S1 { get; init; }
+
+    public int? S2 { get; init; }
+
+    public int? S3 { get; init; }
+
+    public int? S4 { get; init; }
+
+    public string? H1 { get; init; }
+
+    public string? H2 { get; init; }
+
+    public string? H3 { get; init; }
+
+    public string? H4 { get; init; }
+
+    public string? I1 { get; init; }
+
+    public string? I2 { get; init; }
+
+    public string? I3 { get; init; }
+
+    public string? I4 { get; init; }
+
+    public string? I5 { get; init; }
+
+    public string? HeaderProtectionKey { get; init; }
+
+    public string? ContentPaddingAddition { get; init; }
+
+    public string? RekeyAfterTime { get; init; }
+
+    public string? RekeyTimeout { get; init; }
+
+    public string? RejectAfterTime { get; init; }
+
+    public string? KeepaliveTimeout { get; init; }
+
+    public string? MaxHandshakeAttempts { get; init; }
+
+    public bool? RandomTrailers { get; init; }
+
+    public bool? DisableCookies { get; init; }
+
+    /// <summary>Поля новых версий AmneziaWG в формате ядра (snake_case).</summary>
+    public EquatableArray<UnknownParam> ExtraOptions { get; init; }
+
+    public override string ToString() => $"AmneziaWireGuardSettings {{ Mtu = {Mtu}, Jc = {Jc}, Jmin = {Jmin}, Jmax = {Jmax} }}";
 }

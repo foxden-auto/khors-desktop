@@ -79,7 +79,7 @@ public static class CoreLauncher
         var executable = CoreLocator.Find(kind, options.ExecutablePath)
             ?? throw new CoreStartException(CoreStartFailure.ExecutableNotFound, $"{kind} executable not found.") { Core = kind };
 
-        if (kind == CoreKind.SingBox && options.UpstreamSocksPort is null)
+        if (kind is CoreKind.SingBox or CoreKind.SingBoxExtended && options.UpstreamSocksPort is null)
         {
             profile = await ResolveWireGuardServerAsync(profile, cancellationToken).ConfigureAwait(false);
         }
@@ -88,7 +88,7 @@ public static class CoreLauncher
             ? PortAllocator.Allocate(options.PreferredSocksPort, options.PreferredHttpPort, null)
             : PortAllocator.Allocate(options.PreferredSocksPort, options.PreferredHttpPort);
         var traffic = options.TrafficStats
-            ? new TrafficEndpoint(kind, ports[2], kind == CoreKind.SingBox ? Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(16)) : null)
+            ? new TrafficEndpoint(kind, ports[2], kind != CoreKind.Xray ? Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(16)) : null)
             : null;
 
         var log = CoreLogLevels.Plan(kind, options.LogLevel);
@@ -104,7 +104,7 @@ public static class CoreLauncher
                 Routing = routing.Plan,
                 RemoteDns = options.RemoteDns,
             }),
-            CoreKind.SingBox => SingBoxConfigGenerator.Generate(profile, new SingBoxConfigOptions
+            CoreKind.SingBox or CoreKind.SingBoxExtended => SingBoxConfigGenerator.Generate(profile, new SingBoxConfigOptions
             {
                 SocksPort = ports[0],
                 HttpPort = ports[1],

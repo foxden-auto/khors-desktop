@@ -75,7 +75,12 @@ public sealed class ServiceTunLauncher(IIpcClientTransport transport, string cli
     private static CoreStartException Unavailable(CoreKind core, Exception? inner) =>
         new(CoreStartFailure.ServiceUnavailable, "KHORS service is unavailable: " + (inner?.Message ?? "unexpected answer")) { Core = core };
 
-    private static CoreKind ToCore(IpcCore core) => core == IpcCore.Xray ? CoreKind.Xray : CoreKind.SingBox;
+    private static CoreKind ToCore(IpcCore core) => core switch
+    {
+        IpcCore.Xray => CoreKind.Xray,
+        IpcCore.SingBox => CoreKind.SingBox,
+        _ => CoreKind.SingBoxExtended,
+    };
 
     private static CoreStartException ToException(TunFailedResponse failed)
     {

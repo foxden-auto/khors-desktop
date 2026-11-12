@@ -253,6 +253,25 @@ public static partial class ShareLinkExporter
             .Add("reserved", wireGuard.Reserved.Count > 0 ? string.Join(',', wireGuard.Reserved.Select(b => b.ToString(CultureInfo.InvariantCulture))) : null)
             .Add("mtu", Number(wireGuard.Mtu));
 
+        if (wireGuard is AmneziaWireGuardSettings awg)
+        {
+            query.Add("jc", Number(awg.Jc)).Add("jmin", Number(awg.Jmin)).Add("jmax", Number(awg.Jmax))
+                .Add("s1", Number(awg.S1)).Add("s2", Number(awg.S2)).Add("s3", Number(awg.S3)).Add("s4", Number(awg.S4))
+                .Add("h1", awg.H1).Add("h2", awg.H2).Add("h3", awg.H3).Add("h4", awg.H4)
+                .Add("i1", awg.I1).Add("i2", awg.I2).Add("i3", awg.I3).Add("i4", awg.I4).Add("i5", awg.I5)
+                .Add("header_protection_key", awg.HeaderProtectionKey)
+                .Add("content_padding_addition", awg.ContentPaddingAddition)
+                .Add("rekey_after_time", awg.RekeyAfterTime).Add("rekey_timeout", awg.RekeyTimeout)
+                .Add("reject_after_time", awg.RejectAfterTime).Add("keepalive_timeout", awg.KeepaliveTimeout)
+                .Add("max_handshake_attempts", awg.MaxHandshakeAttempts)
+                .Add("random_trailers", awg.RandomTrailers?.ToString().ToLowerInvariant())
+                .Add("disable_cookies", awg.DisableCookies?.ToString().ToLowerInvariant());
+            foreach (var option in awg.ExtraOptions)
+            {
+                query.Add(option.Key, option.Value);
+            }
+        }
+
         return Link("wireguard", Escape(wireGuard.PrivateKey.Value), HostPort(profile.Server.Host, profile.Server.Port.ToString(CultureInfo.InvariantCulture)), query, profile);
     }
 

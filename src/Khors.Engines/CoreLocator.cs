@@ -52,9 +52,10 @@ public static class CoreLocator
     {
         CoreKind.Xray => "xray",
         CoreKind.SingBox => "sing-box",
+        CoreKind.SingBoxExtended => "sing-box-extended",
         _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
     };
 
     private static string ExecutableName(CoreKind kind) =>
-        DirectoryName(kind) + (OperatingSystem.IsWindows() ? ".exe" : string.Empty);
+        (kind == CoreKind.SingBoxExtended ? "sing-box" : DirectoryName(kind)) + (OperatingSystem.IsWindows() ? ".exe" : string.Empty);
 }

@@ -6,11 +6,11 @@ namespace Khors.Ipc;
 /// <summary>
 /// Версия протокола UI ↔ служба. Меняется при несовместимом изменении сообщений (2 — команды TUN, 3 — счётчики трафика TUN,
 /// 4 — удалённый DNS, 5 — гео-базы службы, 6 — маршрутизация, 7 — Kill Switch, 8 — сброс сетевых настроек,
-/// 9 — обновление ядер).
+/// 9 — обновление ядер, 10 — sing-box-extended для AmneziaWG).
 /// </summary>
 public static class IpcProtocol
 {
-    public const int Version = 9;
+    public const int Version = 10;
 }
 
 /// <summary>
@@ -100,6 +100,7 @@ public enum IpcCore
 {
     Xray,
     SingBox,
+    SingBoxExtended,
 }
 
 /// <param name="Core">Ядро профиля (Xray — цепочка TUN → Xray).</param>
