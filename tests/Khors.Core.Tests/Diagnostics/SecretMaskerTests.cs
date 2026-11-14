@@ -12,6 +12,7 @@ public partial class SecretMaskerTests
     private const string Uuid = "3f1c2a9e-7b4d-4e8a-9c21-5d6e7f809a1b";
     private const string RealityPublicKey = "Zx8Q2mT9vK4rL7pW1sN6bY3cH5jD0fG8aE2uI9oP4kM";
     private const string ShortId = "6ba85179e30d4fc2";
+    private const string HeaderProtectionKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
 
     private readonly SecretMasker _masker = new(Encoding.UTF8.GetBytes("khors-test-key"));
 
@@ -76,6 +77,16 @@ public partial class SecretMaskerTests
             $"publicKey: {RealityPublicKey}, shortId={ShortId} password='Hunter2Pass' uuid={Uuid}",
             [RealityPublicKey, ShortId, "Hunter2Pass", Uuid],
             ["publicKey: ", "shortId=", "password='"]
+        },
+        {
+            $"HeaderProtectionKey = {HeaderProtectionKey}",
+            [HeaderProtectionKey],
+            ["HeaderProtectionKey = "]
+        },
+        {
+            $"wireguard://vpn.example.com:51820?header_protection_key={HeaderProtectionKey}",
+            [HeaderProtectionKey, "vpn.example.com"],
+            ["wireguard://", ":51820?header_protection_key="]
         },
         {
             $"user {Uuid} connected",
@@ -151,6 +162,15 @@ public partial class SecretMaskerTests
         Assert.Equal("ws", document.RootElement.GetProperty("net").GetString());
         Assert.Equal("443", document.RootElement.GetProperty("port").GetString());
         Assert.Equal(masked, _masker.MaskText(masked));
+    }
+
+    [Fact]
+    public void MaskJsonMasksAmneziaHeaderProtectionKey()
+    {
+        var masked = _masker.MaskJson($$"""{ "amnezia": { "header_protection_key": "{{HeaderProtectionKey}}" } }""");
+
+        AssertNoLeak(masked, [HeaderProtectionKey]);
+        Assert.Contains(_masker.Mask(SecretKind.Key, HeaderProtectionKey), masked, StringComparison.Ordinal);
     }
 
     [Fact]

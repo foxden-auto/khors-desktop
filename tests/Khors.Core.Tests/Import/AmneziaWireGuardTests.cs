@@ -39,8 +39,8 @@ public class AmneziaWireGuardTests
         RejectAfterTime = 160-200
         KeepaliveTimeout = 8-12
         MaxHandshakeAttempts = 15-20
-        RandomTrailers = true
-        DisableCookies = true
+        RandomTrailers = on
+        DisableCookies = on
         FutureOption = preserved
 
         [Peer]
@@ -140,5 +140,39 @@ public class AmneziaWireGuardTests
         Assert.Equal("50-100", amnezia["content_padding_addition"]!.GetValue<string>());
         Assert.True(amnezia["random_trailers"]!.GetValue<bool>());
         Assert.Equal("<b 0x0102>", amnezia["i1"]!.GetValue<string>());
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=")]
+    public void GeneratorUsesPacketPreservingTransportWithHeaderProtection(string? headerProtectionKey)
+    {
+        var profile = SubscriptionContent.Parse(Config).Profiles.Single();
+        profile = profile with
+        {
+            Protocol = ((AmneziaWireGuardSettings)profile.Protocol) with { HeaderProtectionKey = headerProtectionKey },
+        };
+
+        var generated = SingBoxConfigGenerator.Generate(profile, new SingBoxConfigOptions
+        {
+            SocksPort = 10808,
+            HttpPort = 10809,
+            Tun = new SingBoxTunOptions(),
+        });
+        var config = JsonNode.Parse(generated.Json!)!;
+        var detour = config["endpoints"]![0]!["detour"]?.GetValue<string>();
+        var outbounds = config["outbounds"]!.AsArray();
+        if (headerProtectionKey is null)
+        {
+            Assert.Null(detour);
+            Assert.Single(outbounds);
+            return;
+        }
+
+        Assert.NotNull(detour);
+        var transport = Assert.Single(outbounds, outbound => outbound!["tag"]!.GetValue<string>() == detour);
+        Assert.Equal("direct", transport!["type"]!.GetValue<string>());
+        Assert.True(transport["udp_fragment"]!.GetValue<bool>());
+        Assert.True(config["route"]!["auto_detect_interface"]!.GetValue<bool>());
     }
 }

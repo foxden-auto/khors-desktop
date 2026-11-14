@@ -99,6 +99,33 @@ public class TunEngineTests
         Assert.Equal(new CoreDiagnosis(CoreProblem.ServerNotFound, CoreKind.Xray), error.Diagnosis);
     }
 
+    [Fact]
+    public async Task AmneziaPeerMustResolveBeforeStartingTun()
+    {
+        var profile = Hysteria2() with
+        {
+            Server = new ServerEndpoint("vpn.example.com", 51820),
+            Protocol = new AmneziaWireGuardSettings
+            {
+                PrivateKey = new Secret("test-private-key"),
+                PeerPublicKey = new Secret("test-public-key"),
+            },
+            Security = new NoSecurity(),
+        };
+        var engine = new TunEngine(s_masker, guard: null)
+        {
+            Resolve = (host, _) =>
+            {
+                Assert.Equal(profile.Server.Host, host);
+                return Task.FromResult(Array.Empty<IPAddress>());
+            },
+        };
+
+        var error = await Assert.ThrowsAsync<CoreStartException>(() => engine.StartAsync(profile, "warning", DnsPresets.Default.Server, new RoutingSettings(), Ct));
+
+        Assert.Equal(new CoreDiagnosis(CoreProblem.ServerNotFound, CoreKind.SingBoxExtended), error.Diagnosis);
+    }
+
     private static bool IsRunning(int processId)
     {
         try

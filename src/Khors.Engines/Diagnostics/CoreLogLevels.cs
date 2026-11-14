@@ -12,7 +12,8 @@ public static class CoreLogLevels
     /// поэтому при warning и error ядро запускается с info, а обычные строки info о каждом соединении
     /// (запрос, маршрут, dialing, tunneling — в них адреса посещаемых сайтов) отбрасываются до записи в буфер.
     /// Остаются ошибки исходящих соединений — их разбирает <see cref="CoreErrorClassifier"/>.
-    /// Явно выбранные info и debug — как есть (режим разработчика), sing-box пишет ошибки уже на warn.
+    /// sing-box-extended пишет тайм-аут рукопожатия WireGuard на уровне debug.
+    /// При warning и error сохраняем это сообщение и отбрасываем остальные строки debug и info.
     /// </summary>
     public static CoreLogPlan Plan(CoreKind core, string level)
     {
@@ -20,6 +21,12 @@ public static class CoreLogLevels
         if (core == CoreKind.Xray && level is "warning" or "error")
         {
             return new CoreLogPlan("info", KeepXrayLine);
+        }
+
+        if (core == CoreKind.SingBoxExtended && level is "warning" or "error")
+        {
+            return new CoreLogPlan("debug", line =>
+                KeepExtendedLine(line, includeWarnings: level == "warning"));
         }
 
         return new CoreLogPlan(level, null);
@@ -34,4 +41,18 @@ public static class CoreLogLevels
 
         return line.Contains("failed", StringComparison.OrdinalIgnoreCase) && line.Contains("outbound", StringComparison.Ordinal);
     }
+
+    private static bool KeepExtendedLine(string line, bool includeWarnings) =>
+        HasSingBoxLevel(line, "FATAL")
+        || HasSingBoxLevel(line, "PANIC")
+        || HasSingBoxLevel(line, "ERROR")
+        || (includeWarnings && HasSingBoxLevel(line, "WARN"))
+        || CoreErrorClassifier.IsWireGuardHandshakeTimeout(line);
+
+    // С timestamp ядро печатает "+0300 yyyy-MM-dd HH:mm:ss LEVEL ...".
+    private static bool HasSingBoxLevel(string line, string level) =>
+        line.StartsWith(level + "[", StringComparison.Ordinal)
+        || (line.Length > 26 + level.Length
+            && line[0] is '+' or '-'
+            && line.AsSpan(26).StartsWith(level + " ", StringComparison.Ordinal));
 }

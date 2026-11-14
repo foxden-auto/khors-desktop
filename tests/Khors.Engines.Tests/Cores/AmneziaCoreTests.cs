@@ -19,11 +19,11 @@ public class AmneziaCoreTests
     }
 
     [Theory]
-    [InlineData("1.14.1-extended-2.7.2", true)]
+    [InlineData("1.14.3-extended-2.7.3", true)]
     [InlineData("1.14.9-extended-2.8.0", true)]
     [InlineData("1.15.0-extended-2.8.0", false)]
     [InlineData("1.14.3", false)]
-    [InlineData("1.14.1-extended-2.7.2-beta", false)]
+    [InlineData("1.14.3-extended-2.7.3-beta", false)]
     public void ExtendedSeriesAcceptsOnlyExtendedVersions(string version, bool expected) =>
         Assert.Equal(expected, CoreCatalog.SingBoxExtended.InSeries(version));
 
@@ -38,14 +38,14 @@ public class AmneziaCoreTests
     [Fact]
     public void ExtendedReleaseHasExpectedAsset()
     {
-        const string version = "1.14.1-extended-2.7.2";
+        const string version = "1.14.3-extended-2.7.3";
         var json = Encoding.UTF8.GetBytes(CoreReleasesTests.Release(
             "v" + version,
-            $"sing-box-{version}-windows-amd64.zip").ToJsonString());
+            $"sing-box-{version}-windows-amd64-purego.zip").ToJsonString());
 
         var release = CoreReleases.Parse(CoreCatalog.SingBoxExtended, version, json);
 
         Assert.NotNull(release);
-        Assert.Equal($"sing-box-{version}-windows-amd64/sing-box.exe", CoreCatalog.SingBoxExtended.AssetFor(version)!.ExecutableEntry);
+        Assert.Equal($"sing-box-{version}-windows-amd64-purego/sing-box.exe", CoreCatalog.SingBoxExtended.AssetFor(version)!.ExecutableEntry);
     }
 }

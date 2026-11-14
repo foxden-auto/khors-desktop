@@ -158,7 +158,7 @@ public sealed partial class SecretMasker
             "id" when json => SecretKind.Uuid,
             "password" or "passwd" or "pass" or "pwd" or "auth" or "authstr" or "obfspassword" => SecretKind.Password,
             "user" or "username" when json => SecretKind.Password,
-            "pbk" or "publickey" or "privatekey" or "peerpublickey" or "presharedkey" or "psk" => SecretKind.Key,
+            "pbk" or "publickey" or "privatekey" or "peerpublickey" or "presharedkey" or "psk" or "headerprotectionkey" => SecretKind.Key,
             "sid" or "shortid" or "shortids" => SecretKind.ShortId,
             "token" or "secret" or "accesstoken" => SecretKind.Token,
             "address" or "server" or "serveraddress" or "servername" or "sni" or "host" or "peer" or "endpoint" or "authority"

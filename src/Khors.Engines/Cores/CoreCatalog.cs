@@ -23,12 +23,6 @@ public sealed record CoreInfo(CoreKind Kind, string Repository, string ShippedVe
     {
         if (Kind == CoreKind.SingBoxExtended)
         {
-            // В Windows ZIP этого релиза ошибочно лежит Linux ELF; совместимость проверена по содержимому архива 2026-11-12.
-            if (version == "1.14.3-extended-2.7.3")
-            {
-                return false;
-            }
-
             return CoreVersion.TryParseExtended(version, out var main, out _)
                 && CoreVersion.TryParse(ShippedVersion.Split("-extended-", StringSplitOptions.None)[0], out var shipped)
                 && main.Take(SeriesParts).SequenceEqual(shipped.Take(SeriesParts));
@@ -52,6 +46,11 @@ public sealed record CoreInfo(CoreKind Kind, string Repository, string ShippedVe
         return Kind switch
         {
             CoreKind.Xray => new CoreAsset("Xray-windows-64.zip", "xray.exe", "LICENSE"),
+            // Обычный Windows ZIP sing-box-extended 2.7.3 ошибочно содержит Linux ELF (проверено 2026-11-12); рабочая сборка — purego.
+            CoreKind.SingBoxExtended => new CoreAsset(
+                string.Create(CultureInfo.InvariantCulture, $"sing-box-{version}-windows-amd64-purego.zip"),
+                string.Create(CultureInfo.InvariantCulture, $"sing-box-{version}-windows-amd64-purego/sing-box.exe"),
+                string.Create(CultureInfo.InvariantCulture, $"sing-box-{version}-windows-amd64-purego/LICENSE")),
             _ => new CoreAsset(
                 string.Create(CultureInfo.InvariantCulture, $"sing-box-{version}-windows-amd64.zip"),
                 string.Create(CultureInfo.InvariantCulture, $"sing-box-{version}-windows-amd64/sing-box.exe"),
@@ -71,7 +70,7 @@ public static class CoreCatalog
 
     public static CoreInfo SingBox { get; } = new(CoreKind.SingBox, "SagerNet/sing-box", "1.14.2", "sing-box", SeriesParts: 2);
 
-    public static CoreInfo SingBoxExtended { get; } = new(CoreKind.SingBoxExtended, "shtorm-7/sing-box-extended", "1.14.1-extended-2.7.2", "sing-box-extended", SeriesParts: 2);
+    public static CoreInfo SingBoxExtended { get; } = new(CoreKind.SingBoxExtended, "shtorm-7/sing-box-extended", "1.14.3-extended-2.7.3", "sing-box-extended", SeriesParts: 2);
 
     public static IReadOnlyList<CoreInfo> All { get; } = [Xray, SingBox, SingBoxExtended];
 

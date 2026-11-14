@@ -95,6 +95,7 @@ public static class SingBoxConfigGenerator
 {
     public const string ProxyTag = "proxy";
     public const string DirectTag = "direct";
+    private const string AmneziaTransportTag = "amnezia-transport";
 
     private static readonly JsonSerializerOptions s_jsonOptions = new()
     {
@@ -150,6 +151,16 @@ public static class SingBoxConfigGenerator
             AddRemoteDns(config, options.RemoteDns);
             config["endpoints"] = new JsonArray(WireGuardEndpoint(profile, wireGuard));
             config["outbounds"] = new JsonArray(new JsonObject { ["type"] = "direct", ["tag"] = DirectTag });
+            if (UsesAmneziaHeaderProtection(wireGuard))
+            {
+                // Ядро запрещает detour через direct с параметрами по умолчанию.
+                config["outbounds"]!.AsArray().Add(new JsonObject
+                {
+                    ["type"] = "direct",
+                    ["tag"] = AmneziaTransportTag,
+                    ["udp_fragment"] = true,
+                });
+            }
         }
         else
         {
@@ -851,10 +862,19 @@ public static class SingBoxConfigGenerator
             }
 
             endpoint["amnezia"] = amnezia;
+            if (UsesAmneziaHeaderProtection(awg))
+            {
+                // Штатный UDP bind ядра обнуляет байты 1–3 на приёме. При защите заголовков
+                // это часть nonce. Detour переключает ядро на ClientBind, который сохраняет пакет целиком.
+                endpoint["detour"] = AmneziaTransportTag;
+            }
         }
 
         return endpoint;
     }
+
+    private static bool UsesAmneziaHeaderProtection(WireGuardSettings wireGuard) =>
+        wireGuard is AmneziaWireGuardSettings { HeaderProtectionKey.Length: > 0 };
 
     private static void Add(JsonObject target, string key, string? value)
     {

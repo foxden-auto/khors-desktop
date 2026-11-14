@@ -62,8 +62,24 @@ public static class CoreCompatibility
 
         if (kind == CoreKind.SingBoxExtended)
         {
-            configs.Add(Json(SingBoxConfigGenerator.Generate(Profile(AwgLink), new SingBoxConfigOptions { SocksPort = 10808, HttpPort = 10809 })));
-            configs.Add(Json(SingBoxConfigGenerator.Generate(Profile(AwgLink), new SingBoxConfigOptions { SocksPort = 10808, HttpPort = 10809, Tun = new SingBoxTunOptions() })));
+            var awg = Profile(AwgLink);
+            var protectedAwg = awg with
+            {
+                Protocol = ((AmneziaWireGuardSettings)awg.Protocol) with
+                {
+                    S1 = 84,
+                    S2 = 149,
+                    S3 = 39,
+                    S4 = 18,
+                    HeaderProtectionKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=",
+                    RandomTrailers = true,
+                },
+            };
+            foreach (var profile in new[] { awg, protectedAwg })
+            {
+                configs.Add(Json(SingBoxConfigGenerator.Generate(profile, new SingBoxConfigOptions { SocksPort = 10808, HttpPort = 10809 })));
+                configs.Add(Json(SingBoxConfigGenerator.Generate(profile, new SingBoxConfigOptions { SocksPort = 10808, HttpPort = 10809, Tun = new SingBoxTunOptions() })));
+            }
         }
 
         // TUN (служба) и цепочка TUN → SOCKS → Xray.

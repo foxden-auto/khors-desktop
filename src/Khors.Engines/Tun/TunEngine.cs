@@ -92,15 +92,24 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
         var plan = RoutingPlan.Build(routing, tun: true);
         if (choice.Core is CoreKind.SingBox or CoreKind.SingBoxExtended)
         {
+            var tun = new SingBoxTunOptions { Ipv6 = routing.TunIpv6 };
+            if (profile.Protocol is AmneziaWireGuardSettings)
+            {
+                // UDP к пиру должен идти мимо TUN, в том числе когда endpoint использует прямой detour.
+                var peer = await ResolveServerAsync(profile, choice.Core, cancellationToken).ConfigureAwait(false);
+                profile = ProfileAddress.WithResolvedHost(profile, peer);
+                tun = tun with { ExcludeAddresses = [peer.ToString()] };
+            }
+
             var singBox = await StartSingBoxAsync(
                 choice.Core,
                 profile,
-                options with { Tun = new SingBoxTunOptions { Ipv6 = routing.TunIpv6 }, TrafficStats = true, ReadyTimeout = s_tunReadyTimeout, Routing = plan, GeoDirectory = geoDirectory },
+                options with { Tun = tun, TrafficStats = true, ReadyTimeout = s_tunReadyTimeout, Routing = plan, GeoDirectory = geoDirectory },
                 cancellationToken).ConfigureAwait(false);
             return new TunRun(choice.Core, singBox, chained: null);
         }
 
-        var server = await ResolveServerAsync(profile, cancellationToken).ConfigureAwait(false);
+        var server = await ResolveServerAsync(profile, choice.Core, cancellationToken).ConfigureAwait(false);
         var resolved = ProfileAddress.WithResolvedHost(profile, server);
         var xray = await CoreLauncher.StartAsync(CoreKind.Xray, resolved, options with { TrafficStats = true }, masker, guard, cancellationToken).ConfigureAwait(false);
         try
@@ -156,7 +165,7 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
         logTail.Any(line => line.Contains("create adapter", StringComparison.OrdinalIgnoreCase)
             && line.Contains("open existing adapter", StringComparison.OrdinalIgnoreCase));
 
-    private async Task<IPAddress> ResolveServerAsync(Profile profile, CancellationToken cancellationToken)
+    private async Task<IPAddress> ResolveServerAsync(Profile profile, CoreKind core, CancellationToken cancellationToken)
     {
         if (IPAddress.TryParse(profile.Server.Host, out var literal))
         {
@@ -179,8 +188,8 @@ public sealed class TunEngine(SecretMasker masker, IChildProcessGuard? guard, st
             ?? addresses.FirstOrDefault()
             ?? throw new CoreStartException(CoreStartFailure.ExitedDuringStart, "Server name was not resolved.")
             {
-                Core = CoreKind.Xray,
-                Diagnosis = new CoreDiagnosis(CoreProblem.ServerNotFound, CoreKind.Xray),
+                Core = core,
+                Diagnosis = new CoreDiagnosis(CoreProblem.ServerNotFound, core),
             };
     }
 

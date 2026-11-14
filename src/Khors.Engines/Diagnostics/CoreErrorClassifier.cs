@@ -105,6 +105,11 @@ public static class CoreErrorClassifier
             return CoreProblem.RealityRejected;
         }
 
+        if (core == CoreKind.SingBoxExtended && IsWireGuardHandshakeTimeout(line))
+        {
+            return CoreProblem.ConnectionTimeout;
+        }
+
         if (!IsServerDialFailure(core, line))
         {
             return null;
@@ -153,6 +158,9 @@ public static class CoreErrorClassifier
 
     private static bool IsSingBoxError(string line) =>
         line.StartsWith("ERROR[", StringComparison.Ordinal) || line.StartsWith("FATAL[", StringComparison.Ordinal);
+
+    internal static bool IsWireGuardHandshakeTimeout(string line) =>
+        Has(line, "endpoint/wireguard[") && Has(line, "handshake did not complete after ");
 
     private static bool Has(string line, string marker) => line.Contains(marker, StringComparison.OrdinalIgnoreCase);
 }

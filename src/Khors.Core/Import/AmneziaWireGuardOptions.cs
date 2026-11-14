@@ -31,8 +31,8 @@ internal static class AmneziaWireGuardOptions
         int? Number(string name) => int.TryParse(Take(name), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? value : null;
         bool? Boolean(string name) => Take(name)?.ToLowerInvariant() switch
         {
-            "true" or "1" => true,
-            "false" or "0" => false,
+            "true" or "1" or "on" => true,
+            "false" or "0" or "off" => false,
             _ => null,
         };
 

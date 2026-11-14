@@ -17,6 +17,7 @@ public class CoreErrorClassifierTests
     private const string XrayDialEnd = "] > common/retry: all retry attempts failed";
 
     private const string SingBoxDial = "ERROR[0000] [909430771 0ms] connection: open connection to 198.51.100.20:443 using outbound/vless[proxy]: ";
+    private const string AmneziaHandshakeTimeout = "+0300 2026-11-14 21:09:03 DEBUG endpoint/wireguard[proxy]: peer(test…peer) - handshake did not complete after 6 seconds, retrying (try 2)";
 
     public static TheoryData<CoreKind, string, CoreProblem> Recognized => new()
     {
@@ -54,6 +55,7 @@ public class CoreErrorClassifierTests
         { CoreKind.SingBox, "ERROR[0000] [1682497265 8ms] connection: open connection to 198.51.100.20:443 using outbound/hysteria2[proxy]: authentication failed, status code: 404", CoreProblem.AuthenticationFailed },
         { CoreKind.SingBox, "ERROR[0000] [3486445983 21ms] connection: open connection to 198.51.100.20:443 using outbound/hysteria2[proxy]: INTERNAL_ERROR (local): tls: failed to verify certificate: x509: certificate is valid for vpn.example.com, not cdn.example.net", CoreProblem.CertificateNameMismatch },
         { CoreKind.SingBox, "ERROR[0012] [2934 10s] connection: open packet connection to 198.51.100.20:53 using outbound/tuic[proxy]: timeout: no recent network activity", CoreProblem.ConnectionTimeout },
+        { CoreKind.SingBoxExtended, AmneziaHandshakeTimeout, CoreProblem.ConnectionTimeout },
     };
 
     public static TheoryData<CoreKind, string> Ignored => new()
@@ -130,6 +132,22 @@ public class CoreErrorClassifierTests
         Assert.True(plan.KeepLine("2026/10/05 20:42:25.260525 [Error] [1] transport/internet/reality: REALITY: received real certificate (potential MITM or redirection)"));
         Assert.True(plan.KeepLine("2026/10/05 20:39:54.869294 [Warning] core: Xray 26.9.9 started"));
         Assert.True(plan.KeepLine("Failed to start: main: failed to load config files"));
+    }
+
+    [Theory]
+    [InlineData("warning", true)]
+    [InlineData("error", false)]
+    public void ExtendedCoreKeepsHandshakeTimeoutAtNormalLogLevels(string level, bool keepWarnings)
+    {
+        var plan = CoreLogLevels.Plan(CoreKind.SingBoxExtended, level);
+
+        Assert.Equal("debug", plan.Level);
+        Assert.NotNull(plan.KeepLine);
+        Assert.True(plan.KeepLine(AmneziaHandshakeTimeout));
+        Assert.False(plan.KeepLine("+0300 2026-11-14 21:09:03 DEBUG endpoint/wireguard[proxy]: peer(test…peer) - sending handshake initiation"));
+        Assert.True(plan.KeepLine("+0300 2026-11-14 21:09:03 ERROR endpoint/wireguard[proxy]: failed to send packet"));
+        Assert.True(plan.KeepLine("FATAL[0000] decode config at stdin"));
+        Assert.Equal(keepWarnings, plan.KeepLine("+0300 2026-11-14 21:09:03 WARN inbound/tun[tun-in]: open interface take too much time to finish!"));
     }
 
     [Theory]
